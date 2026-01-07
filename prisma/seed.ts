@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -9,13 +10,17 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+    const passwordHash = await bcrypt.hash("password", 10);
+
     // User admin
     const admin = await prisma.user.upsert({
         where: { email: "admin@test.com" },
-        update: {},
+        update: {
+            password: passwordHash, // met à jour si tu relances le seed
+        },
         create: {
             email: "admin@test.com",
-            password: "password", // temporaire
+            password: passwordHash,
         },
     });
 
@@ -48,11 +53,10 @@ async function main() {
         },
     });
 
-
     const order2 = await prisma.order.create({
         data: {
             status: "PROD",
-            customerId: null, // commande sans client
+            customerId: null,
         },
     });
 

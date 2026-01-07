@@ -44,7 +44,7 @@ export default async function OrderDetailPage({
 
                 <div className="flex items-center gap-3">
                     <Badge>{order.status}</Badge>
-                    <Link href="/orders" className="text-sm underline">
+                    <Link href="/dashboard/orders" className="text-sm underline">
                         Retour
                     </Link>
                 </div>

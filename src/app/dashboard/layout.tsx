@@ -1,8 +1,15 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { ReactNode } from "react";
 import { Package, Users, LayoutDashboard } from "lucide-react";
-
 import { Separator } from "@/components/ui/separator";
+import { LogoutButton } from "@/components/auth/logout-button";
+
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
 
 function NavLink({
                      href,
@@ -27,7 +34,13 @@ function NavLink({
     );
 }
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        redirect("/");
+    }
+
     return (
         <div className="min-h-screen bg-background">
             <div className="grid lg:grid-cols-[260px_1fr]">
@@ -37,8 +50,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         <div className="font-semibold tracking-tight">
                             D3D Dashboard
                             <span className="block text-xs text-muted-foreground font-normal">
-                Gravure 3D cristal
-              </span>
+                              Gravure 3D cristal
+                            </span>
                         </div>
                     </div>
 
@@ -71,11 +84,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             <div className="flex items-center gap-3">
                                 <div className="font-medium">Dashboard</div>
                                 <span className="text-xs text-muted-foreground hidden sm:inline">
-                  Interne • v0.1
-                </span>
+                                  Interne • v0.1
+                                </span>
                             </div>
 
-                            <div className="text-sm text-muted-foreground">admin@test.com</div>
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm text-muted-foreground">
+                                  {session.user?.email ?? "Utilisateur"}
+                                </span>
+                                <LogoutButton />
+                            </div>
                         </div>
                     </header>
 

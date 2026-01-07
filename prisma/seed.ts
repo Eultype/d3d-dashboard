@@ -12,11 +12,13 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     const passwordHash = await bcrypt.hash("password", 10);
 
-    // User admin
+    // ======================
+    // ADMIN USER
+    // ======================
     const admin = await prisma.user.upsert({
         where: { email: "admin@test.com" },
         update: {
-            password: passwordHash, // met à jour si tu relances le seed
+            password: passwordHash,
         },
         create: {
             email: "admin@test.com",
@@ -24,9 +26,18 @@ async function main() {
         },
     });
 
-    // Customer
-    const customer = await prisma.customer.create({
-        data: {
+    // ======================
+    // CUSTOMER
+    // ======================
+    const customer = await prisma.customer.upsert({
+        where: { email: "jean.dupont@test.com" },
+        update: {
+            name: "Jean Dupont",
+            phone: "0600000000",
+            companyName: "Dupont SARL",
+            vatNumber: "FR123456789",
+        },
+        create: {
             name: "Jean Dupont",
             email: "jean.dupont@test.com",
             phone: "0600000000",
@@ -35,7 +46,16 @@ async function main() {
         },
     });
 
-    // Orders
+    // ======================
+    // CLEAN ORDERS (DEV ONLY)
+    // ======================
+    await prisma.orderNote.deleteMany();
+    await prisma.file.deleteMany();
+    await prisma.order.deleteMany();
+
+    // ======================
+    // ORDER 1
+    // ======================
     const order1 = await prisma.order.create({
         data: {
             status: "A_VERIFIER",
@@ -43,7 +63,6 @@ async function main() {
         },
     });
 
-    // File
     await prisma.file.create({
         data: {
             filename: "bloc-r120-face.webp",
@@ -53,14 +72,6 @@ async function main() {
         },
     });
 
-    const order2 = await prisma.order.create({
-        data: {
-            status: "PROD",
-            customerId: null,
-        },
-    });
-
-    // Notes
     await prisma.orderNote.create({
         data: {
             content: "Première commande de test",
@@ -68,12 +79,22 @@ async function main() {
             userId: admin.id,
         },
     });
+
+    // ======================
+    // ORDER 2 (sans client)
+    // ======================
+    await prisma.order.create({
+        data: {
+            status: "PROD",
+            customerId: null,
+        },
+    });
 }
 
 main()
     .then(async () => {
         await prisma.$disconnect();
-        console.log("✅ Seed terminé");
+        console.log("✅ Seed terminé (safe)");
     })
     .catch(async (e) => {
         console.error(e);

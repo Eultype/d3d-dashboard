@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
+import { NavLink } from "@/components/dashboard/nav-link";
 import { ReactNode } from "react";
 import { Package, Users, LayoutDashboard } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -9,30 +9,6 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
-
-
-function NavLink({
-                     href,
-                     icon,
-                     label,
-                 }: {
-    href: string;
-    icon: ReactNode;
-    label: string;
-}) {
-    // Active state (sans hooks, compatible server component)
-    // On utilise un data-attr qu'on gérera côté CSS via :has() ? -> pas fiable partout.
-    // Donc on fait simple : on garde un style neutre. (Je te donne ensuite une version "active" parfaite avec usePathname si tu veux.)
-    return (
-        <Link
-            href={href}
-            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-            {icon}
-            <span>{label}</span>
-        </Link>
-    );
-}
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
     const session = await getServerSession(authOptions);

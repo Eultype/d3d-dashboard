@@ -38,6 +38,17 @@ async function main() {
         },
     });
 
+    // File
+    await prisma.file.create({
+        data: {
+            filename: "bloc-r120-face.webp",
+            url: "/uploads/bloc-r120-face.webp",
+            type: "FINAL",
+            orderId: order1.id,
+        },
+    });
+
+
     const order2 = await prisma.order.create({
         data: {
             status: "PROD",

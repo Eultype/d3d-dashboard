@@ -21,22 +21,68 @@ export default async function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Vue d’ensemble</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-4">
+                {/* Commandes en cours */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Commandes</CardTitle>
+                        <CardTitle>Commandes en cours</CardTitle>
                     </CardHeader>
                     <CardContent className="text-3xl font-semibold">
                         {ordersCount}
                     </CardContent>
                 </Card>
-
+                {/* Commandes en production */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>En production</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-3xl font-semibold">
+                        {ordersCount}
+                    </CardContent>
+                </Card>
+                {/* Commandes à expédier*/}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>À expédier</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-3xl font-semibold">
+                        {ordersCount}
+                    </CardContent>
+                </Card>
+                {/* Commandes à récupérer*/}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>À récupérer</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-3xl font-semibold">
+                        {ordersCount}
+                    </CardContent>
+                </Card>
+                {/* Clients */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Clients</CardTitle>
                     </CardHeader>
                     <CardContent className="text-3xl font-semibold">
                         {customersCount}
+                    </CardContent>
+                </Card>
+                {/* Produits */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Produits</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-3xl font-semibold">
+                        0
+                    </CardContent>
+                </Card>
+                {/* 3d en attente*/}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>3d en attente</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-3xl font-semibold">
+                        {ordersCount}
                     </CardContent>
                 </Card>
             </div>

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NavLink } from "@/components/dashboard/nav-link";
 import { ReactNode } from "react";
-import { Package, Users, LayoutDashboard } from "lucide-react";
+import { Box, Package, Users, LayoutDashboard } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "@/components/auth/logout-button";
 
@@ -52,6 +52,11 @@ export default async function DashboardLayout({
               href="/dashboard/customers"
               icon={<Users className="h-4 w-4" />}
               label="Clients"
+            />
+            <NavLink
+                href="/dashboard/products"
+                icon={<Box className="h-4 w-4" />}
+                label="Products"
             />
           </nav>
         </aside>

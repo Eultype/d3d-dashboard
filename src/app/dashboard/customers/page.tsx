@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { CustomersTable } from "@/components/dashboard/customers-table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function CustomersPage() {
     const customers = await prisma.customer.findMany({
@@ -11,7 +10,7 @@ export default async function CustomersPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold">Clients</h1>
-                <p className="text-sm text-muted-foreground">Liste des clients enregistrés</p>
+                <p className="text-sm text-muted-foreground">Gestions des clients enregistrés</p>
             </div>
 
             <div>

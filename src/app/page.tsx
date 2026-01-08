@@ -13,7 +13,7 @@ export default function LoginPage() {
       {/* LEFT SIDE */}
       <div className="bg-[#0f172a] flex items-center justify-center px-10">
         <div className="text-white max-w-md text-center">
-          <h1 className="text-4xl font-bold mb-4">2D3D</h1>
+          <h1 className="text-5xl font-bold mb-4">2D3D</h1>
           <p className="text-lg opacity-80">Gestion des commandes</p>
           <p className="text-sm opacity-60 mt-2">
             Gravure photo dans le cristal

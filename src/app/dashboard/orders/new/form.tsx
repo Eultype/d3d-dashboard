@@ -12,7 +12,7 @@ export default function OrderForm() {
   return (
     <div className="space-y-6">
       {/* Progress */}
-      <div className="flex gap-2">
+      <div className="">
         {[1, 2, 3, 4].map((s) => (
           <div
             key={s}

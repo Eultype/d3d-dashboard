@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Vue d'ensemble",
+    description: "Accédez à une vue d’ensemble claire des statistiques, clients et performances depuis votre dashboard."
+};
 
 export default async function DashboardPage() {
     const [ordersCount, customersCount] = await Promise.all([

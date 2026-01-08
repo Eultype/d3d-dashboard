@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrdersTable } from "@/components/dashboard/orders-table";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Gestion des commandes",
+    description: "Gérez et suivez l’ensemble des commandes : statuts, détails, historique et actions associées."
+};
 
 export default async function OrdersPage() {
     const orders = await prisma.order.findMany({

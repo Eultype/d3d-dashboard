@@ -1,5 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { CustomersTable } from "@/components/dashboard/customers-table";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Gestion des clients",
+    description: "Gérez et suivez l’ensemble des clients : informations, historique, interactions et actions associées."
+};
+
 
 export default async function CustomersPage() {
     const customers = await prisma.customer.findMany({

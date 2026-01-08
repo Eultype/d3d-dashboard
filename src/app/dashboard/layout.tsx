@@ -26,7 +26,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                         <div className="font-semibold tracking-tight">
                             D3D Dashboard
                             <span className="block text-xs text-muted-foreground font-normal">
-                              Gravure 3D cristal
+                              Gravure 2D - 3D cristal
                             </span>
                         </div>
                     </div>

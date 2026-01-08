@@ -1,4 +1,10 @@
 import { LoginForm } from "@/components/auth/login-form";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "D3D | Connexion",
+    description: "Connectez-vous à votre compte pour accéder au dashboard et gérer vos données en toute sécurité."
+};
 
 export default function LoginPage() {
   return (

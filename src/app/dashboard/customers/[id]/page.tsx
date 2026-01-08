@@ -59,7 +59,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
                 <div className="flex items-center gap-2">
                     <Button asChild variant="ghost">
-                        <Link href="/dashboard/orders">← Retour</Link>
+                        <Link href="/dashboard/customers">← Retour</Link>
                     </Button>
                 </div>
             </div>

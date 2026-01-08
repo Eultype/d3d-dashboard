@@ -10,6 +10,8 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+    console.log("🌱 Début du seed…");
+
     const passwordHash = await bcrypt.hash("password", 10);
 
     // ======================
@@ -17,9 +19,7 @@ async function main() {
     // ======================
     const admin = await prisma.user.upsert({
         where: { email: "admin@test.com" },
-        update: {
-            password: passwordHash,
-        },
+        update: { password: passwordHash },
         create: {
             email: "admin@test.com",
             password: passwordHash,
@@ -27,39 +27,135 @@ async function main() {
     });
 
     // ======================
-    // CUSTOMER
+    // CLIENTS
     // ======================
-    const customer = await prisma.customer.upsert({
+    const customer1 = await prisma.customer.upsert({
         where: { email: "jean.dupont@test.com" },
-        update: {
-            name: "Jean Dupont",
-            phone: "0600000000",
-            companyName: "Dupont SARL",
-            vatNumber: "FR123456789",
-        },
+        update: {},
         create: {
             name: "Jean Dupont",
             email: "jean.dupont@test.com",
             phone: "0600000000",
             companyName: "Dupont SARL",
             vatNumber: "FR123456789",
+            addressLine: "12 rue de la République",
+            postalCode: "75001",
+            city: "Paris",
+            country: "France",
+        },
+    });
+
+    const customer2 = await prisma.customer.upsert({
+        where: { email: "marie.martin@test.com" },
+        update: {},
+        create: {
+            name: "Marie Martin",
+            email: "marie.martin@test.com",
+            phone: "0611111111",
+            companyName: null,
+            vatNumber: null,
+            addressLine: "8 avenue des Lilas",
+            postalCode: "69000",
+            city: "Lyon",
+            country: "France",
+        },
+    });
+
+// ======================
+// PRODUITS
+// ======================
+    const product1 = await prisma.product.upsert({
+        where: { sku: "CRISTAL-R120" },
+        update: {
+            name: "Bloc cristal R120",
+            description:
+                "Bloc en cristal pour gravure 3D (format R120). Idéal pour portraits et souvenirs.",
+            priceCents: 8900,
+            imageUrl: "/uploads/bloc-r120-face.webp",
+            isActive: true,
+        },
+        create: {
+            name: "Bloc cristal R120",
+            sku: "CRISTAL-R120",
+            description:
+                "Bloc en cristal pour gravure 3D (format R120). Idéal pour portraits et souvenirs.",
+            priceCents: 8900,
+            imageUrl: "/uploads/bloc-r120-face.webp",
+            isActive: true,
+        },
+    });
+
+    const product2 = await prisma.product.upsert({
+        where: { sku: "CRISTAL-R80" },
+        update: {
+            name: "Bloc cristal R80",
+            description:
+                "Bloc en cristal compact (format R80). Parfait pour petits portraits et cadeaux.",
+            priceCents: 5900,
+            imageUrl: "/uploads/bloc-r80-face.webp",
+            isActive: true,
+        },
+        create: {
+            name: "Bloc cristal R80",
+            sku: "CRISTAL-R80",
+            description:
+                "Bloc en cristal compact (format R80). Parfait pour petits portraits et cadeaux.",
+            priceCents: 5900,
+            imageUrl: "/uploads/bloc-r80-face.webp",
+            isActive: true,
+        },
+    });
+
+    const product3 = await prisma.product.upsert({
+        where: { sku: "SUPPORT-LED" },
+        update: {
+            name: "Support LED",
+            description:
+                "Support lumineux LED pour mettre en valeur la gravure dans le cristal.",
+            priceCents: 1900,
+            imageUrl: "/uploads/support-led.webp",
+            isActive: true,
+        },
+        create: {
+            name: "Support LED",
+            sku: "SUPPORT-LED",
+            description:
+                "Support lumineux LED pour mettre en valeur la gravure dans le cristal.",
+            priceCents: 1900,
+            imageUrl: "/uploads/support-led.webp",
+            isActive: true,
         },
     });
 
     // ======================
-    // CLEAN ORDERS (DEV ONLY)
+    // CLEAN COMMANDES (DEV ONLY)
     // ======================
     await prisma.orderNote.deleteMany();
     await prisma.file.deleteMany();
+    await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
 
     // ======================
-    // ORDER 1
+    // COMMANDE 1 – CLIENT 1
     // ======================
     const order1 = await prisma.order.create({
         data: {
             status: "A_VERIFIER",
-            customerId: customer.id,
+            customerId: customer1.id,
+            items: {
+                create: [
+                    {
+                        productId: product1.id,
+                        quantity: 1,
+                        unitPriceCents: product1.priceCents,
+                    },
+                    {
+                        productId: product3.id,
+                        quantity: 1,
+                        unitPriceCents: product3.priceCents,
+                    },
+                ],
+            },
         },
     });
 
@@ -67,34 +163,97 @@ async function main() {
         data: {
             filename: "bloc-r120-face.webp",
             url: "/uploads/bloc-r120-face.webp",
-            type: "FINAL",
+            type: "PREVIEW",
             orderId: order1.id,
         },
     });
 
     await prisma.orderNote.create({
         data: {
-            content: "Première commande de test",
+            content: "Client souhaite un rendu très détaillé.",
             orderId: order1.id,
             userId: admin.id,
         },
     });
 
     // ======================
-    // ORDER 2 (sans client)
+    // COMMANDE 2 – CLIENT 2
     // ======================
-    await prisma.order.create({
+    const order2 = await prisma.order.create({
         data: {
             status: "PROD",
-            customerId: null,
+            customerId: customer2.id,
+            items: {
+                create: [
+                    {
+                        productId: product2.id,
+                        quantity: 2,
+                        unitPriceCents: product2.priceCents,
+                    },
+                ],
+            },
         },
     });
+
+    await prisma.file.create({
+        data: {
+            filename: "preview-r80.webp",
+            url: "/uploads/preview-r80.webp",
+            type: "PREVIEW",
+            orderId: order2.id,
+        },
+    });
+
+    await prisma.orderNote.create({
+        data: {
+            content: "Commande en cours de production.",
+            orderId: order2.id,
+            userId: admin.id,
+        },
+    });
+
+    // ======================
+    // COMMANDE 3 – SANS CLIENT
+    // ======================
+    const order3 = await prisma.order.create({
+        data: {
+            status: "TERMINE",
+            customerId: null,
+            items: {
+                create: [
+                    {
+                        productId: product1.id,
+                        quantity: 1,
+                        unitPriceCents: product1.priceCents,
+                    },
+                ],
+            },
+        },
+    });
+
+    await prisma.file.create({
+        data: {
+            filename: "final-cristal.webp",
+            url: "/uploads/final-cristal.webp",
+            type: "FINAL",
+            orderId: order3.id,
+        },
+    });
+
+    await prisma.orderNote.create({
+        data: {
+            content: "Commande terminée et validée.",
+            orderId: order3.id,
+            userId: admin.id,
+        },
+    });
+
+    console.log("✅ Seed terminé avec succès");
 }
 
 main()
     .then(async () => {
         await prisma.$disconnect();
-        console.log("✅ Seed terminé (safe)");
     })
     .catch(async (e) => {
         console.error(e);

@@ -71,11 +71,11 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                                         <div className="flex flex-col">
                                             <span className="font-medium">{o.customer.name ?? "Client sans nom"}</span>
                                             <span className="text-sm text-muted-foreground">
-                        {o.customer.email ?? "—"}
-                      </span>
+                                                {o.customer.email ?? "—"}
+                                            </span>
                                         </div>
                                     ) : (
-                                        <Badge variant="outline">Sans client</Badge>
+                                        <span className="italic text-muted-foreground">Sans client</span>
                                     )}
                                 </TableCell>
 

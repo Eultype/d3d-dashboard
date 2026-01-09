@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -80,6 +81,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-bold ">Fiche client</h1>
                         <StatusBadge companyName={customer.companyName} />
+                        <CustomerActiveBadge isActive={customer.isActive} />
                     </div>
 
                     <p className="text-sm text-muted-foreground">

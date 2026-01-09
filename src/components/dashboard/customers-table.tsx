@@ -11,8 +11,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 
 type CustomerRow = {
     id: string;
@@ -21,7 +22,8 @@ type CustomerRow = {
     phone: string | null;
     companyName: string | null;
     vatNumber: string | null;
-    createdAt: string; // on passe une string depuis le serveur (toISOString)
+    isActive: boolean;
+    createdAt: string;
 };
 
 function initials(name?: string | null) {
@@ -44,15 +46,16 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                             <TableHead>Téléphone</TableHead>
                             <TableHead>Société</TableHead>
                             <TableHead>TVA</TableHead>
+                            <TableHead>Statut</TableHead>
                             <TableHead>Créé le</TableHead>
-                            <TableHead className="text-center w-[120px]">Actions</TableHead>
+                            <TableHead className="text-center w-[96px]">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
                         {customers.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                                     Aucun client.
                                 </TableCell>
                             </TableRow>
@@ -104,6 +107,10 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                                         )}
                                     </TableCell>
 
+                                    <TableCell>
+                                        <CustomerActiveBadge isActive={c.isActive} />
+                                    </TableCell>
+
                                     <TableCell className="text-sm text-muted-foreground">
                                         {new Date(c.createdAt).toLocaleDateString("fr-FR")}
                                     </TableCell>
@@ -125,28 +132,14 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
 
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <button
-                                                        type="button"
+                                                    <Link
+                                                        href={`/dashboard/customers/${c.id}/edit`}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"
-                                                        onClick={() => alert("Edit (à faire)")}
                                                     >
                                                         <Pencil className="h-4 w-4 text-muted-foreground" />
-                                                    </button>
+                                                    </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent>Modifier</TooltipContent>
-                                            </Tooltip>
-
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <button
-                                                        type="button"
-                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"
-                                                        onClick={() => alert("Delete (à faire)")}
-                                                    >
-                                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                                    </button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Supprimer</TooltipContent>
                                             </Tooltip>
                                         </div>
                                     </TableCell>

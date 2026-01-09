@@ -87,10 +87,10 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                                         {isCompany ? (
                                             <div className="flex flex-col">
                                                 <span className="font-medium">{c.companyName}</span>
-                                                <span className="text-sm text-muted-foreground">Entreprise</span>
+                                                <span className="italic text-muted-foreground">Entreprise</span>
                                             </div>
                                         ) : (
-                                            <Badge variant="outline">Particulier</Badge>
+                                            <span className="italic text-muted-foreground">Particulier</span>
                                         )}
                                     </TableCell>
 

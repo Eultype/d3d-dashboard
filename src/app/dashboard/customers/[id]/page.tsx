@@ -72,7 +72,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     </CardHeader>
                     <CardContent>
                         <div className="mx-auto max-w-4xl grid md:grid-cols-2 gap-10 md:gap-24 lg:gap-12 xl:gap-24">
-                            {/* Nom - Email - Tél */}
+                            {/* Nom - Email - Tél - Entreprise - TVA */}
                             <div className="grid grid-cols-[140px_2px_1fr] gap-x-4 gap-y-4 items-center">
                                 {/* Label Nom/Prénom */}
                                 <span className="font-semibold text-gray-700 text-right">
@@ -94,10 +94,6 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                                 </span>
                                 {/* Téléphone */}
                                 <span>{customer.phone}</span>
-                            </div>
-
-                            {/* Entreprise - n°TVA */}
-                            <div className="grid grid-cols-[140px_2px_1fr] gap-x-4 gap-y-4 items-center">
                                 {/* Label Entreprise */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Entreprise
@@ -105,13 +101,64 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                                 {/* Séparateur */}
                                 <div className="row-span-2 bg-gray-300 w-[2px] self-stretch"></div>
                                 {/* Nom de l'entreprise */}
-                                <span>{customer.companyName}</span>
+                                <span>
+                                    {customer.companyName?.trim()
+                                        ? customer.companyName
+                                        : <span className="italic text-muted-foreground">Particulier</span>
+                                    }
+                                </span>
                                 {/* Label TVA */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Numéro de TVA
                                 </span>
                                 {/* Numéro TVA */}
-                                <span>{customer.vatNumber}</span>
+                                <span>
+                                    {customer.vatNumber?.trim()
+                                        ? customer.vatNumber
+                                        : <span className="text-muted-foreground">❌</span>
+                                    }
+                                </span>
+                            </div>
+
+                            {/* Adresse ligne 1 - ligne 2 - CP - Ville - Pays*/}
+                            <div className="grid grid-cols-[140px_2px_1fr] gap-x-4 gap-y-4 items-center">
+                                {/* Label Ligne 1 */}
+                                <span className="font-semibold text-gray-700 text-right">
+                                    Ligne 1
+                                </span>
+                                {/* Séparateur */}
+                                <div className="row-span-5 bg-gray-300 w-[2px] self-stretch"></div>
+                                {/* Ligne 1 */}
+                                <span>{customer.addressLine1}</span>
+                                {/* Label Ligne 2*/}
+                                <span className="text-muted-foreground text-right">
+                                    Ligne 2
+                                </span>
+                                {/* Ligne 2 */}
+                                <span>
+                                    {customer.addressLine2?.trim()
+                                        ? customer.addressLine2
+                                        : <span className="italic text-muted-foreground">Maison</span>
+                                    }
+                                </span>
+                                {/* Label CP */}
+                                <span className="font-semibold text-gray-700 text-right">
+                                    Code postal
+                                </span>
+                                {/* CP */}
+                                <span>{customer.postalCode}</span>
+                                {/* Label Ville */}
+                                <span className="font-semibold text-gray-700 text-right">
+                                    Ville
+                                </span>
+                                {/* Ville */}
+                                <span>{customer.city}</span>
+                                {/* Label Pays */}
+                                <span className="font-semibold text-gray-700 text-right">
+                                    Pays
+                                </span>
+                                {/* Pays */}
+                                <span>{customer.country}</span>
                             </div>
                         </div>
                     </CardContent>

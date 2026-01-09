@@ -65,6 +65,18 @@ export default function StepTwo({
         }}
       />
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button type="button" className="bg-[#0f172a] ">
+          Nouveau client
+        </Button>
+        <Button
+          type="button"
+          className="bg-transparent border border-black text-black hover:bg-gray-200"
+        >
+          Sans client
+        </Button>
+      </div>
+
       <div className="flex justify-between pt-4">
         <Button type="button" onClick={onBack}>
           ← Retour

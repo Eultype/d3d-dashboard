@@ -25,11 +25,11 @@ model Customer {
   companyName String?
   vatNumber   String?
 
-  // Adresse (simple)
-  addressLine String?
-  postalCode  String?
-  city        String?
-  country     String?
+  addressLine1 String?
+  addressLine2 String?
+  postalCode   String?
+  city         String?
+  country      String?
 
   createdAt   DateTime @default(now())
 

@@ -74,44 +74,49 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                         <div className="mx-auto max-w-4xl grid md:grid-cols-2 gap-10 md:gap-24 lg:gap-12 xl:gap-24">
                             {/* Nom - Email - Tél */}
                             <div className="grid grid-cols-[140px_2px_1fr] gap-x-4 gap-y-4 items-center">
+                                {/* Label Nom/Prénom */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Nom / Prénom
                                 </span>
-
+                                {/* Séparateur */}
                                 <div className="row-span-3 bg-gray-300 w-[2px] self-stretch"></div>
-
+                                {/* Nom complet */}
                                 <span>{customer.name}</span>
-
+                                {/* Label Email */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Email
                                 </span>
+                                {/* Email */}
                                 <span>{customer.email}</span>
-
+                                {/* Label Téléphone*/}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Téléphone
                                 </span>
+                                {/* Téléphone */}
                                 <span>{customer.phone}</span>
                             </div>
+
                             {/* Entreprise - n°TVA */}
                             <div className="grid grid-cols-[140px_2px_1fr] gap-x-4 gap-y-4 items-center">
+                                {/* Label Entreprise */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Entreprise
                                 </span>
-
+                                {/* Séparateur */}
                                 <div className="row-span-2 bg-gray-300 w-[2px] self-stretch"></div>
-
+                                {/* Nom de l'entreprise */}
                                 <span>{customer.companyName}</span>
-
+                                {/* Label TVA */}
                                 <span className="font-semibold text-gray-700 text-right">
                                     Numéro de TVA
                                 </span>
+                                {/* Numéro TVA */}
                                 <span>{customer.vatNumber}</span>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
-
 
             <div className="grid gap-4 md:grid-cols-1">
                 <Card>

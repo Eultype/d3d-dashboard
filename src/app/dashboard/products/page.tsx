@@ -17,11 +17,22 @@ export default async function ProductsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold">Produits</h1>
-                <p className="text-sm text-muted-foreground">
-                    Gestion du catalogue (cristaux, supports, etc.)
-                </p>
+            <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">
+                    <Link href="/dashboard" className="hover:underline">
+                        Dashboard
+                    </Link>{" "}
+                    /{" "}
+                    <Link href="/dashboard/products" className="hover:underline">
+                        Produits
+                    </Link>{" "}
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Produits</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Gestion du catalogue (cristaux, supports, etc.)
+                    </p>
+                </div>
             </div>
 
             <div>

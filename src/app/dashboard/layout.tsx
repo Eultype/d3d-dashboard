@@ -56,7 +56,7 @@ export default async function DashboardLayout({
             <NavLink
                 href="/dashboard/products"
                 icon={<ShoppingBag className="h-4 w-4" />}
-                label="Products"
+                label="Produits"
             />
           </nav>
         </aside>

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CustomersTable } from "@/components/dashboard/customers-table";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des clients",
@@ -15,9 +16,20 @@ export default async function CustomersPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold">Clients</h1>
-                <p className="text-sm text-muted-foreground">Gestions des clients enregistrés</p>
+            <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">
+                    <Link href="/dashboard" className="hover:underline">
+                        Dashboard
+                    </Link>{" "}
+                    /{" "}
+                    <Link href="/dashboard/customers" className="hover:underline">
+                        Clients
+                    </Link>{" "}
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold">Clients</h1>
+                    <p className="text-sm text-muted-foreground">Gestions des clients enregistrés</p>
+                </div>
             </div>
 
             <div>

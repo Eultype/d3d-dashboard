@@ -12,6 +12,17 @@ function StatusBadge({ companyName }: { companyName?: string | null }) {
     return <Badge variant="secondary">{label}</Badge>;
 }
 
+function formatEUR(cents: number) {
+    return new Intl.NumberFormat("fr-FR", {
+        style: "currency",
+        currency: "EUR",
+    }).format(cents / 100);
+}
+
+function orderTotalCents(items: { quantity: number; unitPriceCents: number }[]) {
+    return items.reduce((sum, it) => sum + it.quantity * it.unitPriceCents, 0);
+}
+
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id?: string }> }) {
     const { id } = await params;
     if (!id) return notFound();
@@ -20,9 +31,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         where: { id },
     });
 
-    const order = await prisma.order.findMany({
+    const orders = await prisma.order.findMany({
         where: { customerId: id },
-    })
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        include: {
+            items: true,
+        },
+    });
 
     if (!customer) return notFound();
 
@@ -164,15 +180,76 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     </CardContent>
                 </Card>
             </div>
+            <div className="grid gap-4 xl:grid-cols-2 items-stretch">
+                <div className="grid gap-4 md:grid-cols-1">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">Commandes récentes</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            {orders.length === 0 && (
+                                <p className="text-sm text-muted-foreground italic">
+                                    Aucune commande pour ce client.
+                                </p>
+                            )}
 
-            <div className="grid gap-4 md:grid-cols-1">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-sm text-muted-foreground">Commandes récentes</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                    </CardContent>
-                </Card>
+                            {orders.map((order) => {
+                                const totalCents = orderTotalCents(order.items);
+                                const total = formatEUR(totalCents);
+
+                                return (
+                                    <div
+                                        key={order.id}
+                                        className="rounded-lg border px-4 py-3 hover:bg-muted/30"
+                                    >
+                                        <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                                            {/* GAUCHE */}
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                                                    <span className="font-mono text-sm shrink-0">
+                                                        #{order.id.slice(0, 8)}
+                                                    </span>
+                                                    <Badge variant="secondary" className="shrink-0">
+                                                        {order.status}
+                                                    </Badge>
+                                                </div>
+
+                                                <p className="mt-1 text-xs text-muted-foreground">
+                                                    {new Date(order.createdAt).toLocaleDateString("fr-FR")} •{" "}
+                                                    {order.items.length} article{order.items.length > 1 ? "s" : ""}
+                                                </p>
+                                            </div>
+
+                                            {/* DROITE */}
+                                            <div className="flex items-center justify-between gap-3 sm:justify-end">
+                                                <div className="text-right leading-tight">
+                                                    <div className="text-left md:text-right font-semibold whitespace-nowrap">{total}</div>
+                                                    <div className="text-xs text-muted-foreground">Total de la commande</div>
+                                                </div>
+
+                                                <Button asChild size="sm" variant="outline" className="shrink-0">
+                                                    <Link href={`/dashboard/orders/${order.id}`}>Voir</Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
+
+                            {orders.length > 0 && (
+                                <div className="pt-2 text-right">
+                                    <Link
+                                        href={`/dashboard/orders?customer=${customer.id}`}
+                                        className="text-sm underline"
+                                    >
+                                        Voir toutes les commandes →
+                                    </Link>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     )

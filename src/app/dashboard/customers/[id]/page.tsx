@@ -40,6 +40,20 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         },
     });
 
+    const lastItems = await prisma.orderItem.findMany({
+        where: {
+            order: { customerId: id },
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        take: 5,
+        include: {
+            product: true,
+            order: true,
+        },
+    });
+
     if (!customer) return notFound();
 
     const created = new Date(customer.createdAt).toLocaleDateString("fr-FR");
@@ -247,6 +261,71 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                                     </Link>
                                 </div>
                             )}
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="grid gap-4 md:grid-cols-1">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-sm text-muted-foreground">
+                                Derniers produits commandés
+                            </CardTitle>
+                        </CardHeader>
+
+                        <CardContent className="space-y-3">
+                            {lastItems.length === 0 && (
+                                <p className="text-sm text-muted-foreground italic">
+                                    Aucun produit commandé pour ce client.
+                                </p>
+                            )}
+
+                            {lastItems.map((it) => {
+                                const unit = formatEUR(it.unitPriceCents);
+                                const lineTotal = formatEUR(it.unitPriceCents * it.quantity);
+
+                                return (
+                                    <div
+                                        key={it.id}
+                                        className="rounded-lg border px-4 py-3 hover:bg-muted/30"
+                                    >
+                                        <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                                            {/* GAUCHE */}
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <p className="font-medium truncate min-w-0">{it.product.name}</p>
+                                                    <Badge variant="secondary" className="shrink-0">
+                                                        x{it.quantity}
+                                                    </Badge>
+                                                </div>
+
+                                                <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1 text-xs text-muted-foreground">
+                                                    {it.product.sku && (
+                                                        <span className="font-mono">{it.product.sku} •</span>
+                                                    )}
+                                                    <span>
+                                                        Commande #{it.orderId.slice(0, 8)} •{" "}
+                                                        {new Date(it.order.createdAt).toLocaleDateString("fr-FR")}
+                                                     </span>
+                                                </div>
+                                            </div>
+
+                                            {/* DROITE */}
+                                            <div className="flex items-center justify-between gap-3 sm:justify-end">
+                                                <div className="text-left md:text-right leading-tight">
+                                                    <div className="font-semibold whitespace-nowrap">{lineTotal}</div>
+                                                    <div className="text-xs text-muted-foreground whitespace-nowrap">
+                                                        {unit} / unité
+                                                    </div>
+                                                </div>
+
+                                                <Button asChild size="sm" variant="outline" className="shrink-0">
+                                                    <Link href={`/dashboard/orders/${it.orderId}`}>Voir</Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </CardContent>
                     </Card>
                 </div>

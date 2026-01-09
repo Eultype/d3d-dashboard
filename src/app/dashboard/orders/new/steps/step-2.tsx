@@ -146,6 +146,7 @@ export default function StepTwo({
               name="firstName"
               value={form.firstName}
               onChange={handleChange}
+              required={true}
               className="border rounded-md p-2 w-full"
             />
             <input
@@ -153,6 +154,7 @@ export default function StepTwo({
               name="lastName"
               value={form.lastName}
               onChange={handleChange}
+              required={true}
               className="border rounded-md p-2 w-full"
             />
             <input
@@ -160,6 +162,7 @@ export default function StepTwo({
               name="email"
               value={form.email}
               onChange={handleChange}
+              required={true}
               className="border rounded-md p-2 w-full"
             />
             <input
@@ -167,6 +170,7 @@ export default function StepTwo({
               name="phone"
               value={form.phone}
               onChange={handleChange}
+              required={true}
               className="border rounded-md p-2 w-full"
             />
           </div>
@@ -177,6 +181,7 @@ export default function StepTwo({
             value={form.address}
             onChange={handleChange}
             rows={3}
+            required={true}
             className="w-full border rounded-md p-2"
           />
 

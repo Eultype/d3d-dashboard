@@ -432,7 +432,52 @@ export default async function OrderDetailPage({
                     </Card>
 
                     {/* Client */}
-                    
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-base">Client</CardTitle>
+                                {order.customer?.id ? (
+                                    <Link className="text-sm underline" href={`/dashboard/customers/${order.customer.id}`}>
+                                        Ouvrir →
+                                    </Link>
+                                ) : null}
+                            </div>
+                        </CardHeader>
+
+                        <CardContent className="space-y-4">
+                            <div className="rounded-2xl border p-3">
+                                <SectionTitle>Informations générales</SectionTitle>
+
+                                <div className="mt-3 space-y-2">
+                                    <InfoRow label="Nom" value={order.customer?.name ?? "—"} />
+                                    <InfoRow label="Téléphone" value={order.customer?.phone ?? "—"} />
+
+                                    <div className="flex items-center justify-between gap-3">
+                                        <p className="text-sm text-muted-foreground">Email</p>
+                                        <p className="text-sm font-medium break-all text-right">{order.customer?.email ?? "—"}</p>
+                                    </div>
+
+                                    <InfoRow label="Société" value={order.customer?.companyName ?? "Particulier"} />
+                                    <InfoRow label="TVA" value={order.customer?.vatNumber ?? "—"} />
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border p-3">
+                                <SectionTitle>Adresse de livraison</SectionTitle>
+                                <div className="mt-3 text-sm text-muted-foreground space-y-1">
+                                    <p className="font-medium text-foreground">{order.customer?.addressLine1 ?? "—"}</p>
+                                    {order.customer?.addressLine2?.trim() ? <p>{order.customer.addressLine2}</p> : null}
+                                    <p>{(order.customer?.postalCode ?? "—") + " " + (order.customer?.city ?? "—")}</p>
+                                    <p>{order.customer?.country ?? "—"}</p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border p-3">
+                                <SectionTitle>Adresse de facturation</SectionTitle>
+                                <p className="mt-3 text-sm text-muted-foreground">Identique à l’adresse de livraison</p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

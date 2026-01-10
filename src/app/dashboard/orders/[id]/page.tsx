@@ -1,3 +1,4 @@
+// src/app/dashboard/orders/[id]/page.tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -159,16 +160,16 @@ export default async function OrderDetailPage({
                         <span>Détails de la commande</span>
                         <span>•</span>
                         <span>
-                            {createdDate} à {createdTime}
-                        </span>
+              {createdDate} à {createdTime}
+            </span>
                         <span>•</span>
                         <span className="font-medium text-foreground">
-                            {articlesCount} article{articlesCount > 1 ? "s" : ""}
-                        </span>
+              {articlesCount} article{articlesCount > 1 ? "s" : ""}
+            </span>
                     </div>
                 </div>
 
-                {/* Actions (fonctionnelles / sans JS) */}
+                {/* Actions */}
                 <div className="flex flex-wrap items-center gap-2">
                     <Button asChild>
                         <Link href={`/dashboard/orders/${order.id}/edit`}>Modifier la commande</Link>
@@ -180,7 +181,46 @@ export default async function OrderDetailPage({
                 </div>
             </div>
 
-            {/* Le reste de la page sera ajouté ici */}
+            {/* Main grid */}
+            <div className="grid gap-4 lg:grid-cols-12 items-start">
+                {/* Colonne gauche */}
+                <div className="lg:col-span-8 space-y-4">
+                    {/* Progress */}
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="space-y-1">
+                                    <CardTitle className="text-base">Progression</CardTitle>
+                                    <p className="text-sm text-muted-foreground">Statut actuel de la commande</p>
+                                </div>
+
+                                <div className="text-right">
+                                    <p className="text-xs text-muted-foreground">Actuel</p>
+                                    <p className="text-sm font-semibold">{statusLabelFR(order.status)}</p>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <StepperFR current={order.status} />
+                        </CardContent>
+                    </Card>
+
+                    {/* Produits */}
+
+
+                    {/* Notes + Fichiers */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    </div>
+                </div>
+
+                {/* Colonne droite */}
+                <div className="lg:col-span-4 space-y-4">
+                    {/* Récapitulatif (à la place de Paiement) */}
+
+                </div>
+            </div>
         </div>
-    );}
+    );
+}
 

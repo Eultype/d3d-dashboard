@@ -297,7 +297,31 @@ export default async function OrderDetailPage({
 
                     {/* Notes + Fichiers */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Notes */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Notes</CardTitle>
+                                <p className="text-sm text-muted-foreground">Notes internes sur la commande</p>
+                            </CardHeader>
+                            <CardContent>
+                                {order.notes.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground italic">Aucune note.</p>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {order.notes.map((note) => (
+                                            <div key={note.id} className="text-sm">
+                                                <p>{note.content}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Par {note.user.email} • {new Date(note.createdAt).toLocaleDateString("fr-FR")}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
 
+                        
                     </div>
                 </div>
 

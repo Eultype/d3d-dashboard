@@ -1,28 +1,100 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye, Download, FileText, Image as ImageIcon } from "lucide-react";
 
-function StatusBadge({ status }: { status: string }) {
-    switch (status) {
-        case "A_VERIFIER":
-            return <Badge variant="secondary">À vérifier</Badge>;
-        case "PROD":
-            return <Badge>En production</Badge>;
-        case "TERMINE":
-            return <Badge variant="outline">Terminé</Badge>;
-        default:
-            return <Badge variant="outline">{status}</Badge>;
-    }
+import { formatEUR } from "@/lib/money";
+import { orderTotalCents, statusLabelFR } from "@/lib/orders";
+import { OrderStatusBadge } from "@/components/badges/order-status-badge";
+import { formatDateTimeFR } from "@/lib/dates";
+import { isImageUrl } from "@/lib/strings";
+
+// -----------------------------
+// UI helpers
+// -----------------------------
+function MetaChip({ label, value }: { label: string; value: ReactNode }) {
+    return (
+        <div className="rounded-xl border bg-muted/10 px-3 py-2">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className="mt-0.5 text-sm font-medium">{value}</p>
+        </div>
+    );
 }
 
-function isImageUrl(url: string) {
-    return /\.(webp|png|jpg|jpeg|gif)$/i.test(url);
+function SectionTitle({ children }: { children: ReactNode }) {
+    return <h3 className="text-sm font-semibold text-foreground">{children}</h3>;
 }
 
+function InfoRow({ label, value }: { label: ReactNode; value: ReactNode }) {
+    return (
+        <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">{label}</p>
+            <div className="text-sm font-medium text-right">{value}</div>
+        </div>
+    );
+}
+
+function StepperFR({ current }: { current: string }) {
+    const steps = [
+        { key: "A_VERIFIER", label: "Confirmation" },
+        { key: "PROD", label: "Traitement" },
+        { key: "EXPEDITION", label: "Expédition" },
+        { key: "TERMINE", label: "Livrée" },
+    ];
+
+    const idx = Math.max(
+        0,
+        steps.findIndex((s) => s.key === current)
+    );
+
+    return (
+        <div className="grid gap-3 md:grid-cols-4">
+            {steps.map((s, i) => {
+                const done = i < idx;
+                const active = i === idx;
+
+                return (
+                    <div key={s.key} className="rounded-2xl border bg-background p-3">
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={[
+                                    "inline-flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold",
+                                    done ? "bg-foreground text-background border-foreground" : "",
+                                    active ? "border-foreground" : "text-muted-foreground",
+                                ].join(" ")}
+                            >
+                                {i + 1}
+                            </span>
+
+                            <p className={["text-sm font-medium", active ? "" : "text-muted-foreground"].join(" ")}>
+                                {s.label}
+                            </p>
+                        </div>
+
+                        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                            <div
+                                className={[
+                                    "h-full rounded-full bg-foreground transition-all",
+                                    done ? "w-full" : active ? "w-2/3" : "w-0",
+                                ].join(" ")}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// -----------------------------
+// Page
+// -----------------------------
 export default async function OrderDetailPage({
                                                   params,
                                               }: {
@@ -35,6 +107,10 @@ export default async function OrderDetailPage({
         where: { id },
         include: {
             customer: true,
+            items: {
+                include: { product: true },
+                orderBy: { createdAt: "asc" },
+            },
             notes: {
                 include: { user: true },
                 orderBy: { createdAt: "desc" },
@@ -47,16 +123,21 @@ export default async function OrderDetailPage({
 
     if (!order) return notFound();
 
-    const created = new Date(order.createdAt).toLocaleDateString("fr-FR");
-    const createdTime = new Date(order.createdAt).toLocaleTimeString("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    const shortId = order.id.slice(0, 10);
+    const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(order.createdAt));
+
+    const sousTotalCents = orderTotalCents(order.items);
+    const livraisonCents = 0;
+    const tvaCents = 0;
+    const totalCents = sousTotalCents + livraisonCents + tvaCents;
+
+    const lignesCount = order.items.length;
+    const articlesCount = order.items.reduce((sum, it) => sum + it.quantity, 0);
 
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="space-y-2">
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
@@ -66,186 +147,40 @@ export default async function OrderDetailPage({
                         <Link href="/dashboard/orders" className="hover:underline">
                             Commandes
                         </Link>{" "}
-                        / <span className="font-mono">#{order.id.slice(0, 6)}</span>
+                        / <span className="font-mono">#{shortId}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-bold">
-                            Commande <span className="font-mono">#{order.id.slice(0, 10)}</span>
-                        </h1>
-                        <StatusBadge status={order.status} />
+                        <h1 className="text-2xl font-bold">Commande #{shortId}</h1>
+                        <OrderStatusBadge status={order.status} />
                     </div>
 
-                    <p className="text-sm text-muted-foreground">
-                        Créée le {created} à {createdTime}
-                    </p>
+                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                        <span>Détails de la commande</span>
+                        <span>•</span>
+                        <span>
+                            {createdDate} à {createdTime}
+                        </span>
+                        <span>•</span>
+                        <span className="font-medium text-foreground">
+                            {articlesCount} article{articlesCount > 1 ? "s" : ""}
+                        </span>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Actions (fonctionnelles / sans JS) */}
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button asChild>
+                        <Link href={`/dashboard/orders/${order.id}/edit`}>Modifier la commande</Link>
+                    </Button>
+
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/orders">← Retour</Link>
                     </Button>
                 </div>
             </div>
 
-            {/* KPIs */}
-            <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Client</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-lg font-semibold">
-                        {order.customer?.name ?? "Sans client"}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Notes</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-lg font-semibold">
-                        {order.notes.length}
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm text-muted-foreground">Fichiers</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-lg font-semibold">
-                        {order.files.length}
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Client */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Client</CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                    {order.customer ? (
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Nom</p>
-                                <p className="font-medium">{order.customer.name ?? "Client sans nom"}</p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-muted-foreground">Email</p>
-                                <p className="font-medium">{order.customer.email ?? "—"}</p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-muted-foreground">Téléphone</p>
-                                <p className="font-medium">{order.customer.phone ?? "—"}</p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-muted-foreground">Société</p>
-                                <p className="font-medium">{order.customer.companyName ?? "Particulier"}</p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-muted-foreground">TVA</p>
-                                <p className="font-medium">{order.customer.vatNumber ?? "❌"}</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="text-sm text-muted-foreground italic">Aucun client associé</p>
-                    )}
-                </CardContent>
-            </Card>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-                {/* Notes */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Notes</CardTitle>
-                    </CardHeader>
-
-                    <CardContent className="space-y-3">
-                        {order.notes.length === 0 ? (
-                            <p className="text-sm text-muted-foreground italic">Aucune note pour le moment.</p>
-                        ) : (
-                            <div className="space-y-3">
-                                {order.notes.map((n) => (
-                                    <div key={n.id} className="rounded-xl border p-3">
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium truncate">{n.user.email}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {new Date(n.createdAt).toLocaleString("fr-FR")}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <p className="mt-2 text-sm leading-relaxed">{n.content}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Fichiers */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Fichiers</CardTitle>
-                    </CardHeader>
-
-                    <CardContent>
-                        {order.files.length === 0 ? (
-                            <p className="text-sm text-muted-foreground italic">Aucun fichier pour le moment.</p>
-                        ) : (
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                {order.files.map((f) => (
-                                    <div key={f.id} className="rounded-xl border overflow-hidden">
-                                        {isImageUrl(f.url) ? (
-                                            // Preview image
-                                            <div className="aspect-video bg-muted">
-                                                {/* next/image si tu veux + tard, là on reste simple */}
-                                                <img
-                                                    src={f.url}
-                                                    alt={f.filename}
-                                                    className="h-full w-full object-cover"
-                                                    loading="lazy"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="aspect-video bg-muted flex items-center justify-center text-sm text-muted-foreground">
-                                                Aperçu indisponible
-                                            </div>
-                                        )}
-
-                                        <div className="p-3 space-y-2">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="min-w-0">
-                                                    <p className="text-sm font-medium truncate">{f.filename}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {new Date(f.createdAt).toLocaleString("fr-FR")}
-                                                    </p>
-                                                </div>
-
-                                                <Badge variant="outline" className="shrink-0">
-                                                    {f.type}
-                                                </Badge>
-                                            </div>
-
-                                            <Button asChild variant="ghost" className="w-full justify-center">
-                                                <a href={f.url} target="_blank" rel="noreferrer">
-                                                    Ouvrir
-                                                </a>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+            {/* Le reste de la page sera ajouté ici */}
         </div>
-    );
-}
+    );}
+

@@ -72,7 +72,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                        Créée le {created} à {createdTime}
+                        Créé le {created} à {createdTime}
                     </p>
                 </div>
 

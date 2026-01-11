@@ -1,4 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import {
+    getCustomerDetails,
+    getCustomerOrders,
+    getCustomerOrderItems,
+} from "@/lib/data/customers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -19,32 +23,11 @@ export default async function CustomerDetailPage({
     const { id } = await params;
     if (!id) return notFound();
 
-    const customer = await prisma.customer.findUnique({
-        where: { id },
-    });
+    const customer = await getCustomerDetails(id);
 
-    const orders = await prisma.order.findMany({
-        where: { customerId: id },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-        include: {
-            items: true,
-        },
-    });
+    const orders = await getCustomerOrders(id);
 
-    const lastItems = await prisma.orderItem.findMany({
-        where: {
-            order: { customerId: id },
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-        take: 5,
-        include: {
-            product: true,
-            order: true,
-        },
-    });
+    const lastItems = await getCustomerOrderItems(id);
 
     if (!customer) return notFound();
 

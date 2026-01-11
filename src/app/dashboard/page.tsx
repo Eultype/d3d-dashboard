@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
-import { formatEUR } from "@/lib/money";
-import { orderTotalCents } from "@/lib/orders";
 
 import {
   ClipboardList,
@@ -17,6 +15,7 @@ import {
   Factory,
   Truck,
   Store,
+  CheckCircle2,
   Plus,
   ArrowRight,
   Eye,
@@ -25,26 +24,31 @@ import {
 export const metadata: Metadata = {
   title: "D3D | Dashboard | Vue d'ensemble",
   description:
-      "Vue d’ensemble orientée actions : pipeline des commandes + accès rapide aux dernières commandes et aux urgences.",
+      "Vue d’ensemble orientée actions : commandes à vérifier, en production, à livrer, et terminées.",
 };
 
-// ⚠️ Adapte si tes statuts diffèrent
-const STATUS = {
-  A_VERIFIER: "A_VERIFIER",
-  PROD: "PROD",
-  A_EXPEDIER: "A_EXPEDIER",
-  A_RECUPERER: "A_RECUPERER",
-  TERMINE: "TERMINE",
-} as const;
-
+type OrderItemLite = { quantity: number; unitPriceCents: number };
 type OrderLite = {
   id: string;
   status: string;
   createdAt: Date;
   customer: { name: string | null; email: string | null } | null;
-  items: { quantity: number; unitPriceCents: number }[];
+  items: OrderItemLite[];
 };
 
+function computeOrderTotals(items: OrderItemLite[]) {
+  const articlesCount = items.reduce((sum, it) => sum + it.quantity, 0);
+  const totalCents = items.reduce((sum, it) => sum + it.quantity * it.unitPriceCents, 0);
+  return { articlesCount, totalCents };
+}
+
+function formatEUR(cents: number) {
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
+      (cents ?? 0) / 100
+  );
+}
+
+// Format court 09/01/26 (comme tu voulais)
 function formatDateShortFR(d: Date) {
   return new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",
@@ -83,46 +87,30 @@ function StatItem({
   );
 }
 
-function shortOrderId(id: string) {
-  return id.slice(0, 10);
-}
-
-function customerLabel(c: OrderLite["customer"]) {
-  if (!c) return { primary: "Sans client", secondary: "" };
-  return {
-    primary: c.name ?? "Client sans nom",
-    secondary: c.email ?? "—",
-  };
-}
-
 export default async function DashboardPage() {
-  /**
-   * Idée “pro” :
-   * - Cards : pipeline commandes (le + utile)
-   * - Dernières commandes : top 5
-   * - À traiter : top 5 parmi les statuts actionnables (pas seulement parmi les dernières)
-   */
-  const actionableStatuses = [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER];
+  // ⚠️ Ajuste si tu as d'autres statuts (ex: ANNULEE)
+  const STATUS = {
+    A_VERIFIER: "A_VERIFIER",
+    PROD: "PROD",
+    A_EXPEDIER: "A_EXPEDIER",
+    A_RECUPERER: "A_RECUPERER",
+    TERMINE: "TERMINE",
+  } as const;
 
+  // Cards (pipeline)
   const [
     countToVerify,
     countInProd,
     countToShip,
     countToPickUp,
     countDone,
-
     lastOrders,
-    todoOrders,
-
-    // Bonus utile (tu peux enlever si tu veux ultra-minimal)
-    monthCa,
   ] = await Promise.all([
     prisma.order.count({ where: { status: STATUS.A_VERIFIER } }),
     prisma.order.count({ where: { status: STATUS.PROD } }),
     prisma.order.count({ where: { status: STATUS.A_EXPEDIER } }),
     prisma.order.count({ where: { status: STATUS.A_RECUPERER } }),
     prisma.order.count({ where: { status: STATUS.TERMINE } }),
-
     prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -131,42 +119,42 @@ export default async function DashboardPage() {
         items: { select: { quantity: true, unitPriceCents: true } },
       },
     }),
-
-    prisma.order.findMany({
-      where: { status: { in: actionableStatuses } },
-      orderBy: { createdAt: "asc" }, // les plus anciennes d’abord (plus urgent)
-      take: 5,
-      include: {
-        customer: true,
-        items: { select: { quantity: true, unitPriceCents: true } },
-      },
-    }),
-
-    // CA du mois (terminées uniquement)
-    (async () => {
-      const now = new Date();
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-      const doneThisMonth = await prisma.order.findMany({
-        where: {
-          status: STATUS.TERMINE,
-          createdAt: { gte: start, lt: end },
-        },
-        include: { items: true },
-      });
-
-      const cents = doneThisMonth.reduce((sum, o) => sum + orderTotalCents(o.items), 0);
-      return cents;
-    })(),
   ]);
 
-  const inProgress = countToVerify + countInProd + countToShip + countToPickUp;
-  const toProcessTotal = countToVerify + countToShip + countToPickUp;
+  const countInProgress =
+      countToVerify + countInProd + countToShip + countToPickUp;
+
+  const countToProcess = countToVerify + countToShip + countToPickUp;
+
+  const recent: Array<{
+    id: string;
+    status: string;
+    createdAt: Date;
+    customer: { name: string | null; email: string | null } | null;
+    articlesCount: number;
+    totalCents: number;
+  }> = (lastOrders as OrderLite[]).map((o) => {
+    const { articlesCount, totalCents } = computeOrderTotals(o.items);
+    return {
+      id: o.id,
+      status: o.status,
+      createdAt: o.createdAt,
+      customer: o.customer
+          ? { name: o.customer.name, email: o.customer.email }
+          : null,
+      articlesCount,
+      totalCents,
+    };
+  });
+
+  // À traiter = “ce qui nécessite une action maintenant”
+  const todoOrders = recent.filter((o) =>
+      [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER].includes(o.status as any)
+  );
 
   return (
       <div className="space-y-6">
-        {/* Header */}
+        {/* Header (même style que tes pages Orders/Customers/Products) */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2">
             <div className="text-sm text-muted-foreground">
@@ -179,12 +167,12 @@ export default async function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold">Dashboard</h1>
               <p className="text-sm text-muted-foreground">
-                Pipeline des commandes + accès rapide aux actions.
+                Le pipeline des commandes + accès rapide aux actions.
               </p>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions rapides */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button asChild>
               <Link href="/dashboard/orders/new">
@@ -209,12 +197,12 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Cards pipeline (focus commandes) */}
+        {/* 5 cards utiles (pipeline commandes) */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <StatItem
               icon={<ClipboardList className="h-4 w-4" />}
               label="En cours"
-              value={inProgress}
+              value={countInProgress}
               hint="Commandes actives"
           />
 
@@ -247,7 +235,7 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* 2 colonnes: Dernières commandes + À traiter */}
+        {/* Contenu bas: 2 cards comme sur tes fiches (propre et lisible) */}
         <div className="grid gap-4 xl:grid-cols-2 items-stretch">
           {/* Dernières commandes */}
           <Card className="rounded-lg">
@@ -267,22 +255,15 @@ export default async function DashboardPage() {
             </CardHeader>
 
             <CardContent className="space-y-3">
-              {lastOrders.length === 0 && (
+              {recent.length === 0 && (
                   <p className="text-sm text-muted-foreground italic">
                     Aucune commande pour le moment.
                   </p>
               )}
 
-              {(lastOrders as OrderLite[]).map((o) => {
+              {recent.map((o) => {
                 const href = `/dashboard/orders/${o.id}`;
-                const id = shortOrderId(o.id);
-
-                const totalCents = orderTotalCents(o.items);
-                const total = formatEUR(totalCents);
-
-                const { primary, secondary } = customerLabel(o.customer);
-
-                const articlesCount = o.items.reduce((s, it) => s + it.quantity, 0);
+                const shortId = o.id.slice(0, 10);
 
                 return (
                     <div
@@ -290,18 +271,22 @@ export default async function DashboardPage() {
                         className="rounded-lg border px-4 py-3 hover:bg-muted/30 transition-colors"
                     >
                       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                        {/* gauche */}
+                        {/* GAUCHE */}
                         <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="font-mono text-sm">#{id}</span>
+                          <div className="flex flex-wrap items-center gap-2 min-w-0">
+                            <span className="font-mono text-sm shrink-0">#{shortId}</span>
                             <OrderStatusBadge status={o.status} />
                           </div>
 
                           <p className="mt-1 text-xs text-muted-foreground">
                             {o.customer ? (
                                 <>
-                                  <span className="font-medium text-foreground/90">{primary}</span>{" "}
-                                  <span className="text-muted-foreground">({secondary})</span>
+                            <span className="font-medium text-foreground/90">
+                              {o.customer.name ?? "Client sans nom"}
+                            </span>{" "}
+                                  <span className="text-muted-foreground">
+                              ({o.customer.email ?? "—"})
+                            </span>
                                   {" • "}
                                 </>
                             ) : (
@@ -309,16 +294,20 @@ export default async function DashboardPage() {
                                   <span className="italic">Sans client</span> •{" "}
                                 </>
                             )}
-                            {formatDateShortFR(new Date(o.createdAt))} • {articlesCount} article
-                            {articlesCount > 1 ? "s" : ""}
+                            {formatDateShortFR(o.createdAt)} •{" "}
+                            {o.articlesCount} article{o.articlesCount > 1 ? "s" : ""}
                           </p>
                         </div>
 
-                        {/* droite */}
+                        {/* DROITE */}
                         <div className="flex items-center justify-between gap-3 sm:justify-end">
                           <div className="text-right leading-tight">
-                            <div className="font-semibold whitespace-nowrap">{total}</div>
-                            <div className="text-xs text-muted-foreground">Total commande</div>
+                            <div className="font-semibold whitespace-nowrap">
+                              {formatEUR(o.totalCents)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Total commande
+                            </div>
                           </div>
 
                           <Button asChild size="sm" variant="outline" className="shrink-0">
@@ -335,7 +324,7 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* À traiter (le vrai truc utile) */}
+          {/* À traiter (focus action) */}
           <Card className="rounded-lg">
             <CardHeader className="flex flex-row items-center justify-between gap-3">
               <div>
@@ -345,9 +334,12 @@ export default async function DashboardPage() {
                 </p>
               </div>
 
-              <Badge variant="secondary" className="tabular-nums">
-                {toProcessTotal} au total
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="tabular-nums">
+                  {countToProcess} au total
+                </Badge>
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+              </div>
             </CardHeader>
 
             <CardContent className="space-y-3">
@@ -356,10 +348,9 @@ export default async function DashboardPage() {
                     Rien d’urgent. 👍
                   </p>
               ) : (
-                  (todoOrders as OrderLite[]).map((o) => {
+                  todoOrders.map((o) => {
                     const href = `/dashboard/orders/${o.id}`;
-                    const id = shortOrderId(o.id);
-                    const { primary } = customerLabel(o.customer);
+                    const shortId = o.id.slice(0, 10);
 
                     return (
                         <div
@@ -369,12 +360,12 @@ export default async function DashboardPage() {
                           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-mono text-sm">#{id}</span>
+                                <span className="font-mono text-sm">#{shortId}</span>
                                 <OrderStatusBadge status={o.status} />
                               </div>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                {formatDateShortFR(new Date(o.createdAt))}
-                                {o.customer ? ` • ${primary}` : " • Sans client"}
+                                {formatDateShortFR(o.createdAt)}
+                                {o.customer?.name ? ` • ${o.customer.name}` : ""}
                               </p>
                             </div>
 
@@ -387,13 +378,7 @@ export default async function DashboardPage() {
                   })
               )}
 
-              <div className="pt-1 flex items-center justify-between">
-                {/* Bonus pro (ultra utile) : CA du mois */}
-                <div className="text-xs text-muted-foreground">
-                  CA du mois :{" "}
-                  <span className="font-medium text-foreground">{formatEUR(monthCa)}</span>
-                </div>
-
+              <div className="pt-1 text-right">
                 <Link href="/dashboard/orders" className="text-sm underline">
                   Aller aux commandes →
                 </Link>
@@ -402,15 +387,15 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        {/* Quick links */}
+        {/* Accès rapides bas (optionnel, mais clean) */}
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="gap-2">
             <Link href="/dashboard/orders">Voir les commandes</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="gap-2">
             <Link href="/dashboard/customers">Voir les clients</Link>
           </Button>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="gap-2">
             <Link href="/dashboard/products">Voir les produits</Link>
           </Button>
         </div>

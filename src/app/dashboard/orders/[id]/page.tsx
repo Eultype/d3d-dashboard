@@ -160,8 +160,8 @@ export default async function OrderDetailPage({
                         <span>Détails de la commande</span>
                         <span>•</span>
                         <span>
-              {createdDate} à {createdTime}
-            </span>
+                             {createdDate} à {createdTime}
+                        </span>
                         <span>•</span>
                         <span className="font-medium text-foreground">
               {articlesCount} article{articlesCount > 1 ? "s" : ""}

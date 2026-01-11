@@ -1,4 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import {
+    getProductDetails,
+    getProductOrderItems,
+    getProductRecentCustomers,
+} from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -8,14 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 
 import { formatEUR } from "@/lib/money";
-import { formatDateFR } from "@/lib/dates";
-
-function formatTimeFR(d: Date) {
-    return new Intl.DateTimeFormat("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
-    }).format(d);
-}
+import { formatDateFR, formatDateTimeFR } from "@/lib/dates";
 
 export default async function ProductDetailPage({
                                                     params,
@@ -25,63 +22,15 @@ export default async function ProductDetailPage({
     const { id } = await params;
     if (!id) return notFound();
 
-    const product = await prisma.product.findUnique({
-        where: { id },
-        select: {
-            id: true,
-            name: true,
-            sku: true,
-            description: true,
-            imageUrl: true,
-            isActive: true,
-            priceCents: true,
-            createdAt: true,
-        },
-    });
+    const product = await getProductDetails(id);
 
     if (!product) return notFound();
 
-    // 5 dernières lignes de commande (orderItems) qui concernent ce produit
-    const lastItems = await prisma.orderItem.findMany({
-        where: { productId: product.id },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-        include: {
-            order: {
-                include: {
-                    customer: true,
-                    items: true,
-                },
-            },
-        },
-    });
+    const lastItems = await getProductOrderItems(product.id);
 
-    // 5 derniers clients (dédupliqués) ayant commandé ce produit
-    const lastCustomersRaw = await prisma.orderItem.findMany({
-        where: {
-            productId: product.id,
-            order: { customerId: { not: null } },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 20, // on prend large puis on déduplique
-        include: {
-            order: { include: { customer: true } },
-        },
-    });
+    const lastCustomers = await getProductRecentCustomers(product.id);
 
-    const seen = new Set<string>();
-    const lastCustomers = lastCustomersRaw
-        .map((x) => x.order.customer)
-        .filter((c): c is NonNullable<typeof c> => !!c)
-        .filter((c) => {
-            if (seen.has(c.id)) return false;
-            seen.add(c.id);
-            return true;
-        })
-        .slice(0, 5);
-
-    const createdDate = formatDateFR(new Date(product.createdAt));
-    const createdTime = formatTimeFR(new Date(product.createdAt));
+    const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(product.createdAt));
 
     const shortId = product.id.slice(0, 10);
     const price = formatEUR(product.priceCents ?? 0);

@@ -61,7 +61,7 @@ function StepperFR({ current }: { current: string }) {
                 const active = i === idx;
 
                 return (
-                    <div key={s.key} className="rounded-2xl border bg-background p-3">
+                    <div key={s.key} className="rounded-xl border bg-background p-3">
                         <div className="flex items-center gap-2">
                             <span
                                 className={[
@@ -445,7 +445,7 @@ export default async function OrderDetailPage({
                         </CardHeader>
 
                         <CardContent className="space-y-4">
-                            <div className="rounded-2xl border p-3">
+                            <div className="rounded-xl border p-3">
                                 <SectionTitle>Informations générales</SectionTitle>
 
                                 <div className="mt-3 space-y-2">
@@ -462,7 +462,7 @@ export default async function OrderDetailPage({
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl border p-3">
+                            <div className="rounded-xl border p-3">
                                 <SectionTitle>Adresse de livraison</SectionTitle>
                                 <div className="mt-3 text-sm text-muted-foreground space-y-1">
                                     <p className="font-medium text-foreground">{order.customer?.addressLine1 ?? "—"}</p>
@@ -472,7 +472,7 @@ export default async function OrderDetailPage({
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl border p-3">
+                            <div className="rounded-xl border p-3">
                                 <SectionTitle>Adresse de facturation</SectionTitle>
                                 <p className="mt-3 text-sm text-muted-foreground">Identique à l’adresse de livraison</p>
                             </div>

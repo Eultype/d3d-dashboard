@@ -148,7 +148,7 @@ export default async function OrderDetailPage({
                         <Link href="/dashboard/orders" className="hover:underline">
                             Commandes
                         </Link>{" "}
-                        / <span className="font-mono">#{shortId}</span>
+                        / <span className="text-foreground">#{shortId}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

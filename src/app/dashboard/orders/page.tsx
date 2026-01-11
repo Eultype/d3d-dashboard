@@ -116,9 +116,7 @@ export default async function OrdersPage() {
                             Dashboard
                         </Link>{" "}
                         /{" "}
-                        <Link href="/dashboard/orders" className="hover:underline">
-                            Commandes
-                        </Link>
+                        <span className="text-foreground">Commandes</span>
                     </div>
 
                     <div>

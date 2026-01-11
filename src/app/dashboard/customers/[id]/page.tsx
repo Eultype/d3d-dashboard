@@ -66,7 +66,7 @@ export default async function CustomerDetailPage({
                         <Link href="/dashboard/customers" className="hover:underline">
                             Clients
                         </Link>{" "}
-                        / <span className="font-mono">#{customer.id.slice(0, 10)}</span>
+                        / <span className="text-foreground">#{customer.id.slice(0, 10)}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

@@ -83,9 +83,7 @@ export default async function CustomersPage() {
                             Dashboard
                         </Link>{" "}
                         /{" "}
-                        <Link href="/dashboard/customers" className="hover:underline">
-                            Clients
-                        </Link>
+                        <span className="text-foreground">Clients</span>
                     </div>
 
                     <div>

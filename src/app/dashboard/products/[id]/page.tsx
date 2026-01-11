@@ -99,7 +99,7 @@ export default async function ProductDetailPage({
                         <Link href="/dashboard/products" className="hover:underline">
                             Produits
                         </Link>{" "}
-                        / <span className="font-mono">#{product.id.slice(0, 10)}</span>
+                        / <span className="text-foreground">#{product.id.slice(0, 10)}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">

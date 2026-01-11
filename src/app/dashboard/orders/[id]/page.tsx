@@ -93,6 +93,7 @@ function StepperFR({ current }: { current: string }) {
     );
 }
 
+import { getOrderDetails } from "@/lib/data/orders";
 // -----------------------------
 // Page
 // -----------------------------
@@ -104,23 +105,7 @@ export default async function OrderDetailPage({
     const { id } = await params;
     if (!id) return notFound();
 
-    const order = await prisma.order.findUnique({
-        where: { id },
-        include: {
-            customer: true,
-            items: {
-                include: { product: true },
-                orderBy: { createdAt: "asc" },
-            },
-            notes: {
-                include: { user: true },
-                orderBy: { createdAt: "desc" },
-            },
-            files: {
-                orderBy: { createdAt: "desc" },
-            },
-        },
-    });
+    const order = await getOrderDetails(id);
 
     if (!order) return notFound();
 

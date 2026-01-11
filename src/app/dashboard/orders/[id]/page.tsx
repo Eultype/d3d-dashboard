@@ -15,23 +15,13 @@ import { orderTotalCents, statusLabelFR } from "@/lib/orders";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { formatDateTimeFR } from "@/lib/dates";
 import { InfoRow } from "@/components/ui/info-row";
+import { SectionTitle } from "@/components/ui/section-title";
 import { isImageUrl } from "@/lib/strings";
 
 // -----------------------------
 // UI helpers
 // -----------------------------
-function MetaChip({ label, value }: { label: string; value: ReactNode }) {
-    return (
-        <div className="rounded-xl border bg-muted/10 px-3 py-2">
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
-            <p className="mt-0.5 text-sm font-medium">{value}</p>
-        </div>
-    );
-}
 
-function SectionTitle({ children }: { children: ReactNode }) {
-    return <h3 className="text-sm font-semibold text-foreground">{children}</h3>;
-}
 
 
 
@@ -62,7 +52,6 @@ export default async function OrderDetailPage({
     const tvaCents = 0;
     const totalCents = sousTotalCents + livraisonCents + tvaCents;
 
-    const lignesCount = order.items.length;
     const articlesCount = order.items.reduce((sum, it) => sum + it.quantity, 0);
 
     return (
@@ -354,10 +343,7 @@ export default async function OrderDetailPage({
                                 value={<span className="font-bold tabular-nums">{formatEUR(totalCents)}</span>}
                             />
 
-                            <div className="grid gap-3 pt-2 sm:grid-cols-2">
-                                <MetaChip label="Lignes" value={lignesCount} />
-                                <MetaChip label="Articles" value={articlesCount} />
-                            </div>
+
                         </CardContent>
                     </Card>
 

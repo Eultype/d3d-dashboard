@@ -164,8 +164,8 @@ export default async function OrderDetailPage({
                         </span>
                         <span>•</span>
                         <span className="font-medium text-foreground">
-              {articlesCount} article{articlesCount > 1 ? "s" : ""}
-            </span>
+                            {articlesCount} article{articlesCount > 1 ? "s" : ""}
+                        </span>
                     </div>
                 </div>
 

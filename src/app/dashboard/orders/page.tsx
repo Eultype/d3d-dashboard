@@ -123,7 +123,7 @@ export default async function OrdersPage() {
 
                     <div>
                         <h1 className="text-2xl font-bold">Commandes</h1>
-                        <p className="text-sm text-muted-foreground">Gestion des commandes de gravure 3D</p>
+                        <p className="text-sm text-muted-foreground">Gestion des commandes de gravure 2D-3D</p>
                     </div>
                 </div>
 

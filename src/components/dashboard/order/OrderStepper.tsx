@@ -1,0 +1,55 @@
+type OrderStepperProps = {
+    current: string;
+};
+
+export function OrderStepper({ current }: OrderStepperProps) {
+    const steps = [
+        { key: "A_VERIFIER", label: "Confirmation" },
+        { key: "PROD", label: "Traitement" },
+        { key: "EXPEDITION", label: "Expédition" },
+        { key: "TERMINE", label: "Livrée" },
+    ];
+
+    const idx = Math.max(
+        0,
+        steps.findIndex((s) => s.key === current)
+    );
+
+    return (
+        <div className="grid gap-3 md:grid-cols-4">
+            {steps.map((s, i) => {
+                const done = i < idx;
+                const active = i === idx;
+
+                return (
+                    <div key={s.key} className="rounded-2xl border bg-background p-3">
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={[
+                                    "inline-flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold",
+                                    done ? "bg-foreground text-background border-foreground" : "",
+                                    active ? "border-foreground" : "text-muted-foreground",
+                                ].join(" ")}
+                            >
+                                {i + 1}
+                            </span>
+
+                            <p className={["text-sm font-medium", active ? "" : "text-muted-foreground"].join(" ")}>
+                                {s.label}
+                            </p>
+                        </div>
+
+                        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                            <div
+                                className={[
+                                    "h-full rounded-full bg-foreground transition-all",
+                                    done ? "w-full" : active ? "w-2/3" : "w-0",
+                                ].join(" ")}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}

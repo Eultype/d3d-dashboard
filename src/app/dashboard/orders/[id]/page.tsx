@@ -14,6 +14,7 @@ import { formatEUR } from "@/lib/money";
 import { orderTotalCents, statusLabelFR } from "@/lib/orders";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { formatDateTimeFR } from "@/lib/dates";
+import { InfoRow } from "@/components/ui/info-row";
 import { isImageUrl } from "@/lib/strings";
 
 // -----------------------------
@@ -32,14 +33,7 @@ function SectionTitle({ children }: { children: ReactNode }) {
     return <h3 className="text-sm font-semibold text-foreground">{children}</h3>;
 }
 
-function InfoRow({ label, value }: { label: ReactNode; value: ReactNode }) {
-    return (
-        <div className="flex items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <div className="text-sm font-medium text-right">{value}</div>
-        </div>
-    );
-}
+
 
 
 

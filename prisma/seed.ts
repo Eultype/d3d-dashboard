@@ -31,7 +31,11 @@ async function main() {
     // ======================
     const customer1 = await prisma.customer.upsert({
         where: { email: "jean.dupont@test.com" },
-        update: {},
+        update: {
+            // si tu relances la seed, tu veux généralement repartir propre
+            isActive: true,
+            addressLine2: "Bâtiment B, 2e étage",
+        },
         create: {
             name: "Jean Dupont",
             email: "jean.dupont@test.com",
@@ -43,12 +47,17 @@ async function main() {
             postalCode: "75001",
             city: "Paris",
             country: "France",
+            isActive: true,
         },
     });
 
     const customer2 = await prisma.customer.upsert({
         where: { email: "marie.martin@test.com" },
-        update: {},
+        update: {
+            isActive: true,
+            // on évite "" => null (plus propre en DB)
+            addressLine2: null,
+        },
         create: {
             name: "Marie Martin",
             email: "marie.martin@test.com",
@@ -56,16 +65,17 @@ async function main() {
             companyName: null,
             vatNumber: null,
             addressLine1: "8 avenue des Lilas",
-            addressLine2: "",
+            addressLine2: null,
             postalCode: "69000",
             city: "Lyon",
             country: "France",
+            isActive: true,
         },
     });
 
-// ======================
-// PRODUITS
-// ======================
+    // ======================
+    // PRODUITS
+    // ======================
     const product1 = await prisma.product.upsert({
         where: { sku: "CRISTAL-R120" },
         update: {

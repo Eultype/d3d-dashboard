@@ -3,25 +3,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-function StatusBadge({ companyName }: { companyName?: string | null }) {
-    const label = companyName?.trim() ? "Entreprise" : "Particulier";
-
-    return <Badge variant="secondary">{label}</Badge>;
-}
-
-function formatEUR(cents: number) {
-    return new Intl.NumberFormat("fr-FR", {
-        style: "currency",
-        currency: "EUR",
-    }).format(cents / 100);
-}
-
-function orderTotalCents(items: { quantity: number; unitPriceCents: number }[]) {
-    return items.reduce((sum, it) => sum + it.quantity * it.unitPriceCents, 0);
-}
+import { CustomerTypeBadge } from "@/components/badges/customer-type-badge";
+import { formatEUR } from "@/lib/money";
+import { orderTotalCents } from "@/lib/orders";
+import { formatDateFR } from "@/lib/dates";
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id?: string }> }) {
     const { id } = await params;
@@ -56,7 +44,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
     if (!customer) return notFound();
 
-    const created = new Date(customer.createdAt).toLocaleDateString("fr-FR");
+    const created = formatDateFR(new Date(customer.createdAt));
     const createdTime = new Date(customer.createdAt).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
@@ -79,7 +67,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-bold ">Fiche client</h1>
-                        <StatusBadge companyName={customer.companyName} />
+                        <CustomerTypeBadge companyName={customer.companyName} />
+                        <CustomerActiveBadge isActive={customer.isActive} />
                     </div>
 
                     <p className="text-sm text-muted-foreground">
@@ -229,7 +218,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                                                 </div>
 
                                                 <p className="mt-1 text-xs text-muted-foreground">
-                                                    {new Date(order.createdAt).toLocaleDateString("fr-FR")} •{" "}
+                                                    {formatDateFR(new Date(order.createdAt))} •{" "}
                                                     {order.items.length} article{order.items.length > 1 ? "s" : ""}
                                                 </p>
                                             </div>
@@ -304,7 +293,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                                                     )}
                                                     <span>
                                                         Commande #{it.orderId.slice(0, 8)} •{" "}
-                                                        {new Date(it.order.createdAt).toLocaleDateString("fr-FR")}
+                                                        {formatDateFR(new Date(it.order.createdAt))}
                                                      </span>
                                                 </div>
                                             </div>

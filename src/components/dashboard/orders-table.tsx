@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDateFR } from "@/lib/dates";
 import Link from "next/link";
 import {
     Table,
@@ -9,9 +10,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Eye } from "lucide-react";
+import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 
 type OrderRow = {
     id: string;
@@ -22,19 +23,6 @@ type OrderRow = {
         email: string | null;
     } | null;
 };
-
-function StatusBadge({ status }: { status: string }) {
-    switch (status) {
-        case "A_VERIFIER":
-            return <Badge variant="secondary">À vérifier</Badge>;
-        case "PROD":
-            return <Badge>En production</Badge>;
-        case "TERMINE":
-            return <Badge variant="outline">Terminé</Badge>;
-        default:
-            return <Badge variant="outline">{status}</Badge>;
-    }
-}
 
 export function OrdersTable({ orders }: { orders: OrderRow[] }) {
     return (
@@ -71,20 +59,20 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                                         <div className="flex flex-col">
                                             <span className="font-medium">{o.customer.name ?? "Client sans nom"}</span>
                                             <span className="text-sm text-muted-foreground">
-                        {o.customer.email ?? "—"}
-                      </span>
+                                                {o.customer.email ?? "—"}
+                                            </span>
                                         </div>
                                     ) : (
-                                        <Badge variant="outline">Sans client</Badge>
+                                        <span className="italic text-muted-foreground">Sans client</span>
                                     )}
                                 </TableCell>
 
                                 <TableCell>
-                                    <StatusBadge status={o.status} />
+                                    <OrderStatusBadge status={o.status} />
                                 </TableCell>
 
                                 <TableCell className="text-sm text-muted-foreground">
-                                    {new Date(o.createdAt).toLocaleDateString("fr-FR")}
+                                    {formatDateFR(new Date(o.createdAt))}
                                 </TableCell>
 
                                 <TableCell>

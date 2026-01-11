@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 import {
     Table,
     TableBody,
@@ -87,7 +88,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                 {formatPriceEUR(p.priceCents)}
                             </TableCell>
                             <TableCell>
-                                <ProductStatusBadge isActive={p.isActive} />
+                                <ProductActiveBadge isActive={p.isActive} />
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                                 {new Date(p.createdAt).toLocaleDateString("fr-FR")}

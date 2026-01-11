@@ -41,6 +41,7 @@ export default async function CustomersPage() {
                         phone: c.phone,
                         companyName: c.companyName,
                         vatNumber: c.vatNumber,
+                        isActive: c.isActive,
                         createdAt: c.createdAt.toISOString(),
                     }))}
                 />

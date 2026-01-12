@@ -39,7 +39,7 @@ export async function getProductRecentCustomers(productId: string) {
             order: { customerId: { not: null } },
         },
         orderBy: { createdAt: "desc" },
-        take: 20, // on prend large puis on déduplique
+        take: 20,
         include: {
             order: { include: { customer: true } },
         },
@@ -58,3 +58,45 @@ export async function getProductRecentCustomers(productId: string) {
 
     return lastCustomers;
 }
+
+export async function getProductsAndStats() {
+    const products = await prisma.product.findMany({
+        orderBy: { createdAt: "desc" },
+        select: {
+            id: true,
+            name: true,
+            sku: true,
+            description: true,
+            imageUrl: true,
+            isActive: true,
+            priceCents: true,
+            createdAt: true,
+        },
+    });
+
+    const rows = products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        description: p.description,
+        imageUrl: p.imageUrl,
+        isActive: p.isActive,
+        priceCents: p.priceCents,
+        createdAt: p.createdAt.toISOString(),
+    }));
+
+    // Stats
+    const totalProducts = products.length;
+    const activeProducts = products.filter((p) => p.isActive).length;
+    const inactiveProducts = products.filter((p) => !p.isActive).length;
+
+    return {
+        products: rows,
+        stats: {
+            totalProducts,
+            activeProducts,
+            inactiveProducts,
+        },
+    };
+}
+

@@ -1,5 +1,4 @@
 // src/app/dashboard/products/page.tsx
-import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -9,37 +8,11 @@ import { Button } from "@/components/ui/button";
 
 import { Package, CheckCircle2, XCircle } from "lucide-react";
 import { StatItem } from "@/components/dashboard/StatItem";
+import { getProductsAndStats } from "@/lib/data/products";
 
 export default async function ProductsPage() {
-    const products = await prisma.product.findMany({
-        orderBy: { createdAt: "desc" },
-        select: {
-            id: true,
-            name: true,
-            sku: true,
-            description: true,
-            imageUrl: true,
-            isActive: true,
-            priceCents: true,
-            createdAt: true,
-        },
-    });
-
-    const rows = products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        sku: p.sku,
-        description: p.description,
-        imageUrl: p.imageUrl,
-        isActive: p.isActive,
-        priceCents: p.priceCents,
-        createdAt: p.createdAt.toISOString(),
-    }));
-
-    // Stats (3 cards utiles)
-    const totalProducts = products.length;
-    const activeProducts = products.filter((p) => p.isActive).length;
-    const inactiveProducts = products.filter((p) => !p.isActive).length;
+    const { products: rows, stats } = await getProductsAndStats();
+    const { totalProducts, activeProducts, inactiveProducts } = stats;
 
     return (
         <div className="space-y-6">

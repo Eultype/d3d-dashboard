@@ -18,57 +18,55 @@ export type ProductItem = {
   needs3D: boolean;
 };
 
+// 👇 1. On définit la structure des détails client
+export type ClientDetails = {
+  name: string;
+  email: string;
+  phone: string;
+};
+
 export type OrderDraft = {
-  // Infos Step 1 (à adapter selon ce que Step 1 renvoie)
   info: {
     prefix: string;
     channel: string;
     delivery: string;
   };
-  // Infos Step 2
   customerId: string | null;
-  // Infos Step 3
+  // 👇 2. On ajoute ce champ pour stocker les infos lisibles
+  clientDetails: ClientDetails | null;
   products: ProductItem[];
-  // Infos Step 4 (saisies directement au récap)
   discountType: string;
   internalNote: string;
 };
 
-// --- Composant Principal ---
-
 export default function OrderForm() {
   const [step, setStep] = useState(1);
 
-  // 🔑 ÉTAT GLOBAL UNIQUE INITIALISÉ
   const [draft, setDraft] = useState<OrderDraft>({
     info: { prefix: "", channel: "", delivery: "" },
     customerId: null,
+    clientDetails: null, // 👇 3. Initialisé à null
     products: [],
     discountType: "none",
     internalNote: "",
   });
 
-  // 🔑 PATCHER PROPREMENT
   const updateDraft = (patch: Partial<OrderDraft>) => {
     setDraft((prev) => ({ ...prev, ...patch }));
-    console.log("Draft Updated:", { ...draft, ...patch }); // Utile pour débugger
   };
 
   const handleSubmit = () => {
-    // Ici, appel à ton API (Server Action ou fetch)
     console.log("Envoi de la commande finale : ", draft);
   };
 
   return (
     <div className="space-y-6">
-      {/* Note: J'assume que StepOne accepte aussi onChange.
-         Sinon, il faudra l'adapter comme StepThree ci-dessous.
-      */}
       {step === 1 && (
         <StepOne
+          draft={draft} // AJOUTÉ
+          onChange={updateDraft} // AJOUTÉ
           onNext={() => setStep(2)}
-          // draft={draft}
-          // onChange={updateDraft}
+          // onBack n'est pas nécessaire ici si c'est la page 1, ou redirige vers dashboard
         />
       )}
 
@@ -83,8 +81,8 @@ export default function OrderForm() {
 
       {step === 3 && (
         <StepThree
-          draft={draft} // On passe les données actuelles
-          onChange={updateDraft} // On passe la fonction de mise à jour
+          draft={draft}
+          onChange={updateDraft}
           onNext={() => setStep(4)}
           onBack={() => setStep(2)}
         />
@@ -93,7 +91,7 @@ export default function OrderForm() {
       {step === 4 && (
         <StepFour
           draft={draft}
-          onChange={updateDraft} // Step 4 modifie aussi le draft (note, remise)
+          onChange={updateDraft}
           onBack={() => setStep(3)}
           onSubmit={handleSubmit}
         />

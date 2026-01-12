@@ -124,10 +124,14 @@ export default function StepFour({
             </div>
           </CardHeader>
           <CardContent>
-            {draft.customerId ? (
-              <div className="font-medium text-gray-900">
-                {/* Idéalement, récupérez le nom du client via une requête ou passez-le dans draft */}
-                Client #{draft.customerId}
+            {draft.clientDetails ? (
+              // 👇 C'est ici que la magie opère
+              <div className="text-sm space-y-1">
+                <div className="font-bold text-gray-900">
+                  {draft.clientDetails.name}
+                </div>
+                <div className="text-gray-600">{draft.clientDetails.email}</div>
+                <div className="text-gray-600">{draft.clientDetails.phone}</div>
               </div>
             ) : (
               <p className="text-sm text-gray-500">Aucun client associé</p>

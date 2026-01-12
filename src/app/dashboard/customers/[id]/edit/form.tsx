@@ -1,68 +1,43 @@
-// src/app/dashboard/customers/[id]/edit/form.tsx
 "use client";
 
-import { useState } from "react";
-import { updateCustomer } from "./actions";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { updateCustomer, type CustomerFormState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-export default function CustomerEditForm({
-                                             customer,
-                                         }: {
-    customer: {
-        id: string;
-        name: string;
-        email: string;
-        phone: string;
-        companyName: string;
-        vatNumber: string;
-        isActive: boolean;
-        addressLine1: string;
-        addressLine2: string;
-        postalCode: string;
-        city: string;
-        country: string;
-    };
-}) {
-    const [pending, setPending] = useState(false);
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button aria-disabled={pending} type="submit">
+            {pending ? "Enregistrement..." : "Enregistrer"}
+        </Button>
+    );
+}
+
+export default function CustomerEditForm({ customer }: { customer: { id: string; name: string; email: string; phone: string; companyName: string; vatNumber: string; isActive: boolean; addressLine1: string; addressLine2: string; postalCode: string; city: string; country: string; }; }) {
+    const initialState: CustomerFormState = { errors: {}, message: null };
+    const [state, dispatch] = useActionState(updateCustomer, initialState);
 
     const [isActive, setIsActive] = useState<boolean>(customer.isActive);
 
-    async function onSubmit(formData: FormData) {
-        setPending(true);
-
-        const active = formData.get("isActive") === "true";
-
-        await updateCustomer(customer.id, {
-            name: (formData.get("name") as string) || null,
-            email: (formData.get("email") as string) || null,
-            phone: (formData.get("phone") as string) || null,
-            companyName: (formData.get("companyName") as string) || null,
-            vatNumber: (formData.get("vatNumber") as string) || null,
-            isActive: active,
-            addressLine1: (formData.get("addressLine1") as string) || null,
-            addressLine2: (formData.get("addressLine2") as string) || null,
-            postalCode: (formData.get("postalCode") as string) || null,
-            city: (formData.get("city") as string) || null,
-            country: (formData.get("country") as string) || null,
-        });
-
-        setPending(false);
-    }
-
     return (
-        <form action={onSubmit} className="space-y-6">
+        <form action={dispatch} className="space-y-6">
+            <input type="hidden" name="id" value={customer.id} />
+
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                    <Label>Nom</Label>
-                    <Input name="name" defaultValue={customer.name} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input id="name" name="name" defaultValue={customer.name} />
+                    {state.errors?.name && <p className="text-sm text-red-600 mt-1">{state.errors.name[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input name="email" defaultValue={customer.email} />
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" defaultValue={customer.email} />
+                    {state.errors?.email && <p className="text-sm text-red-600 mt-1">{state.errors.email[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -81,10 +56,8 @@ export default function CustomerEditForm({
                 </div>
 
                 <div className="flex items-center gap-3 pt-6">
-                    <Switch checked={isActive} onCheckedChange={setIsActive} />
-
-                    <input type="hidden" name="isActive" value={isActive ? "true" : "false"} />
-
+                    <Switch checked={isActive} onCheckedChange={setIsActive} name="isActiveSwitch" />
+                    <input type="hidden" name="isActive" value={String(isActive)} />
                     <span className="text-sm text-muted-foreground">
                         Client {isActive ? "actif" : "inactif"}
                     </span>
@@ -118,10 +91,13 @@ export default function CustomerEditForm({
                 </div>
             </div>
 
-            <div className="flex justify-end">
-                <Button disabled={pending} type="submit">
-                    {pending ? "Enregistrement..." : "Enregistrer"}
-                </Button>
+            <div className="flex items-center justify-between">
+                <div>
+                    {state.message && <p className="text-sm text-red-600">{state.message}</p>}
+                </div>
+                <div className="flex justify-end">
+                    <SubmitButton />
+                </div>
             </div>
         </form>
     );

@@ -1,16 +1,9 @@
+{/* Import des datas */}
 import { getOrderDetails } from "@/lib/data/orders";
-
+{/* Import Next */}
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import type { ReactNode } from "react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InfoRow } from "@/components/ui/info-row";
-import { SectionTitle } from "@/components/ui/section-title";
-import { Eye, Download, FileText, Image as ImageIcon } from "lucide-react";
+{/* Import des composants propre à la page détails */}
 import { OrderProgressionCard } from "./_components/OrderProgressionCard";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { OrderProductsCard } from "./_components/OrderProductsCard";
@@ -18,13 +11,12 @@ import { OrderNotesCard } from "./_components/OrderNotesCard";
 import { OrderFilesCard } from "./_components/OrderFilesCard";
 import { OrderSummaryCard } from "./_components/OrderSummaryCard";
 import { OrderCustomerCard } from "./_components/OrderCustomerCard";
-
-import { formatEUR } from "@/lib/money";
-import { orderTotalCents, statusLabelFR } from "@/lib/orders";
+import { Button } from "@/components/ui/button";
+{/* Import des lib */}
+import { orderTotalCents } from "@/lib/orders";
 import { formatDateTimeFR } from "@/lib/dates";
-import { isImageUrl } from "@/lib/strings";
 
-
+{/* Page de détails */}
 export default async function OrderDetailPage({
                                                   params,
                                               }: {
@@ -95,10 +87,11 @@ export default async function OrderDetailPage({
 
             {/* Main grid */}
             <div className="grid gap-4 lg:grid-cols-12 items-start">
-                {/* Colonne gauche */}
+                {/* Colonne gauche : Progression - Produits - Notes + Fichiers */}
                 <div className="lg:col-span-8 space-y-4">
+                    {/* Progression */}
                     <OrderProgressionCard order={order} />
-
+                    {/* Produits */}
                     <OrderProductsCard items={order.items} orderStatus={order.status} />
 
                     {/* Notes + Fichiers */}
@@ -110,7 +103,7 @@ export default async function OrderDetailPage({
                     </div>
                 </div>
 
-                {/* Récapitulatif - Client */}
+                {/* Colonne droite : Récapitulatif - Client */}
                 <div className="lg:col-span-4 space-y-4">
                     {/* Récapitulatif */}
                     <OrderSummaryCard

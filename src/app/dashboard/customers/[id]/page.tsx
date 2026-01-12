@@ -1,8 +1,4 @@
-import {
-    getCustomerDetails,
-    getCustomerOrders,
-    getCustomerOrderItems,
-} from "@/lib/data/customers";
+import { getCustomerDetails, getCustomerOrders, getCustomerOrderItems } from "@/lib/data/customers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -24,9 +20,7 @@ export default async function CustomerDetailPage({
     if (!id) return notFound();
 
     const customer = await getCustomerDetails(id);
-
     const orders = await getCustomerOrders(id);
-
     const lastItems = await getCustomerOrderItems(id);
 
     if (!customer) return notFound();

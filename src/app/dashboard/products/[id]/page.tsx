@@ -1,8 +1,4 @@
-import {
-    getProductDetails,
-    getProductOrderItems,
-    getProductRecentCustomers,
-} from "@/lib/data/products";
+import { getProductDetails, getProductOrderItems, getProductRecentCustomers } from "@/lib/data/products";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 

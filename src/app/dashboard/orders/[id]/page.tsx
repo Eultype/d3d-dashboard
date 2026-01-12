@@ -1,5 +1,5 @@
-// src/app/dashboard/orders/[id]/page.tsx
-import { prisma } from "@/lib/prisma";
+import { getOrderDetails } from "@/lib/data/orders";
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,30 +8,20 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoRow } from "@/components/ui/info-row";
+import { SectionTitle } from "@/components/ui/section-title";
 import { Eye, Download, FileText, Image as ImageIcon } from "lucide-react";
+import { OrderStepper } from "./_components/OrderStepper";
+import { OrderStatusBadge } from "@/components/badges/order-status-badge";
+import { OrderProductsCard } from "./_components/OrderProductsCard";
+import { OrderNotesCard } from "./_components/OrderNotesCard";
 
 import { formatEUR } from "@/lib/money";
 import { orderTotalCents, statusLabelFR } from "@/lib/orders";
-import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { formatDateTimeFR } from "@/lib/dates";
-import { InfoRow } from "@/components/ui/info-row";
-import { SectionTitle } from "@/components/ui/section-title";
 import { isImageUrl } from "@/lib/strings";
 
-// -----------------------------
-// UI helpers
-// -----------------------------
 
-
-
-
-
-
-import { getOrderDetails } from "@/lib/data/orders";
-import { OrderStepper } from "@/components/dashboard/order/OrderStepper";
-// -----------------------------
-// Page
-// -----------------------------
 export default async function OrderDetailPage({
                                                   params,
                                               }: {
@@ -124,121 +114,11 @@ export default async function OrderDetailPage({
                         </CardContent>
                     </Card>
 
-                    {/* Produits */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="space-y-1">
-                                <CardTitle className="text-base">Produits</CardTitle>
-                                <p className="text-sm text-muted-foreground">Articles de la commande</p>
-                            </div>
-                        </CardHeader>
-
-                        <CardContent className="p-0">
-                            <div className="overflow-hidden rounded-b-2xl border-t">
-                                <div className="grid grid-cols-12 bg-muted/30 px-4 py-2 text-xs font-semibold text-muted-foreground">
-                                    <div className="col-span-5">Article</div>
-                                    <div className="col-span-2 text-center">Statut</div>
-                                    <div className="col-span-1 text-center">Qté</div>
-                                    <div className="col-span-2 text-right">Prix</div>
-                                    <div className="col-span-2 text-right">Montant</div>
-                                </div>
-
-                                {order.items.length === 0 ? (
-                                    <div className="px-4 py-6 text-sm text-muted-foreground italic">Aucun produit.</div>
-                                ) : (
-                                    <div className="divide-y">
-                                        {order.items.map((it) => {
-                                            const name = it.product?.name ?? "Produit supprimé";
-                                            const sku = it.product?.sku ?? "—";
-                                            const unit = formatEUR(it.unitPriceCents);
-                                            const amount = formatEUR(it.unitPriceCents * it.quantity);
-
-                                            const lineStatus =
-                                                order.status === "TERMINE" ? "Livré" : order.status === "PROD" ? "En cours" : "En attente";
-
-                                            const imgSrc = it.product?.imageUrl ?? "";
-
-                                            return (
-                                                <div key={it.id} className="grid grid-cols-12 items-center px-4 py-3">
-                                                    {/* Article */}
-                                                    <div className="col-span-5 min-w-0">
-                                                        <div className="flex items-center gap-3 min-w-0">
-                                                            <div className="relative h-10 w-10 overflow-hidden rounded-xl border bg-muted/40 shadow-sm">
-                                                                {imgSrc ? (
-                                                                    <Image
-                                                                        src={imgSrc}
-                                                                        alt={name}
-                                                                        fill
-                                                                        sizes="40px"
-                                                                        className="object-cover"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="h-full w-full flex items-center justify-center text-xs font-semibold text-muted-foreground">
-                                                                        {name.slice(0, 1).toUpperCase()}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-
-                                                            <div className="min-w-0">
-                                                                <p className="text-sm font-semibold truncate">{name}</p>
-                                                                <p className="text-xs text-muted-foreground truncate">
-                                                                    {sku} • {unit}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Statut */}
-                                                    <div className="col-span-2 flex justify-center">
-                                                        <Badge variant={order.status === "TERMINE" ? "outline" : "secondary"}>{lineStatus}</Badge>
-                                                    </div>
-
-                                                    {/* Qté */}
-                                                    <div className="col-span-1 text-center">
-                                                        <span className="inline-flex rounded-lg border bg-background px-2 py-1 text-sm font-semibold tabular-nums">
-                                                            {it.quantity}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Prix */}
-                                                    <div className="col-span-2 text-right text-sm tabular-nums">{unit}</div>
-
-                                                    {/* Montant */}
-                                                    <div className="col-span-2 text-right text-sm font-semibold tabular-nums">{amount}</div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <OrderProductsCard items={order.items} orderStatus={order.status} />
 
                     {/* Notes + Fichiers */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Notes */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-base">Notes</CardTitle>
-                                <p className="text-sm text-muted-foreground">Notes internes sur la commande</p>
-                            </CardHeader>
-                            <CardContent>
-                                {order.notes.length === 0 ? (
-                                    <p className="text-sm text-muted-foreground italic">Aucune note.</p>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {order.notes.map((note) => (
-                                            <div key={note.id} className="text-sm">
-                                                <p>{note.content}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Par {note.user.email} • {new Date(note.createdAt).toLocaleDateString("fr-FR")}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        <OrderNotesCard notes={order.notes} />
 
                         {/* Fichiers */}
                         <Card>

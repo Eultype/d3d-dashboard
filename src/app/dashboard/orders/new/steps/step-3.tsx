@@ -163,7 +163,7 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
           </div>
           <Button
             onClick={addProduct}
-            className="h-11 w-11 p-0 shrink-0 bg-slate-500 hover:bg-slate-600"
+            className=" shrink-0 bg-black "
             disabled={!selectedProductKey}
           >
             <Plus className="h-5 w-5 text-white" />

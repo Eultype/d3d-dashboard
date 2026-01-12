@@ -11,12 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/info-row";
 import { SectionTitle } from "@/components/ui/section-title";
 import { Eye, Download, FileText, Image as ImageIcon } from "lucide-react";
-import { OrderStepper } from "./_components/OrderStepper";
+import { OrderProgressionCard } from "./_components/OrderProgressionCard";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { OrderProductsCard } from "./_components/OrderProductsCard";
 import { OrderNotesCard } from "./_components/OrderNotesCard";
 import { OrderFilesCard } from "./_components/OrderFilesCard";
 import { OrderSummaryCard } from "./_components/OrderSummaryCard";
+import { OrderCustomerCard } from "./_components/OrderCustomerCard";
 
 import { formatEUR } from "@/lib/money";
 import { orderTotalCents, statusLabelFR } from "@/lib/orders";
@@ -96,25 +97,7 @@ export default async function OrderDetailPage({
             <div className="grid gap-4 lg:grid-cols-12 items-start">
                 {/* Colonne gauche */}
                 <div className="lg:col-span-8 space-y-4">
-                    {/* Progress */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base">Progression</CardTitle>
-                                    <p className="text-sm text-muted-foreground">Statut actuel de la commande</p>
-                                </div>
-
-                                <div className="text-right">
-                                    <p className="text-xs text-muted-foreground">Actuel</p>
-                                    <p className="text-sm font-semibold">{statusLabelFR(order.status)}</p>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <OrderStepper current={order.status} />
-                        </CardContent>
-                    </Card>
+                    <OrderProgressionCard order={order} />
 
                     <OrderProductsCard items={order.items} orderStatus={order.status} />
 
@@ -122,13 +105,14 @@ export default async function OrderDetailPage({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Notes */}
                         <OrderNotesCard notes={order.notes} />
-
+                        {/* Fichiers */}
                         <OrderFilesCard files={order.files} />
                     </div>
                 </div>
 
-                {/* Colonne droite */}
+                {/* Récapitulatif - Client */}
                 <div className="lg:col-span-4 space-y-4">
+                    {/* Récapitulatif */}
                     <OrderSummaryCard
                         orderId={order.id}
                         sousTotalCents={sousTotalCents}
@@ -136,54 +120,8 @@ export default async function OrderDetailPage({
                         tvaCents={tvaCents}
                         totalCents={totalCents}
                     />
-
                     {/* Client */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-base">Client</CardTitle>
-                                {order.customer?.id ? (
-                                    <Link className="text-sm underline" href={`/dashboard/customers/${order.customer.id}`}>
-                                        Ouvrir →
-                                    </Link>
-                                ) : null}
-                            </div>
-                        </CardHeader>
-
-                        <CardContent className="space-y-4">
-                            <div className="rounded-xl border p-3">
-                                <SectionTitle>Informations générales</SectionTitle>
-
-                                <div className="mt-3 space-y-2">
-                                    <InfoRow label="Nom" value={order.customer?.name ?? "—"} />
-                                    <InfoRow label="Téléphone" value={order.customer?.phone ?? "—"} />
-
-                                    <div className="flex items-center justify-between gap-3">
-                                        <p className="text-sm text-muted-foreground">Email</p>
-                                        <p className="text-sm font-medium break-all text-right">{order.customer?.email ?? "—"}</p>
-                                    </div>
-
-                                    <InfoRow label="Société" value={order.customer?.companyName ?? "Particulier"} />
-                                    <InfoRow label="TVA" value={order.customer?.vatNumber ?? "—"} />
-                                </div>
-                            </div>
-
-                            <div className="rounded-xl border p-3">
-                                <SectionTitle>Adresse de livraison</SectionTitle>
-                                <div className="mt-3 text-sm text-muted-foreground space-y-1">
-                                    <p className="font-medium text-foreground">{order.customer?.addressLine1 ?? "—"}</p>
-                                    {order.customer?.addressLine2?.trim() ? <p>{order.customer.addressLine2}</p> : null}
-                                    <p>{(order.customer?.postalCode ?? "—") + " " + (order.customer?.city ?? "—")}</p>
-                                    <p>{order.customer?.country ?? "—"}</p>
-                                </div>
-                            </div>
-
-                            <div className="rounded-xl border p-3">
-                                <SectionTitle>Adresse de facturation</SectionTitle>
-                                <p className="mt-3 text-sm text-muted-foreground">Identique à l’adresse de livraison</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <OrderCustomerCard customer={order.customer} />
                 </div>
             </div>
         </div>

@@ -1,18 +1,20 @@
+{/* Import des datas */}
 import { getProductDetails, getProductOrderItems, getProductRecentCustomers } from "@/lib/data/products";
+{/* Import Next */}
 import { notFound } from "next/navigation";
 import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+{/* Import des composants */}
 import { ProductInfoCard } from "./_components/ProductInfoCard";
 import { ProductRecentOrdersCard } from "./_components/ProductRecentOrdersCard";
 import { ProductRecentCustomersCard } from "./_components/ProductRecentCustomersCard";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
-
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+{/* Import des lib */}
 import { formatEUR } from "@/lib/money";
-import { formatDateFR, formatDateTimeFR } from "@/lib/dates";
+import { formatDateTimeFR } from "@/lib/dates";
 
+{/* Page de détails produit */}
 export default async function ProductDetailPage({
                                                     params,
                                                 }: {
@@ -65,6 +67,7 @@ export default async function ProductDetailPage({
                     </p>
                 </div>
 
+                {/* Boutons Retour - Modifier */}
                 <div className="flex items-center gap-2">
                     {/* Bouton retour */}
                     <Button asChild variant="ghost">
@@ -83,6 +86,7 @@ export default async function ProductDetailPage({
             <div className="grid gap-4 xl:grid-cols-2 items-stretch">
                 {/* Dernières commandes avec ce produit */}
                 <ProductRecentOrdersCard lastItems={lastItems} productId={product.id} />
+                {/* Dernier client qui a commandé ce produit */}
                 <ProductRecentCustomersCard lastCustomers={lastCustomers} />
             </div>
         </div>

@@ -3,7 +3,7 @@ import { getOrderDetails } from "@/lib/data/orders";
 {/* Import Next */}
 import { notFound } from "next/navigation";
 import Link from "next/link";
-{/* Import des composants propre à la page détails */}
+{/* Import des composants */}
 import { OrderProgressionCard } from "./_components/OrderProgressionCard";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { OrderProductsCard } from "./_components/OrderProductsCard";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { orderTotalCents } from "@/lib/orders";
 import { formatDateTimeFR } from "@/lib/dates";
 
-{/* Page de détails */}
+{/* Page de détails commande */}
 export default async function OrderDetailPage({
                                                   params,
                                               }: {

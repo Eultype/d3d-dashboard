@@ -1,4 +1,7 @@
-// components/StepOne.tsx (or wherever your component is)
+"use client";
+
+import * as React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -24,6 +27,16 @@ const steps = [
 ];
 
 export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [products, setProducts] = useState<string[]>([]);
+
+  const addProduct = () => {
+    if (selectedProduct) {
+      setProducts([...products, selectedProduct]);
+      setSelectedProduct(null); // réinitialise la sélection
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
       {/* Stepper */}
@@ -40,15 +53,19 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
           Ajoutez les produits avec leurs options
         </p>
       </div>
+
       {/* Form Fields */}
-      <div className="flex flex-col space-y-6  ">
+      <div className="flex flex-col space-y-6">
         {/* Ligne 1 */}
-        <div className="flex justify-center items-center space-y-7 gap-6 ">
+        <div className="flex justify-center items-center space-y-7 gap-6">
           <Field>
             <FieldLabel htmlFor="select-prefix">
               Sélectionner un produit *
             </FieldLabel>
-            <Select>
+            <Select
+              value={selectedProduct || ""}
+              onValueChange={(value) => setSelectedProduct(value)}
+            >
               <SelectTrigger className="w-full pl-4 h-12">
                 <SelectValue
                   id="select-prefix"
@@ -72,15 +89,26 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
               </SelectContent>
             </Select>
           </Field>
-          <Button>+</Button>
+          <Button onClick={addProduct}>+</Button>
         </div>
 
         {/* Ligne 2 */}
         <div className="border-2 border-dashed p-10">
-          <div className="text-center text-gray-400">
-            <h3>Aucun produit ajouté</h3>
-            <p>Sélectionnez un produit dans la liste ci-dessus</p>
-          </div>
+          {products.length === 0 ? (
+            <div className="text-center text-gray-400">
+              <h3>Aucun produit ajouté</h3>
+              <p>Sélectionnez un produit dans la liste ci-dessus</p>
+            </div>
+          ) : (
+            products.map((prod, idx) => (
+              <div
+                key={idx}
+                className="p-4  mb-2 border rounded flex justify-between items-center"
+              >
+                <span>{prod}</span>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Buttons */}

@@ -31,10 +31,12 @@ model Customer {
   city         String?
   country      String?
 
-  createdAt   DateTime @default(now())
+  isActive    Boolean  @default(true)
 
+  createdAt   DateTime @default(now())
   orders      Order[]
 }
+
 
 model Order {
   id         String   @id @default(cuid())

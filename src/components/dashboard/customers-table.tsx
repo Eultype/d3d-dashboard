@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatDateFR } from "@/lib/dates";
 
 import {
     Table,
@@ -10,9 +11,17 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
+import { Eye, Pencil } from "lucide-react";
 
 type CustomerRow = {
     id: string;
@@ -21,7 +30,8 @@ type CustomerRow = {
     phone: string | null;
     companyName: string | null;
     vatNumber: string | null;
-    createdAt: string; // on passe une string depuis le serveur (toISOString)
+    isActive: boolean;
+    createdAt: string; // ISO
 };
 
 function initials(name?: string | null) {
@@ -35,16 +45,17 @@ function initials(name?: string | null) {
 export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
     return (
         <TooltipProvider>
-            <div className="bg-background overflow-hidden">
+            <div className="overflow-hidden rounded-lg border bg-background">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-muted/90">
+                        <TableRow className="bg-muted/40">
                             <TableHead className="w-[320px] py-2">Nom</TableHead>
                             <TableHead>Email</TableHead>
-                            <TableHead>Téléphone</TableHead>
-                            <TableHead>Société</TableHead>
-                            <TableHead>TVA</TableHead>
-                            <TableHead>Créé le</TableHead>
+                            <TableHead className="w-[160px]">Téléphone</TableHead>
+                            <TableHead className="w-[220px]">Société</TableHead>
+                            <TableHead className="w-[150px]">TVA</TableHead>
+                            <TableHead className="w-[120px]">Statut</TableHead>
+                            <TableHead className="w-[160px]">Créé le</TableHead>
                             <TableHead className="text-center w-[120px]">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -52,48 +63,60 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                     <TableBody>
                         {customers.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
                                     Aucun client.
                                 </TableCell>
                             </TableRow>
                         )}
 
                         {customers.map((c) => {
-                            const isCompany = !!c.companyName;
-                            const vatOk = !!c.vatNumber;
+                            const isCompany = !!c.companyName?.trim();
+                            const vatOk = !!c.vatNumber?.trim();
+
+                            const detailsHref = `/dashboard/customers/${c.id}`;
+                            const editHref = `/dashboard/customers/${c.id}/edit`;
 
                             return (
                                 <TableRow key={c.id} className="hover:bg-muted/30 transition-colors">
-                                    {/* NAME cell (avatar + name + email) */}
+                                    {/* Nom (avatar + name + email) */}
                                     <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
-                                                {initials(c.name)}
-                                            </div>
+                                        <Link href={detailsHref} className="block">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
+                                                    {initials(c.name)}
+                                                </div>
 
-                                            <div className="min-w-0">
-                                                <div className="font-medium truncate">{c.name ?? "Client sans nom"}</div>
-                                                <div className="text-sm text-muted-foreground truncate">
-                                                    {c.email ?? "—"}
+                                                <div className="min-w-0">
+                                                    <div className="font-medium truncate">
+                                                        {c.name ?? "Client sans nom"}
+                                                    </div>
+                                                    <div className="text-sm text-muted-foreground truncate">
+                                                        {c.email ?? "—"}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </TableCell>
 
+                                    {/* Email */}
                                     <TableCell className="text-sm">{c.email ?? "—"}</TableCell>
+
+                                    {/* Téléphone */}
                                     <TableCell className="text-sm">{c.phone ?? "—"}</TableCell>
 
+                                    {/* Société */}
                                     <TableCell>
                                         {isCompany ? (
                                             <div className="flex flex-col">
-                                                <span className="font-medium">{c.companyName}</span>
-                                                <span className="italic text-muted-foreground">Entreprise</span>
+                                                <span className="font-medium truncate">{c.companyName}</span>
+                                                <span className="text-sm text-muted-foreground italic">Entreprise</span>
                                             </div>
                                         ) : (
-                                            <span className="italic text-muted-foreground">Particulier</span>
+                                            <span className="text-sm text-muted-foreground italic">Particulier</span>
                                         )}
                                     </TableCell>
 
+                                    {/* TVA */}
                                     <TableCell>
                                         {vatOk ? (
                                             <Badge variant="secondary" className="font-mono">
@@ -104,17 +127,23 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                                         )}
                                     </TableCell>
 
-                                    <TableCell className="text-sm text-muted-foreground">
-                                        {new Date(c.createdAt).toLocaleDateString("fr-FR")}
+                                    {/* Statut */}
+                                    <TableCell>
+                                        <CustomerActiveBadge isActive={c.isActive} />
                                     </TableCell>
 
-                                    {/* ACTIONS */}
+                                    {/* Créé le */}
+                                    <TableCell className="text-sm text-muted-foreground">
+                                        {formatDateFR(new Date(c.createdAt))}
+                                    </TableCell>
+
+                                    {/* Actions */}
                                     <TableCell>
                                         <div className="flex items-center justify-center">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link
-                                                        href={`/dashboard/customers/${c.id}`}
+                                                        href={detailsHref}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"
                                                     >
                                                         <Eye className="h-4 w-4 text-muted-foreground" />
@@ -125,28 +154,14 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
 
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <button
-                                                        type="button"
+                                                    <Link
+                                                        href={editHref}
                                                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"
-                                                        onClick={() => alert("Edit (à faire)")}
                                                     >
                                                         <Pencil className="h-4 w-4 text-muted-foreground" />
-                                                    </button>
+                                                    </Link>
                                                 </TooltipTrigger>
                                                 <TooltipContent>Modifier</TooltipContent>
-                                            </Tooltip>
-
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <button
-                                                        type="button"
-                                                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted"
-                                                        onClick={() => alert("Delete (à faire)")}
-                                                    >
-                                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                                    </button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>Supprimer</TooltipContent>
                                             </Tooltip>
                                         </div>
                                     </TableCell>

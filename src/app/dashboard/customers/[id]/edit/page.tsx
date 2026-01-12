@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CustomerEditForm from "./form";
+import { CustomerForm } from "@/components/dashboard/customer/CustomerForm";
 
 export default async function CustomerEditPage({
                                                    params,
@@ -43,7 +43,7 @@ export default async function CustomerEditPage({
                     <CardTitle>Informations</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <CustomerEditForm
+                    <CustomerForm
                         customer={{
                             id: customer.id,
                             name: customer.name ?? "",

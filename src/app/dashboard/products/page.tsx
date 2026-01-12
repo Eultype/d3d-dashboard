@@ -1,60 +1,79 @@
-import { prisma } from "@/lib/prisma";
+{/* Import des datas */}
+import { getProductsAndStats } from "@/lib/data/products";
+{/* Import Next */}
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+{/* Import des composants */}
 import { ProductsTable } from "@/components/dashboard/products-table";
+import { Button } from "@/components/ui/button";
+import { StatItem } from "@/components/dashboard/StatItem";
+import { Package, CheckCircle2, XCircle } from "lucide-react";
 
+{/*  */}
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des produits",
     description:
-        "Gérez votre catalogue produits : prix, stock, visuels, descriptions et statut actif/inactif.",
+        "Gérez et suivez l’ensemble de vos produits : activation, détails, stock, historique des ventes et actions associées.",
 };
 
+{/* Page de listing produits */}
 export default async function ProductsPage() {
-    const products = await prisma.product.findMany({
-        orderBy: { createdAt: "desc" },
-    });
+    const { products: rows, stats } = await getProductsAndStats();
+    const { totalProducts, activeProducts, inactiveProducts } = stats;
 
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
-                <div className="text-sm text-muted-foreground">
-                    <Link href="/dashboard" className="hover:underline">
-                        Dashboard
-                    </Link>{" "}
-                    /{" "}
-                    <Link href="/dashboard/products" className="hover:underline">
-                        Produits
-                    </Link>{" "}
+            {/* Header */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-2">
+                    <div className="text-sm text-muted-foreground">
+                        <Link href="/dashboard" className="hover:underline">
+                            Dashboard
+                        </Link>{" "}
+                        /{" "}
+                        <span className="text-foreground">Produits</span>
+                    </div>
+
+                    <div>
+                        <h1 className="text-2xl font-bold">Produits</h1>
+                        <p className="text-sm text-muted-foreground">
+                            Gestion du catalogue (cristaux, supports, etc.)
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h1 className="text-2xl font-bold">Produits</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Gestion du catalogue (cristaux, supports, etc.)
-                    </p>
-                </div>
+
+                <Button asChild>
+                    <Link href="/dashboard/products/new">Nouveau produit</Link>
+                </Button>
             </div>
 
-            <div>
-                <Link href="/dashboard/products/new">
-                    <Button>Nouveau produit</Button>
-                </Link>
-            </div>
-
-            <div>
-                <ProductsTable
-                    products={products.map((p) => ({
-                        id: p.id,
-                        name: p.name,
-                        sku: p.sku,
-                        description: p.description,
-                        imageUrl: p.imageUrl,
-                        isActive: p.isActive,
-                        priceCents: p.priceCents,
-                        createdAt: p.createdAt.toISOString(),
-                    }))}
+            {/* Stats ( Total - Actifs - Inactifs */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Total */ }
+                <StatItem
+                    icon={<Package className="h-4 w-4" />}
+                    label="Produits"
+                    value={totalProducts}
+                    hint="Total"
+                />
+                {/* Actifs */}
+                <StatItem
+                    icon={<CheckCircle2 className="h-4 w-4" />}
+                    label="Actifs"
+                    value={activeProducts}
+                    hint="Disponibles"
+                />
+                {/* Inactifs */}
+                <StatItem
+                    icon={<XCircle className="h-4 w-4" />}
+                    label="Inactifs"
+                    value={inactiveProducts}
+                    hint="Non visibles"
                 />
             </div>
+
+            {/* Tableau produits */}
+            <ProductsTable products={rows} />
         </div>
     );
 }

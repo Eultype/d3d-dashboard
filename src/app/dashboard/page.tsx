@@ -1,94 +1,398 @@
+// src/app/dashboard/page.tsx
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+import { prisma } from "@/lib/prisma";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OrderStatusBadge } from "@/components/badges/order-status-badge";
+
+import {
+  ClipboardList,
+  AlertCircle,
+  Factory,
+  Truck,
+  Store,
+  CheckCircle2,
+  Plus,
+  ArrowRight,
+  Eye,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "D3D | Dashboard | Vue d'ensemble",
   description:
-    "Accédez à une vue d’ensemble claire des statistiques, clients et performances depuis votre dashboard.",
+      "Vue d’ensemble orientée actions : commandes à vérifier, en production, à livrer, et terminées.",
 };
 
+type OrderItemLite = { quantity: number; unitPriceCents: number };
+type OrderLite = {
+  id: string;
+  status: string;
+  createdAt: Date;
+  customer: { name: string | null; email: string | null } | null;
+  items: OrderItemLite[];
+};
+
+function computeOrderTotals(items: OrderItemLite[]) {
+  const articlesCount = items.reduce((sum, it) => sum + it.quantity, 0);
+  const totalCents = items.reduce((sum, it) => sum + it.quantity * it.unitPriceCents, 0);
+  return { articlesCount, totalCents };
+}
+
+function formatEUR(cents: number) {
+  return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
+      (cents ?? 0) / 100
+  );
+}
+
+// Format court 09/01/26 (comme tu voulais)
+function formatDateShortFR(d: Date) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }).format(d);
+}
+
+function StatItem({
+                    icon,
+                    label,
+                    value,
+                    hint,
+                  }: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+}) {
+  return (
+      <div className="rounded-lg border bg-background px-4 py-3 shadow-sm transition-colors hover:bg-muted/20">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg border bg-muted/30">
+              {icon}
+            </div>
+            <div className="text-[11px] font-medium uppercase tracking-wide">{label}</div>
+          </div>
+        </div>
+
+        <div className="mt-3 text-xl font-bold tabular-nums leading-tight">{value}</div>
+        {hint ? (
+            <div className="mt-1 text-[11px] leading-tight text-muted-foreground">{hint}</div>
+        ) : null}
+      </div>
+  );
+}
+
 export default async function DashboardPage() {
-  const [ordersCount, customersCount] = await Promise.all([
-    prisma.order.count(),
-    prisma.customer.count(),
+  // ⚠️ Ajuste si tu as d'autres statuts (ex: ANNULEE)
+  const STATUS = {
+    A_VERIFIER: "A_VERIFIER",
+    PROD: "PROD",
+    A_EXPEDIER: "A_EXPEDIER",
+    A_RECUPERER: "A_RECUPERER",
+    TERMINE: "TERMINE",
+  } as const;
+
+  // Cards (pipeline)
+  const [
+    countToVerify,
+    countInProd,
+    countToShip,
+    countToPickUp,
+    countDone,
+    lastOrders,
+  ] = await Promise.all([
+    prisma.order.count({ where: { status: STATUS.A_VERIFIER } }),
+    prisma.order.count({ where: { status: STATUS.PROD } }),
+    prisma.order.count({ where: { status: STATUS.A_EXPEDIER } }),
+    prisma.order.count({ where: { status: STATUS.A_RECUPERER } }),
+    prisma.order.count({ where: { status: STATUS.TERMINE } }),
+    prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: {
+        customer: true,
+        items: { select: { quantity: true, unitPriceCents: true } },
+      },
+    }),
   ]);
 
+  const countInProgress =
+      countToVerify + countInProd + countToShip + countToPickUp;
+
+  const countToProcess = countToVerify + countToShip + countToPickUp;
+
+  const recent: Array<{
+    id: string;
+    status: string;
+    createdAt: Date;
+    customer: { name: string | null; email: string | null } | null;
+    articlesCount: number;
+    totalCents: number;
+  }> = (lastOrders as OrderLite[]).map((o) => {
+    const { articlesCount, totalCents } = computeOrderTotals(o.items);
+    return {
+      id: o.id,
+      status: o.status,
+      createdAt: o.createdAt,
+      customer: o.customer
+          ? { name: o.customer.name, email: o.customer.email }
+          : null,
+      articlesCount,
+      totalCents,
+    };
+  });
+
+  // À traiter = “ce qui nécessite une action maintenant”
+  const todoOrders = recent.filter((o) =>
+      [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER].includes(o.status as any)
+  );
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Vue d’ensemble</p>
-      </div>
+      <div className="space-y-6">
+        {/* Header (même style que tes pages Orders/Customers/Products) */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              <Link href="/dashboard" className="hover:underline">
+                Dashboard
+              </Link>{" "}
+              / <span className="text-foreground">Vue d’ensemble</span>
+            </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        {/* Commandes en cours */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Commandes en cours</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {ordersCount}
-          </CardContent>
-        </Card>
-        {/* Commandes en production */}
-        <Card>
-          <CardHeader>
-            <CardTitle>En production</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {ordersCount}
-          </CardContent>
-        </Card>
-        {/* Commandes à expédier*/}
-        <Card>
-          <CardHeader>
-            <CardTitle>À expédier</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {ordersCount}
-          </CardContent>
-        </Card>
-        {/* Commandes à récupérer*/}
-        <Card>
-          <CardHeader>
-            <CardTitle>À récupérer</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {ordersCount}
-          </CardContent>
-        </Card>
-        {/* Clients */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Clients</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {customersCount}
-          </CardContent>
-        </Card>
-        {/* Produits */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Produits</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">0</CardContent>
-        </Card>
-        {/* 3d en attente*/}
-        <Card>
-          <CardHeader>
-            <CardTitle>3d en attente</CardTitle>
-          </CardHeader>
-          <CardContent className="text-3xl font-semibold">
-            {ordersCount}
-          </CardContent>
-        </Card>
-      </div>
+            <div>
+              <h1 className="text-2xl font-bold">Dashboard</h1>
+              <p className="text-sm text-muted-foreground">
+                Le pipeline des commandes + accès rapide aux actions.
+              </p>
+            </div>
+          </div>
 
-      <Link href="/dashboard/orders" className="underline">
-        Voir les commandes
-      </Link>
-    </div>
+          {/* Actions rapides */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Button asChild>
+              <Link href="/dashboard/orders/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Nouvelle commande
+              </Link>
+            </Button>
+
+            <Button asChild variant="outline">
+              <Link href="/dashboard/customers/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Nouveau client
+              </Link>
+            </Button>
+
+            <Button asChild variant="outline">
+              <Link href="/dashboard/products/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Nouveau produit
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* 5 cards utiles (pipeline commandes) */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <StatItem
+              icon={<ClipboardList className="h-4 w-4" />}
+              label="En cours"
+              value={countInProgress}
+              hint="Commandes actives"
+          />
+
+          <StatItem
+              icon={<AlertCircle className="h-4 w-4" />}
+              label="À vérifier"
+              value={countToVerify}
+              hint="Priorité"
+          />
+
+          <StatItem
+              icon={<Factory className="h-4 w-4" />}
+              label="En production"
+              value={countInProd}
+              hint="Atelier"
+          />
+
+          <StatItem
+              icon={<Truck className="h-4 w-4" />}
+              label="À expédier"
+              value={countToShip}
+              hint="Prêtes à envoyer"
+          />
+
+          <StatItem
+              icon={<Store className="h-4 w-4" />}
+              label="À récupérer"
+              value={countToPickUp}
+              hint="Click & collect"
+          />
+        </div>
+
+        {/* Contenu bas: 2 cards comme sur tes fiches (propre et lisible) */}
+        <div className="grid gap-4 xl:grid-cols-2 items-stretch">
+          {/* Dernières commandes */}
+          <Card className="rounded-lg">
+            <CardHeader className="flex flex-row items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">Dernières commandes</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Les 5 dernières commandes créées
+                </p>
+              </div>
+
+              <Button asChild variant="ghost" className="gap-2">
+                <Link href="/dashboard/orders">
+                  Voir tout <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+
+            <CardContent className="space-y-3">
+              {recent.length === 0 && (
+                  <p className="text-sm text-muted-foreground italic">
+                    Aucune commande pour le moment.
+                  </p>
+              )}
+
+              {recent.map((o) => {
+                const href = `/dashboard/orders/${o.id}`;
+                const shortId = o.id.slice(0, 10);
+
+                return (
+                    <div
+                        key={o.id}
+                        className="rounded-lg border px-4 py-3 hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                        {/* GAUCHE */}
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 min-w-0">
+                            <span className="font-mono text-sm shrink-0">#{shortId}</span>
+                            <OrderStatusBadge status={o.status} />
+                          </div>
+
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {o.customer ? (
+                                <>
+                            <span className="font-medium text-foreground/90">
+                              {o.customer.name ?? "Client sans nom"}
+                            </span>{" "}
+                                  <span className="text-muted-foreground">
+                              ({o.customer.email ?? "—"})
+                            </span>
+                                  {" • "}
+                                </>
+                            ) : (
+                                <>
+                                  <span className="italic">Sans client</span> •{" "}
+                                </>
+                            )}
+                            {formatDateShortFR(o.createdAt)} •{" "}
+                            {o.articlesCount} article{o.articlesCount > 1 ? "s" : ""}
+                          </p>
+                        </div>
+
+                        {/* DROITE */}
+                        <div className="flex items-center justify-between gap-3 sm:justify-end">
+                          <div className="text-right leading-tight">
+                            <div className="font-semibold whitespace-nowrap">
+                              {formatEUR(o.totalCents)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Total commande
+                            </div>
+                          </div>
+
+                          <Button asChild size="sm" variant="outline" className="shrink-0">
+                            <Link href={href}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Voir
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+
+          {/* À traiter (focus action) */}
+          <Card className="rounded-lg">
+            <CardHeader className="flex flex-row items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">À traiter</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Commandes qui nécessitent une action maintenant
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="tabular-nums">
+                  {countToProcess} au total
+                </Badge>
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-3">
+              {todoOrders.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    Rien d’urgent. 👍
+                  </p>
+              ) : (
+                  todoOrders.map((o) => {
+                    const href = `/dashboard/orders/${o.id}`;
+                    const shortId = o.id.slice(0, 10);
+
+                    return (
+                        <div
+                            key={o.id}
+                            className="rounded-lg border px-4 py-3 hover:bg-muted/30 transition-colors"
+                        >
+                          <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-mono text-sm">#{shortId}</span>
+                                <OrderStatusBadge status={o.status} />
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {formatDateShortFR(o.createdAt)}
+                                {o.customer?.name ? ` • ${o.customer.name}` : ""}
+                              </p>
+                            </div>
+
+                            <Button asChild size="sm" variant="outline" className="shrink-0">
+                              <Link href={href}>Ouvrir</Link>
+                            </Button>
+                          </div>
+                        </div>
+                    );
+                  })
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Accès rapides bas (optionnel, mais clean) */}
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="gap-2">
+            <Link href="/dashboard/orders">Voir les commandes</Link>
+          </Button>
+          <Button asChild variant="outline" className="gap-2">
+            <Link href="/dashboard/customers">Voir les clients</Link>
+          </Button>
+          <Button asChild variant="outline" className="gap-2">
+            <Link href="/dashboard/products">Voir les produits</Link>
+          </Button>
+        </div>
+      </div>
   );
 }

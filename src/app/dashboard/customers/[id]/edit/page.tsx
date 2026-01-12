@@ -25,7 +25,7 @@ export default async function CustomerEditPage({
                 <Link href={`/dashboard/customers/${customer.id}`} className="hover:underline">
                     #{customer.id.slice(0, 10)}
                 </Link>{" "}
-                / <span>Modifier</span>
+                / <span className="text-foreground">Modifier</span>
             </div>
 
             <div className="flex items-center justify-between gap-3">

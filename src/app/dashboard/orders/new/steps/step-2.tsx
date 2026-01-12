@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
@@ -36,7 +36,6 @@ export default function StepTwo({
   onBack,
   currentStep = 2,
 }: Props) {
-  const [selected, setSelected] = React.useState<CustomerLite | null>(null);
   const [isNewClient, setIsNewClient] = React.useState(false);
   const [form, setForm] = React.useState({
     firstName: "",
@@ -81,6 +80,7 @@ export default function StepTwo({
     setIsNewClient(false);
     handleReset();
   };
+  const [selected, setSelected] = useState<CustomerLite | null>(null);
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
@@ -202,8 +202,8 @@ export default function StepTwo({
 
           <Button
             type="button"
-            onClick={onNext} // tu peux rendre le client obligatoire si besoin
-            // disabled={!draft.customerId}
+            onClick={onNext}
+            disabled={!draft.customerId && !isNewClient}
           >
             Continuer →
           </Button>

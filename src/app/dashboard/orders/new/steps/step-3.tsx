@@ -76,18 +76,12 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
         </div>
 
         {/* Ligne 2 */}
-        <Field>
-          <FieldLabel>Mode De Livraison *</FieldLabel>
-          <Select>
-            <SelectTrigger className="w-full pl-4  h-12">
-              <SelectValue placeholder="Retrait Atelier" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="atelier">Retrait Atelier</SelectItem>
-              <SelectItem value="livraison">Livraison</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
+        <div className="border-2 border-dashed p-10">
+          <div className="text-center text-gray-400">
+            <h3>Aucun produit ajouté</h3>
+            <p>Sélectionnez un produit dans la liste ci-dessus</p>
+          </div>
+        </div>
 
         {/* Buttons */}
         <div className="flex justify-between pt-4">

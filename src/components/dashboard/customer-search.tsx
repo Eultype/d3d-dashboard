@@ -49,6 +49,12 @@ export function CustomerSearch({
         const res = await fetch(
           `/api/customers/search?q=${encodeURIComponent(debounced)}`,
         );
+        if (!res.ok) { // Gérer les réponses non-OK
+          const errorData = await res.json();
+          console.error("API error:", res.status, errorData.error);
+          setItems([]); // Vider les éléments en cas d'erreur
+          return;
+        }
         const data = (await res.json()) as CustomerLite[];
         if (!cancelled) setItems(data);
       } finally {

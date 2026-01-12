@@ -16,6 +16,7 @@ import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 import { OrderProductsCard } from "./_components/OrderProductsCard";
 import { OrderNotesCard } from "./_components/OrderNotesCard";
 import { OrderFilesCard } from "./_components/OrderFilesCard";
+import { OrderSummaryCard } from "./_components/OrderSummaryCard";
 
 import { formatEUR } from "@/lib/money";
 import { orderTotalCents, statusLabelFR } from "@/lib/orders";
@@ -128,36 +129,13 @@ export default async function OrderDetailPage({
 
                 {/* Colonne droite */}
                 <div className="lg:col-span-4 space-y-4">
-                    {/* Récapitulatif (à la place de Paiement) */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base">Récapitulatif</CardTitle>
-                                    <p className="text-sm text-muted-foreground">Total de la commande</p>
-                                </div>
-
-                                <Button asChild variant="outline">
-                                    <Link href={`/print/orders/${order.id}/facture`} target="_blank" rel="noreferrer">
-                                        Facture
-                                    </Link>
-                                </Button>
-                            </div>
-                        </CardHeader>
-
-                        <CardContent className="space-y-3">
-                            <InfoRow label="Sous-total" value={<span className="tabular-nums">{formatEUR(sousTotalCents)}</span>} />
-                            <InfoRow label="Livraison" value={<span className="tabular-nums">{formatEUR(livraisonCents)}</span>} />
-                            <InfoRow label="TVA" value={<span className="tabular-nums">{formatEUR(tvaCents)}</span>} />
-                            <div className="h-px bg-border" />
-                            <InfoRow
-                                label={<span className="font-semibold text-foreground">Total</span>}
-                                value={<span className="font-bold tabular-nums">{formatEUR(totalCents)}</span>}
-                            />
-
-
-                        </CardContent>
-                    </Card>
+                    <OrderSummaryCard
+                        orderId={order.id}
+                        sousTotalCents={sousTotalCents}
+                        livraisonCents={livraisonCents}
+                        tvaCents={tvaCents}
+                        totalCents={totalCents}
+                    />
 
                     {/* Client */}
                     <Card>

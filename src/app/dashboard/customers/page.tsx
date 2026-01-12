@@ -1,13 +1,22 @@
+{/* Import des datas */}
+import { getCustomersAndStats } from "@/lib/data/customers";
+{/* Import Next */}
 import Link from "next/link";
 import type { Metadata } from "next";
-
+{/* Import des composants */}
 import { CustomersTable } from "@/components/dashboard/customers-table";
 import { Button } from "@/components/ui/button";
-
-import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
-import { getCustomersAndStats } from "@/lib/data/customers";
 import { StatItem } from "@/components/dashboard/StatItem";
+import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
 
+{/*  */}
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Gestion des clients",
+    description:
+        "Gérez et suivez l’ensemble de vos clients : informations, statut, historique, entreprises, TVA et activités récentes.",
+};
+
+{/* Page de listing clients */}
 export default async function CustomersPage() {
     const { customers, stats } = await getCustomersAndStats();
 
@@ -34,42 +43,43 @@ export default async function CustomersPage() {
                     </div>
                 </div>
 
-                {/* Si tu as la route /new, sinon supprime ce bouton */}
+                {/* Nouveau client */}
                 <Button asChild>
                     <Link href="/dashboard/customers/new">Nouveau client</Link>
                 </Button>
             </div>
 
-            {/* Stats (sans “Aperçu”, juste les 5 cards) */}
+            {/* Stats (Total - Actifs - Entreprises - TVA - Nouveaux) */}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {/* Total */}
                 <StatItem
                     icon={<Users className="h-4 w-4" />}
                     label="Clients"
                     value={totalCustomers}
                     hint="Total"
                 />
-
+                {/* Actifs */}
                 <StatItem
                     icon={<UserCheck className="h-4 w-4" />}
                     label="Actifs"
                     value={actifs}
                     hint="Statut actif"
                 />
-
+                {/* Entreprises */}
                 <StatItem
                     icon={<Building2 className="h-4 w-4" />}
                     label="Entreprises"
                     value={entreprises}
                     hint="Avec société"
                 />
-
+                {/* TVA */}
                 <StatItem
                     icon={<BadgeCheck className="h-4 w-4" />}
                     label="TVA"
                     value={tvaRenseignee}
                     hint="TVA renseignée"
                 />
-
+                {/* Nouveaux */}
                 <StatItem
                     icon={<UserPlus className="h-4 w-4" />}
                     label="Nouveaux"

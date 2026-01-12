@@ -1,3 +1,5 @@
+import type {Metadata} from "next";
+
 {/* Import des datas */}
 import { getProductDetails, getProductOrderItems, getProductRecentCustomers } from "@/lib/data/products";
 {/* Import Next */}
@@ -13,6 +15,13 @@ import { Badge } from "@/components/ui/badge";
 {/* Import des lib */}
 import { formatEUR } from "@/lib/money";
 import { formatDateTimeFR } from "@/lib/dates";
+
+{/*  */}
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Détails produit",
+    description:
+        "Consultez et gérez les informations, le statut, l’historique des ventes, les commandes et les clients liés à ce produit.",
+};
 
 {/* Page de détails produit */}
 export default async function ProductDetailPage({

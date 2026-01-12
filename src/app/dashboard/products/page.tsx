@@ -1,22 +1,29 @@
-// src/app/dashboard/products/page.tsx
+{/* Import des datas */}
+import { getProductsAndStats } from "@/lib/data/products";
+{/* Import Next */}
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { ReactNode } from "react";
-
+{/* Import des composants */}
 import { ProductsTable } from "@/components/dashboard/products-table";
 import { Button } from "@/components/ui/button";
-
-import { Package, CheckCircle2, XCircle } from "lucide-react";
 import { StatItem } from "@/components/dashboard/StatItem";
-import { getProductsAndStats } from "@/lib/data/products";
+import { Package, CheckCircle2, XCircle } from "lucide-react";
 
+{/*  */}
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Gestion des produits",
+    description:
+        "Gérez et suivez l’ensemble de vos produits : activation, détails, stock, historique des ventes et actions associées.",
+};
+
+{/* Page de listing produits */}
 export default async function ProductsPage() {
     const { products: rows, stats } = await getProductsAndStats();
     const { totalProducts, activeProducts, inactiveProducts } = stats;
 
     return (
         <div className="space-y-6">
-            {/* Header (comme Orders/Customers) */}
+            {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
                     <div className="text-sm text-muted-foreground">
@@ -40,22 +47,23 @@ export default async function ProductsPage() {
                 </Button>
             </div>
 
-            {/* Stats (3 mini cards) */}
+            {/* Stats ( Total - Actifs - Inactifs */}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Total */ }
                 <StatItem
                     icon={<Package className="h-4 w-4" />}
                     label="Produits"
                     value={totalProducts}
                     hint="Total"
                 />
-
+                {/* Actifs */}
                 <StatItem
                     icon={<CheckCircle2 className="h-4 w-4" />}
                     label="Actifs"
                     value={activeProducts}
                     hint="Disponibles"
                 />
-
+                {/* Inactifs */}
                 <StatItem
                     icon={<XCircle className="h-4 w-4" />}
                     label="Inactifs"
@@ -64,7 +72,7 @@ export default async function ProductsPage() {
                 />
             </div>
 
-            {/* Table */}
+            {/* Tableau produits */}
             <ProductsTable products={rows} />
         </div>
     );

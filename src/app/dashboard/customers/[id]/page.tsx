@@ -1,3 +1,5 @@
+import type {Metadata} from "next";
+
 {/* Import des datas */}
 import { getCustomerDetails, getCustomerOrders, getCustomerOrderItems } from "@/lib/data/customers";
 {/* Import Next */}
@@ -12,6 +14,13 @@ import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Button } from "@/components/ui/button";
 {/* Import des lib */}
 import { formatDateTimeFR } from "@/lib/dates";
+
+{/*  */}
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Détails client",
+    description:
+        "Consultez et gérez les informations du client, son historique de commandes, ses statuts et autres actions associées.",
+};
 
 {/* Page de détails client */}
 export default async function CustomerDetailPage({

@@ -1,3 +1,5 @@
+import type {Metadata} from "next";
+
 {/* Import des datas */}
 import { getOrderDetails } from "@/lib/data/orders";
 {/* Import Next */}
@@ -15,6 +17,13 @@ import { Button } from "@/components/ui/button";
 {/* Import des lib */}
 import { orderTotalCents } from "@/lib/orders";
 import { formatDateTimeFR } from "@/lib/dates";
+
+{/*  */}
+export const metadata: Metadata = {
+    title: "D3D | Dashboard | Détails commande",
+    description:
+        "Consultez le détail, le statut, les fichiers et l’historique des modifications de cette commande.",
+};
 
 {/* Page de détails commande */}
 export default async function OrderDetailPage({

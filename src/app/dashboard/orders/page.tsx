@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";
 {/* Import des lib */}
-import { formatEUR } from "@/lib/money"; // Keep the global one.
+import { formatEUR } from "@/lib/money";
 
+{/*  */}
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des commandes",
     description:
@@ -46,36 +47,37 @@ export default async function OrdersPage() {
                 </Button>
             </div>
 
-            {/* Stats (sans “Aperçu”, juste les 5 cards) */}
+            {/* Stats (Total - À confirmer - En production - Terminées - CA total (hors livraison / TVA) */}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {/* Total */}
                 <StatItem
                     icon={<ClipboardList className="h-4 w-4" />}
                     label="Commandes"
                     value={totalOrders}
                     hint="Total"
                 />
-
+                {/* À confirmer */}
                 <StatItem
                     icon={<AlertCircle className="h-4 w-4" />}
                     label="À vérifier"
                     value={aVerifier}
                     hint="À confirmer"
                 />
-
+                {/* En production */}
                 <StatItem
                     icon={<Factory className="h-4 w-4" />}
                     label="En production"
                     value={enProd}
                     hint="En cours"
                 />
-
+                {/* Terminées */}
                 <StatItem
                     icon={<CheckCircle2 className="h-4 w-4" />}
                     label="Terminées"
                     value={terminees}
                     hint="Livrées"
                 />
-
+                {/* CA total (hors livraison / TVA) */}
                 <StatItem
                     icon={<Euro className="h-4 w-4" />}
                     label="CA total"
@@ -84,7 +86,7 @@ export default async function OrdersPage() {
                 />
             </div>
 
-            {/* Table */}
+            {/* Tableau commandes */}
             <OrdersTable orders={rows} />
         </div>
     );

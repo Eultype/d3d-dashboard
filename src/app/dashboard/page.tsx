@@ -377,12 +377,6 @@ export default async function DashboardPage() {
                     );
                   })
               )}
-
-              <div className="pt-1 text-right">
-                <Link href="/dashboard/orders" className="text-sm underline">
-                  Aller aux commandes →
-                </Link>
-              </div>
             </CardContent>
           </Card>
         </div>

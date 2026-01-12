@@ -10,14 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Field, FieldLabel } from "@/components/ui/field"; // Vos composants existants
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Stepper } from "@/components/ui/stepper";
-import { Input } from "@/components/ui/input"; // Nécessaire pour quantité/prix
-import { Checkbox } from "@/components/ui/checkbox"; // Nécessaire pour les options
-import { Label } from "@/components/ui/label"; // Label standard shadcn
-import { Trash2, Upload, Plus } from "lucide-react"; // Icônes
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Trash2, Upload, Plus } from "lucide-react";
+// Import des types du parent pour la cohérence
+import { OrderDraft, ProductItem } from "../page";
 
-// --- Types ---
+// --- Types Locaux & Catalogue ---
 
 type ProductDef = {
   id: string;
@@ -25,7 +27,6 @@ type ProductDef = {
   basePrice: number;
 };
 
-// Catalogue des produits disponibles
 const PRODUCT_CATALOG: Record<string, ProductDef> = {
   coeur: { id: "coeur", label: "Coeur", basePrice: 55 },
   pra: { id: "pra", label: "PRA (Prisma Allongé)", basePrice: 85 },
@@ -42,17 +43,10 @@ const PRODUCT_CATALOG: Record<string, ProductDef> = {
   },
 };
 
-type AddedProduct = {
-  uniqueId: string; // Pour la clé React (cas où on ajoute 2x le même produit)
-  typeId: string;
-  label: string;
-  unitPrice: number;
-  quantity: number;
-  hasCustomText: boolean;
-  needs3D: boolean;
-};
-
+// Update des Props pour recevoir le state global
 type Props = {
+  draft: OrderDraft;
+  onChange: (patch: Partial<OrderDraft>) => void;
   onNext: () => void;
   onBack?: () => void;
   currentStep?: number;
@@ -65,18 +59,26 @@ const steps = [
   { number: 4, label: "Recap" },
 ];
 
-export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
+export default function StepThree({
+  draft,
+  onChange,
+  onNext,
+  onBack,
+  currentStep = 3,
+}: Props) {
   const [selectedProductKey, setSelectedProductKey] = useState<string | null>(
     null,
   );
-  const [products, setProducts] = useState<AddedProduct[]>([]);
+
+  // 🔑 INITIALISATION : On reprend les produits du draft s'ils existent, sinon tableau vide
+  const [products, setProducts] = useState<ProductItem[]>(draft.products || []);
 
   // Ajouter un produit à la liste
   const addProduct = () => {
     if (selectedProductKey && PRODUCT_CATALOG[selectedProductKey]) {
       const original = PRODUCT_CATALOG[selectedProductKey];
 
-      const newProduct: AddedProduct = {
+      const newProduct: ProductItem = {
         uniqueId: Math.random().toString(36).substr(2, 9),
         typeId: original.id,
         label: original.label,
@@ -99,7 +101,7 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
   // Mettre à jour un champ d'un produit spécifique
   const updateProduct = (
     uniqueId: string,
-    field: keyof AddedProduct,
+    field: keyof ProductItem,
     value: any,
   ) => {
     setProducts((prev) =>
@@ -114,6 +116,12 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
       const subTotal = (p.unitPrice + textOptionPrice) * p.quantity;
       return acc + subTotal;
     }, 0);
+  };
+
+  // 🔑 SAUVEGARDE : On envoie les données au parent avant de changer de page
+  const handleNext = () => {
+    onChange({ products });
+    onNext();
   };
 
   return (
@@ -326,8 +334,9 @@ export default function StepOne({ onNext, onBack, currentStep = 3 }: Props) {
           <Button variant="outline" onClick={onBack} className="w-32">
             ← Retour
           </Button>
+          {/* IMPORTANT : Utiliser handleNext pour sauvegarder */}
           <Button
-            onClick={onNext}
+            onClick={handleNext}
             className="w-32 bg-slate-800 hover:bg-slate-900"
           >
             Continuer →

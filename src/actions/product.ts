@@ -4,29 +4,66 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import fs from "node:fs/promises";
+import path from "node:path";
 
-// Schéma de validation pour le formulaire produit
+// --- Fonctions Helper ---
+
+// Crée un nom de fichier "slug" à partir d'un texte
+const slugify = (text: string) =>
+  text
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-");
+
+// Schéma pour le fichier image, avec validation de la taille et du type
+const ImageSchema = z
+  .instanceof(File)
+  .refine((file) => file.size === 0 || file.type.startsWith("image/"), { message: "Seuls les fichiers image sont acceptés." })
+  .refine((file) => file.size < 2 * 1024 * 1024, "L'image doit peser moins de 2MB.")
+  .optional();
+
+// Le schéma existant, mais avec `imageUrl` remplacé par `imageFile`
 const ProductFormSchema = z.object({
   name: z.string().min(2, { message: "Le nom du produit doit contenir au moins 2 caractères." }),
-  sku: z.string().min(1, { message: "Le SKU est requis." }), // <= Obligatoire
+  sku: z.string().min(1, { message: "Le SKU est requis." }),
   description: z.string().optional(),
-  imageUrl: z.string().url({ message: "Veuillez entrer une URL d'image valide." }).optional().or(z.literal("")),
+  imageFile: ImageSchema,
   priceCents: z.coerce.number().int().min(0, { message: "Le prix doit être un nombre positif." }),
   isActive: z.boolean(),
 });
 
-
-// Type pour l'état du formulaire
 export type ProductFormState = {
   errors?: {
     name?: string[];
     sku?: string[];
     description?: string[];
-    imageUrl?: string[];
+    imageFile?: string[]
     priceCents?: string[];
   };
   message?: string | null;
 };
+
+// Fonction helper pour gérer l'upload
+async function uploadImage(imageFile: File | undefined | null, productName: string): Promise<string | null> {
+    if (!imageFile || imageFile.size === 0) {
+        return null;
+    }
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    const fileExtension = path.extname(imageFile.name);
+    const slug = slugify(productName);
+    const filename = `${slug}${fileExtension}`;
+    const uploadDir = path.join(process.cwd(), "public/uploads/products");
+    await fs.mkdir(uploadDir, { recursive: true });
+    await fs.writeFile(path.join(uploadDir, filename), buffer);
+    return `/uploads/products/${filename}`;
+}
+
 
 // --- ACTION DE CRÉATION ---
 export async function createProduct(
@@ -37,9 +74,9 @@ export async function createProduct(
     name: formData.get("name"),
     sku: formData.get("sku"),
     description: formData.get("description"),
-    imageUrl: formData.get("imageUrl"),
     priceCents: formData.get("priceCents"),
     isActive: formData.get("isActive") === "true",
+    imageFile: formData.get("imageFile"),
   });
 
   if (!validatedFields.success) {
@@ -49,9 +86,15 @@ export async function createProduct(
     };
   }
 
+  const { imageFile, ...productData } = validatedFields.data;
+  const imageUrl = await uploadImage(imageFile, productData.name);
+
   try {
     await prisma.product.create({
-      data: validatedFields.data,
+      data: {
+        ...productData,
+        imageUrl: imageUrl,
+      },
     });
   } catch (error) {
     return { message: "Erreur de base de données : Impossible de créer le produit." };
@@ -76,9 +119,9 @@ export async function updateProduct(
     name: formData.get("name"),
     sku: formData.get("sku"),
     description: formData.get("description"),
-    imageUrl: formData.get("imageUrl"),
     priceCents: formData.get("priceCents"),
     isActive: formData.get("isActive") === "true",
+    imageFile: formData.get("imageFile"),
   });
 
   if (!validatedFields.success) {
@@ -88,12 +131,16 @@ export async function updateProduct(
     };
   }
 
-  const { id, ...data } = validatedFields.data;
+  const { id, imageFile, ...data } = validatedFields.data;
+  const imageUrl = await uploadImage(imageFile, data.name);
 
   try {
     await prisma.product.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        ...(imageUrl && { imageUrl: imageUrl }),
+      },
     });
   } catch (error) {
     return { message: "Erreur de base de données : Impossible de mettre à jour le produit." };

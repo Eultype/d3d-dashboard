@@ -98,8 +98,8 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                                     />
                                                 ) : (
                                                     <span className="text-xs text-muted-foreground">
-                            IMG
-                          </span>
+                                                        IMG
+                                                    </span>
                                                 )}
                                             </div>
 

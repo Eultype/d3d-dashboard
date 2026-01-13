@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import Image from "next/image";
 // Note: les actions seront créées à l'étape suivante, l'import est en anticipation
 import { createProduct, updateProduct, type ProductFormState } from "@/actions/product"; 
 import { Button } from "@/components/ui/button";
@@ -71,9 +72,21 @@ export function ProductForm({ product }: ProductFormProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field>
-                    <Label htmlFor="imageUrl">URL de l&apos;image</Label>
-                    <Input id="imageUrl" name="imageUrl" defaultValue={product?.imageUrl ?? ""} placeholder="https://..." />
-                    {state.errors?.imageUrl && <p className="text-sm text-red-600 mt-1">{state.errors.imageUrl[0]}</p>}
+                    <Label htmlFor="imageFile">Image du produit</Label>
+                    {product?.imageUrl && (
+                        <div className="mt-2">
+                            <Image
+                                src={product.imageUrl}
+                                alt={product.name ?? "Image produit"}
+                                width={100}
+                                height={100}
+                                className="rounded-lg object-cover"
+                            />
+                        </div>
+                    )}
+                    <Input id="imageFile" name="imageFile" type="file" accept="image/png, image/jpeg, image/webp" />
+                    <p className="text-xs text-muted-foreground mt-1">Le fichier ne doit pas dépasser 2MB.</p>
+                    {state.errors?.imageFile && <p className="text-sm text-red-600 mt-1">{state.errors.imageFile[0]}</p>}
                 </Field>
 
                 <Field>

@@ -1,7 +1,9 @@
-// src/app/dashboard/customers/[id]/edit/page.tsx
+// Import des datas
 import { prisma } from "@/lib/prisma";
+// Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
+// Import des composants
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerForm } from "@/components/dashboard/customer/CustomerForm";

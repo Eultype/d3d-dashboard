@@ -1,22 +1,22 @@
-{/* Import des datas */}
+// Import des datas
 import { getProductsAndStats } from "@/lib/data/products";
-{/* Import Next */}
+// Import Next
 import type { Metadata } from "next";
 import Link from "next/link";
-{/* Import des composants */}
+// Import des composants
 import { ProductsTable } from "@/components/dashboard/products-table";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import { Package, CheckCircle2, XCircle } from "lucide-react";
 
-{/*  */}
+// Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des produits",
     description:
         "Gérez et suivez l’ensemble de vos produits : activation, détails, stock, historique des ventes et actions associées.",
 };
 
-{/* Page de listing produits */}
+// Page de listing produits
 export default async function ProductsPage() {
     const { products: rows, stats } = await getProductsAndStats();
     const { totalProducts, activeProducts, inactiveProducts } = stats;

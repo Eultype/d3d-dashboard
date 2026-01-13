@@ -1,22 +1,22 @@
-{/* Import des datas */}
+// Import des datas
 import { getCustomersAndStats } from "@/lib/data/customers";
-{/* Import Next */}
+// Import Next
 import Link from "next/link";
 import type { Metadata } from "next";
-{/* Import des composants */}
+// Import des composants
 import { CustomersTable } from "@/components/dashboard/customers-table";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
 
-{/*  */}
+// Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des clients",
     description:
         "Gérez et suivez l’ensemble de vos clients : informations, statut, historique, entreprises, TVA et activités récentes.",
 };
 
-{/* Page de listing clients */}
+// Page de listing clients
 export default async function CustomersPage() {
     const { customers, stats } = await getCustomersAndStats();
 

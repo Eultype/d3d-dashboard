@@ -1,29 +1,28 @@
-import type {Metadata} from "next";
-
-{/* Import des datas */}
+// Import des datas
 import { getProductDetails, getProductOrderItems, getProductRecentCustomers } from "@/lib/data/products";
-{/* Import Next */}
+// Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
-{/* Import des composants */}
+import type {Metadata} from "next";
+// Import des composants
 import { ProductInfoCard } from "./_components/ProductInfoCard";
 import { ProductRecentOrdersCard } from "./_components/ProductRecentOrdersCard";
 import { ProductRecentCustomersCard } from "./_components/ProductRecentCustomersCard";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-{/* Import des lib */}
+// Import des lib
 import { formatEUR } from "@/lib/money";
 import { formatDateTimeFR } from "@/lib/dates";
 
-{/*  */}
+//
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Détails produit",
     description:
         "Consultez et gérez les informations, le statut, l’historique des ventes, les commandes et les clients liés à ce produit.",
 };
 
-{/* Page de détails produit */}
+// Page de détails produit
 export default async function ProductDetailPage({
                                                     params,
                                                 }: {

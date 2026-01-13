@@ -1,24 +1,24 @@
-{/* Import des datas */}
+// Import des datas
 import { getOrdersAndStats } from "@/lib/data/orders";
-{/* Import Next */}
+//Import Next
 import type { Metadata } from "next";
 import Link from "next/link";
-{/* Import des composants */}
+// Import des composants
 import { OrdersTable } from "@/components/dashboard/orders-table";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";
-{/* Import des lib */}
+// Import des lib
 import { formatEUR } from "@/lib/money";
 
-{/*  */}
+// Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des commandes",
     description:
         "Gérez et suivez l’ensemble des commandes : statuts, détails, historique et actions associées.",
 };
 
-{/* Page de listing commandes */}
+// Page de listing commandes
 export default async function OrdersPage() {
     const { orders: rows, stats } = await getOrdersAndStats();
     const { totalOrders, aVerifier, enProd, terminees, caTotalCents } = stats;

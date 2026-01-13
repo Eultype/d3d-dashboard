@@ -55,6 +55,7 @@ export default function StepTwo({
       postalCode: "",
       city: "",
       country: "",
+      isActive: true,
     },
   );
 
@@ -97,8 +98,10 @@ export default function StepTwo({
         email: formData.email,
         phone: formData.phone,
       },
-      // 🚨 C'est ici qu'on stocke tout le formulaire pour l'étape 4
-      newClientData: formData,
+      newClientData: {
+        ...formData,
+        isActive: true,
+      },
     });
 
     // On ferme le mode édition

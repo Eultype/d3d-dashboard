@@ -1,15 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
 import {
   updateCustomer,
   createCustomer,
   type CustomerFormState,
 } from "@/actions/customer";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 type CustomerFormProps = {
@@ -29,17 +26,6 @@ type CustomerFormProps = {
   };
 };
 
-function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
-  const { pending } = useFormStatus();
-  const buttonText = isEditMode ? "Enregistrer" : "Créer le client";
-  const pendingText = isEditMode ? "Enregistrement..." : "Création...";
-  return (
-    <Button aria-disabled={pending} type="submit">
-      {pending ? pendingText : buttonText}
-    </Button>
-  );
-}
-
 export function OrderForm({ customer }: CustomerFormProps) {
   const isEditMode = !!customer;
   const action = isEditMode ? updateCustomer : createCustomer;
@@ -47,13 +33,14 @@ export function OrderForm({ customer }: CustomerFormProps) {
   const initialState: CustomerFormState = { errors: {}, message: null };
   const [state, dispatch] = useActionState(action, initialState);
 
-  const [isActive, setIsActive] = useState<boolean>(customer?.isActive ?? true);
-
   return (
     <form action={dispatch} className="space-y-6">
       {isEditMode && <input type="hidden" name="id" value={customer.id} />}
 
       <div className="grid gap-4 md:grid-cols-2">
+        {/*Switch*/}
+        <input type="hidden" name="isActive" value="true" />
+        {/*Nom*/}
         <div className="space-y-2">
           <Label htmlFor="name">Nom</Label>
           <Input id="name" name="name" defaultValue={customer?.name ?? ""} />
@@ -61,6 +48,7 @@ export function OrderForm({ customer }: CustomerFormProps) {
             <p className="text-sm text-red-600 mt-1">{state.errors.name[0]}</p>
           )}
         </div>
+        {/*Email*/}
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -73,10 +61,12 @@ export function OrderForm({ customer }: CustomerFormProps) {
             <p className="text-sm text-red-600 mt-1">{state.errors.email[0]}</p>
           )}
         </div>
+        {/*Telephone*/}
         <div className="space-y-2">
           <Label>Téléphone</Label>
           <Input name="phone" defaultValue={customer?.phone ?? ""} />
         </div>
+        {/*societé*/}
         <div className="space-y-2">
           <Label>Société</Label>
           <Input
@@ -84,6 +74,7 @@ export function OrderForm({ customer }: CustomerFormProps) {
             defaultValue={customer?.companyName ?? ""}
           />
         </div>
+        {/*TVA*/}
         <div className="space-y-2">
           <Label>TVA</Label>
           <Input name="vatNumber" defaultValue={customer?.vatNumber ?? ""} />

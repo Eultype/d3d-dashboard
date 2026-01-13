@@ -35,6 +35,7 @@ export type NewClientData = {
   postalCode: string;
   city: string;
   country: string;
+  isActive: boolean;
 };
 
 export type ClientDetails = {

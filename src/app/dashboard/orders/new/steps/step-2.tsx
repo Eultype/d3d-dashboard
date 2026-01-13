@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
 import { CustomerSearch } from "@/components/dashboard/customer-search";
-// 👇 On importe le type ClientDetails
-import { OrderDraft, ClientDetails } from "../page"; // ou "../form" selon votre fichier
-import { OrderForm } from "../../[id]/_components/OrderForm";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+// Assurez-vous que le chemin est bon vers votre page.tsx où sont définis les types
+import { OrderDraft, NewClientData } from "../page";
 
 type Props = {
   draft: OrderDraft;
@@ -39,65 +40,79 @@ export default function StepTwo({
   onBack,
   currentStep = 2,
 }: Props) {
-  const [isNewClient, setIsNewClient] = React.useState(false);
+  const [isNewClient, setIsNewClient] = useState(false);
 
-  const [form, setForm] = React.useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-  });
+  // Initialisation du formulaire avec les données existantes du draft si on revient en arrière
+  const [formData, setFormData] = useState<NewClientData>(
+    draft.newClientData || {
+      name: "",
+      email: "",
+      phone: "",
+      companyName: "",
+      vatNumber: "",
+      addressLine1: "",
+      addressLine2: "",
+      postalCode: "",
+      city: "",
+      country: "",
+    },
+  );
 
-  // État local pour l'UI (CustomerSearch)
+  // État local pour afficher le client sélectionné dans la barre de recherche
   const [selected, setSelected] = useState<CustomerLite | null>(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // Met à jour les champs du formulaire
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Réinitialise le formulaire et retourne à la recherche
   const handleReset = () => {
-    setForm({ firstName: "", lastName: "", email: "", phone: "", address: "" });
     setIsNewClient(false);
+    // On ne vide pas forcément le formData pour garder les infos si on ré-ouvre,
+    // mais on peut le faire si vous préférez.
   };
 
-  // --- CAS 1 : CRÉATION NOUVEAU CLIENT ---
-  const handleSubmitNewClient = () => {
-    const fakeId = `new-${Date.now()}`;
-    const fullName = `${form.firstName} ${form.lastName}`;
+  // --- LOGIQUE : CRÉATION NOUVEAU CLIENT (SANS DB) ---
+  const handleValidateNewClient = () => {
+    // 1. ID Temporaire
+    const tempId = `TEMP_${Date.now()}`;
 
-    const newCustomer: CustomerLite = {
-      id: fakeId,
-      name: fullName,
-      email: form.email,
-      phone: form.phone,
-      companyName: null,
+    // 2. Objet visuel pour l'UI
+    const newCustomerLite: CustomerLite = {
+      id: tempId,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      companyName: formData.companyName,
     };
 
-    setSelected(newCustomer);
+    setSelected(newCustomerLite);
 
-    // 👇 ON SAUVEGARDE TOUT DANS LE DRAFT
+    // 3. MISE À JOUR DU DRAFT GLOBAL
     onChange({
-      customerId: newCustomer.id,
+      customerId: tempId,
       clientDetails: {
-        name: fullName,
-        email: form.email,
-        phone: form.phone,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
       },
+      // 🚨 C'est ici qu'on stocke tout le formulaire pour l'étape 4
+      newClientData: formData,
     });
 
+    // On ferme le mode édition
     setIsNewClient(false);
-    // handleReset(); // Optionnel
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
+      {/* Stepper */}
       <div className="pb-2">
         <Stepper steps={steps} currentStep={currentStep} />
       </div>
 
+      {/* Titre */}
       <div className="pb-2">
         <h2 className="text-2xl font-bold text-gray-900">
           Informations client
@@ -107,59 +122,183 @@ export default function StepTwo({
         </p>
       </div>
 
+      {/* --- CAS 1 : MODE RECHERCHE --- */}
       {!isNewClient ? (
         <>
-          {/* --- CAS 2 : RECHERCHE CLIENT EXISTANT --- */}
           <CustomerSearch
             value={selected}
             onPick={(c) => {
               setSelected(c);
-              // 👇 ON SAUVEGARDE TOUT DANS LE DRAFT
+              // Si on choisit un existant, on vide newClientData pour éviter de créer un doublon
               onChange({
                 customerId: c.id,
                 clientDetails: {
-                  name: c.name || "Nom inconnu",
+                  name: c.name || "Inconnu",
                   email: c.email || "",
                   phone: c.phone || "",
                 },
+                newClientData: null, // IMPORTANT
               });
             }}
             onClear={() => {
               setSelected(null);
-              onChange({ customerId: null, clientDetails: null });
+              onChange({
+                customerId: null,
+                clientDetails: null,
+                newClientData: null,
+              });
             }}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            {/* Si un client TEMP est sélectionné, on peut proposer de le modifier */}
+            {draft.customerId?.startsWith("TEMP") && (
+              <div className="bg-blue-50 text-blue-700 p-4 rounded-md text-sm mb-2">
+                Nouveau client en cours de création :{" "}
+                <strong>{draft.clientDetails?.name}</strong>. Il sera enregistré
+                lors de la validation finale.
+              </div>
+            )}
+
             <Button
               type="button"
               className="bg-[#0f172a]"
               onClick={() => setIsNewClient(true)}
             >
-              Nouveau client
+              {draft.customerId?.startsWith("TEMP")
+                ? "Modifier ce nouveau client"
+                : "Nouveau client"}
             </Button>
           </div>
         </>
       ) : (
-        // ... (Le formulaire de création reste identique, voir plus haut) ...
-        <div className="rounded-lg border p-4 space-y-4">
-          {/* ... Champs inputs ... */}
-          {/* Je ne remets pas tout le JSX des inputs pour abréger,
-               gardez votre code existant ici */}
-
-          <div className="grid grid-cols-1 gap-4">
-            <OrderForm />
+        // --- CAS 2 : MODE FORMULAIRE CRÉATION ---
+        <div className="rounded-lg border p-6 bg-white shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b pb-4">
+            <h3 className="font-semibold text-lg">Nouveau Client</h3>
+            <Button variant="ghost" size="sm" onClick={handleReset}>
+              Annuler
+            </Button>
           </div>
-          {/* ... */}
-          <div className="flex justify-between mt-4">
+
+          <div className="space-y-6">
+            {/* Champs principaux */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom *</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Nom complet"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="exemple@mail.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Téléphone</Label>
+                <Input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="06..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Société</Label>
+                <Input
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  placeholder="Nom de l'entreprise"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>TVA</Label>
+                <Input
+                  name="vatNumber"
+                  value={formData.vatNumber}
+                  onChange={handleChange}
+                  placeholder="Numéro de TVA"
+                />
+              </div>
+            </div>
+
+            {/* Champs Adresse */}
+            <div className="grid gap-4 md:grid-cols-2 pt-4 border-t">
+              <div className="space-y-2">
+                <Label>Adresse ligne 1</Label>
+                <Input
+                  name="addressLine1"
+                  value={formData.addressLine1}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Adresse ligne 2</Label>
+                <Input
+                  name="addressLine2"
+                  value={formData.addressLine2}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Code postal</Label>
+                <Input
+                  name="postalCode"
+                  value={formData.postalCode}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Ville</Label>
+                <Input
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Pays</Label>
+                <Input
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between pt-4 border-t mt-4">
             <Button variant="outline" onClick={handleReset}>
               Retour
             </Button>
-            <Button onClick={handleSubmitNewClient}>Continuer →</Button>
+            <Button
+              onClick={handleValidateNewClient}
+              disabled={!formData.name || !formData.email} // Validation simple
+              className="bg-slate-800"
+            >
+              Confirmer ce client
+            </Button>
           </div>
         </div>
       )}
 
+      {/* Navigation Globale */}
       {!isNewClient && (
         <div className="flex justify-between pt-4">
           <Button
@@ -170,6 +309,7 @@ export default function StepTwo({
           >
             ← Retour
           </Button>
+
           <Button
             type="button"
             onClick={onNext}

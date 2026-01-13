@@ -63,57 +63,66 @@ export function CustomerForm({ customer }: CustomerFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Téléphone</Label>
-                    <Input name="phone" defaultValue={customer?.phone ?? ""} />
+                    <Label htmlFor="phone">Téléphone</Label>
+                    <Input id="phone" name="phone" type="tel" defaultValue={customer?.phone ?? ""} />
+                    {state.errors?.phone && <p className="text-sm text-red-600 mt-1">{state.errors.phone[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Société</Label>
-                    <Input name="companyName" defaultValue={customer?.companyName ?? ""} />
+                    <Label htmlFor="companyName">Société</Label>
+                    <Input id="companyName" name="companyName" defaultValue={customer?.companyName ?? ""} />
+                    {state.errors?.companyName && <p className="text-sm text-red-600 mt-1">{state.errors.companyName[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>TVA</Label>
-                    <Input name="vatNumber" defaultValue={customer?.vatNumber ?? ""} />
+                    <Label htmlFor="vatNumber">TVA</Label>
+                    <Input id="vatNumber" name="vatNumber" defaultValue={customer?.vatNumber ?? ""} />
+                    {state.errors?.vatNumber && <p className="text-sm text-red-600 mt-1">{state.errors.vatNumber[0]}</p>}
                 </div>
 
                 <div className="flex items-center gap-3 pt-6">
                     <Switch checked={isActive} onCheckedChange={setIsActive} name="isActiveSwitch" />
                     <input type="hidden" name="isActive" value={String(isActive)} />
                     <span className="text-sm text-muted-foreground">
-                        Client {isActive ? "actif" : "inactif"}
-                    </span>
+      Client {isActive ? "actif" : "inactif"}
+    </span>
+                    {state.errors?.isActive && <p className="text-sm text-red-600 mt-1">{state.errors.isActive[0]}</p>}
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 mt-6">
                 <div className="space-y-2">
-                    <Label>Adresse ligne 1</Label>
-                    <Input name="addressLine1" defaultValue={customer?.addressLine1 ?? ""} />
+                    <Label htmlFor="addressLine1">Adresse ligne 1</Label>
+                    <Input id="addressLine1" name="addressLine1" defaultValue={customer?.addressLine1 ?? ""} />
+                    {state.errors?.addressLine1 && <p className="text-sm text-red-600 mt-1">{state.errors.addressLine1[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Adresse ligne 2</Label>
-                    <Input name="addressLine2" defaultValue={customer?.addressLine2 ?? ""} />
+                    <Label htmlFor="addressLine2">Adresse ligne 2</Label>
+                    <Input id="addressLine2" name="addressLine2" defaultValue={customer?.addressLine2 ?? ""} />
+                    {state.errors?.addressLine2 && <p className="text-sm text-red-600 mt-1">{state.errors.addressLine2[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Code postal</Label>
-                    <Input name="postalCode" defaultValue={customer?.postalCode ?? ""} />
+                    <Label htmlFor="postalCode">Code postal</Label>
+                    <Input id="postalCode" name="postalCode" defaultValue={customer?.postalCode ?? ""} />
+                    {state.errors?.postalCode && <p className="text-sm text-red-600 mt-1">{state.errors.postalCode[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Ville</Label>
-                    <Input name="city" defaultValue={customer?.city ?? ""} />
+                    <Label htmlFor="city">Ville</Label>
+                    <Input id="city" name="city" defaultValue={customer?.city ?? ""} />
+                    {state.errors?.city && <p className="text-sm text-red-600 mt-1">{state.errors.city[0]}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <Label>Pays</Label>
-                    <Input name="country" defaultValue={customer?.country ?? ""} />
+                    <Label htmlFor="country">Pays</Label>
+                    <Input id="country" name="country" defaultValue={customer?.country ?? ""} />
+                    {state.errors?.country && <p className="text-sm text-red-600 mt-1">{state.errors.country[0]}</p>}
                 </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-6">
                 <div>
                     {state.message && <p className="text-sm text-red-600">{state.message}</p>}
                 </div>

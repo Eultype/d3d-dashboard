@@ -9,25 +9,34 @@ import { z } from "zod";
 const CustomerFormSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "Veuillez entrer une adresse email valide." }),
-  phone: z.string().optional(),
+  phone: z.string().min(10, "Le téléphone est requis"),
   companyName: z.string().optional(),
   vatNumber: z.string().optional(),
   isActive: z.boolean(),
-  addressLine1: z.string().optional(),
+  addressLine1: z.string().min(1, "L'adresse (ligne 1) est requise"),
   addressLine2: z.string().optional(),
-  postalCode: z.string().optional(),
-  city: z.string().optional(),
-  country: z.string().optional(),
+  postalCode: z.string().min(1, "Le code postal est requis"),
+  city: z.string().min(1, "La ville est requise"),
+  country: z.string().min(1, "Le pays est requis"),
 });
 
 export type CustomerFormState = {
   errors?: {
     name?: string[];
     email?: string[];
-    // ... et potentiellement d'autres champs
+    phone?: string[];
+    companyName?: string[];
+    vatNumber?: string[];
+    isActive?: string[];
+    addressLine1?: string[];
+    addressLine2?: string[];
+    postalCode?: string[];
+    city?: string[];
+    country?: string[];
   };
   message?: string | null;
 };
+
 
 // --- ACTION DE CRÉATION ---
 export async function createCustomer(

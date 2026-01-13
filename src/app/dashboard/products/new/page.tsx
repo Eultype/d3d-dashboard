@@ -14,7 +14,7 @@ export default function ProductCreatePage() {
         <div className="space-y-6">
             <div className="text-sm text-muted-foreground">
                 <Link href="/dashboard" className="hover:underline">Dashboard</Link> /{" "}
-                <Link href="/dashboard/customers" className="hover:underline">Produits</Link> /{" "}
+                <Link href="/dashboard/products" className="hover:underline">Produits</Link> /{" "}
                 <span className="text-foreground">Nouveau</span>
             </div>
 

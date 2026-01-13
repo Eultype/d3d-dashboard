@@ -8,12 +8,13 @@ import { z } from "zod";
 // Schéma de validation pour le formulaire produit
 const ProductFormSchema = z.object({
   name: z.string().min(2, { message: "Le nom du produit doit contenir au moins 2 caractères." }),
-  sku: z.string().optional(),
+  sku: z.string().min(1, { message: "Le SKU est requis." }), // <= Obligatoire
   description: z.string().optional(),
-  imageUrl: z.string().url({ message: "Veuillez entrer une URL d'image valide." }).optional().or(z.literal('')),
+  imageUrl: z.string().url({ message: "Veuillez entrer une URL d'image valide." }).optional().or(z.literal("")),
   priceCents: z.coerce.number().int().min(0, { message: "Le prix doit être un nombre positif." }),
   isActive: z.boolean(),
 });
+
 
 // Type pour l'état du formulaire
 export type ProductFormState = {
@@ -24,7 +25,7 @@ export type ProductFormState = {
     imageUrl?: string[];
     priceCents?: string[];
   };
-  message?: string;
+  message?: string | null;
 };
 
 // --- ACTION DE CRÉATION ---

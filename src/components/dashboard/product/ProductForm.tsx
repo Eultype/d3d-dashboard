@@ -14,7 +14,7 @@ import { Field } from "@/components/ui/field";
 type ProductForForm = {
     id: string;
     name: string;
-    sku: string | null;
+    sku: string;
     description: string | null;
     imageUrl: string | null;
     priceCents: number;
@@ -71,7 +71,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Field>
-                    <Label htmlFor="imageUrl">URL de l'image</Label>
+                    <Label htmlFor="imageUrl">URL de l&apos;image</Label>
                     <Input id="imageUrl" name="imageUrl" defaultValue={product?.imageUrl ?? ""} placeholder="https://..." />
                     {state.errors?.imageUrl && <p className="text-sm text-red-600 mt-1">{state.errors.imageUrl[0]}</p>}
                 </Field>

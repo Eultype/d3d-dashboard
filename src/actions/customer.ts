@@ -26,7 +26,7 @@ export type CustomerFormState = {
     email?: string[];
     // ... et potentiellement d'autres champs
   };
-  message?: string;
+  message?: string | null;
 };
 
 // --- ACTION DE CRÉATION ---

@@ -8,7 +8,7 @@ export function CustomerActiveBadge({ isActive }: { isActive: boolean }) {
             Actif
         </Badge>
     ) : (
-        <Badge className="flex items-center gap-1 bg-orange-500/15 text-orange-700 border border-orange-500/30">
+        <Badge className="flex items-center gap-1 bg-orange-500/15 text-orange-700 border border-orange-600/30">
             <PauseCircle className="h-3 w-3" />
             Inactif
         </Badge>

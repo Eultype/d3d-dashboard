@@ -7,6 +7,7 @@ import { Stepper } from "@/components/ui/stepper";
 import { CustomerSearch } from "@/components/dashboard/customer-search";
 // 👇 On importe le type ClientDetails
 import { OrderDraft, ClientDetails } from "../page"; // ou "../form" selon votre fichier
+import { OrderForm } from "../../[id]/_components/OrderForm";
 
 type Props = {
   draft: OrderDraft;
@@ -146,35 +147,8 @@ export default function StepTwo({
           {/* Je ne remets pas tout le JSX des inputs pour abréger,
                gardez votre code existant ici */}
 
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              placeholder="Prénom"
-              name="firstName"
-              value={form.firstName}
-              onChange={handleChange}
-              className="border rounded-md p-2 w-full"
-            />
-            <input
-              placeholder="Nom"
-              name="lastName"
-              value={form.lastName}
-              onChange={handleChange}
-              className="border rounded-md p-2 w-full"
-            />
-            <input
-              placeholder="Email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className="border rounded-md p-2 w-full"
-            />
-            <input
-              placeholder="Téléphone"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              className="border rounded-md p-2 w-full"
-            />
+          <div className="grid grid-cols-1 gap-4">
+            <OrderForm />
           </div>
           {/* ... */}
           <div className="flex justify-between mt-4">

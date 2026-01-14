@@ -4,21 +4,8 @@ import Link from "next/link";
 import { formatDateFR } from "@/lib/dates";
 import { formatEUR } from "@/lib/money";
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 
 import { Eye } from "lucide-react";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";

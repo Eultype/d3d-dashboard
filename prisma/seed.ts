@@ -142,16 +142,29 @@ async function main() {
     // ======================
     // CLEAN COMMANDES (DEV ONLY)
     // ======================
-    await prisma.orderNote.deleteMany();
     await prisma.file.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
+    await prisma.sequence.deleteMany(); // Ajout du nettoyage des séquences
+
+    // ======================
+    // SEQUENCES
+    // ======================
+    await prisma.sequence.createMany({
+        data: [
+            { id: "BOG", currentValue: 1000 },
+            { id: "ERIC", currentValue: 1000 },
+            { id: "WEB", currentValue: 1000 },
+        ],
+        skipDuplicates: true,
+    });
 
     // ======================
     // COMMANDE 1 – CLIENT 1
     // ======================
     const order1 = await prisma.order.create({
         data: {
+            reference: "SEED-001", // Ajout d'une référence manuelle unique
             status: "A_VERIFIER",
             customerId: customer1.id,
             items: {
@@ -193,6 +206,7 @@ async function main() {
     // ======================
     const order2 = await prisma.order.create({
         data: {
+            reference: "SEED-002", // Ajout d'une référence manuelle unique
             status: "PROD",
             customerId: customer2.id,
             items: {
@@ -229,6 +243,7 @@ async function main() {
     // ======================
     const order3 = await prisma.order.create({
         data: {
+            reference: "SEED-003", // Ajout d'une référence manuelle unique
             status: "TERMINE",
             customerId: null,
             items: {

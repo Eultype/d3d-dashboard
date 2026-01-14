@@ -17,39 +17,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Trash2, Upload, Plus } from "lucide-react";
 // Import des types du parent pour la cohérence
-import { OrderDraft, ProductItem } from "../page";
+import { OrderDraft, ProductItem } from "../form"; // Attention : import depuis form, pas page
+import { ProductFromDB } from "../form";
 
-// --- Types Locaux & Catalogue ---
-
-type ProductDef = {
-  id: string;
-  label: string;
-  basePrice: number;
-};
-
-const PRODUCT_CATALOG: Record<string, ProductDef> = {
-  coeur: { id: "coeur", label: "Coeur", basePrice: 55 },
-  pra: { id: "pra", label: "PRA (Prisma Allongé)", basePrice: 85 },
-  prc: { id: "prc", label: "PRC (Prisma Carrée)", basePrice: 65 },
-  rectangle_grand: {
-    id: "rectangle_grand",
-    label: "Rectangle grand",
-    basePrice: 75,
-  },
-  rectangle_petit: {
-    id: "rectangle_petit",
-    label: "Rectangle petit",
-    basePrice: 45,
-  },
-};
-
-// Update des Props pour recevoir le state global
+// Update des Props pour recevoir le state global et le catalogue
 type Props = {
   draft: OrderDraft;
   onChange: (patch: Partial<OrderDraft>) => void;
   onNext: () => void;
   onBack?: () => void;
   currentStep?: number;
+  productsCatalog: ProductFromDB[]; // AJOUTÉ
 };
 
 const steps = [
@@ -65,6 +43,7 @@ export default function StepThree({
   onNext,
   onBack,
   currentStep = 3,
+  productsCatalog,
 }: Props) {
   const [selectedProductKey, setSelectedProductKey] = useState<string | null>(
     null,
@@ -75,38 +54,25 @@ export default function StepThree({
 
   // Ajouter un produit à la liste
   const addProduct = () => {
-    if (selectedProductKey && PRODUCT_CATALOG[selectedProductKey]) {
-      const original = PRODUCT_CATALOG[selectedProductKey];
+    if (selectedProductKey) {
+      // On cherche dans le catalogue reçu du serveur
+      const original = productsCatalog.find(p => p.id === selectedProductKey);
 
-      const newProduct: ProductItem = {
-        uniqueId: Math.random().toString(36).substr(2, 9),
-        typeId: original.id,
-        label: original.label,
-        unitPrice: original.basePrice,
-        quantity: 1,
-        hasCustomText: false,
-        needs3D: false,
-      };
+      if (original) {
+        const newProduct: ProductItem = {
+          uniqueId: Math.random().toString(36).substr(2, 9),
+          typeId: original.id, // C'est maintenant le VRAI ID (ex: cmk...)
+          label: original.name, // On utilise 'name' de la DB
+          unitPrice: original.priceCents / 100, // Conversion centimes -> euros
+          quantity: 1,
+          hasCustomText: false,
+          needs3D: false,
+        };
 
-      setProducts([...products, newProduct]);
-      setSelectedProductKey(null); // Reset select
+        setProducts([...products, newProduct]);
+        setSelectedProductKey(null); // Reset select
+      }
     }
-  };
-
-  // Supprimer un produit
-  const removeProduct = (uniqueId: string) => {
-    setProducts(products.filter((p) => p.uniqueId !== uniqueId));
-  };
-
-  // Mettre à jour un champ d'un produit spécifique
-  const updateProduct = (
-    uniqueId: string,
-    field: keyof ProductItem,
-    value: any,
-  ) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.uniqueId === uniqueId ? { ...p, [field]: value } : p)),
-    );
   };
 
   // Calcul du total global
@@ -126,12 +92,11 @@ export default function StepThree({
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 pb-10">
-      {/* Stepper */}
+      {/* ... (Stepper et titre restent identiques) */}
       <div className="pb-2">
         <Stepper steps={steps} currentStep={currentStep} />
       </div>
 
-      {/* Form Title */}
       <div>
         <h2 className="text-2xl font-bold ">Produits de la commande</h2>
         <p className="text-sm text-muted-foreground mt-1">
@@ -155,9 +120,9 @@ export default function StepThree({
                   <SelectValue placeholder="Sélectionner un produit à ajouter" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(PRODUCT_CATALOG).map((prod) => (
+                  {productsCatalog.map((prod) => (
                     <SelectItem key={prod.id} value={prod.id}>
-                      {prod.label} - {prod.basePrice.toFixed(2)} €
+                      {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -174,6 +139,7 @@ export default function StepThree({
         </div>
 
         {/* --- Liste des produits --- */}
+        {/* (Le reste du rendu est identique, j'utilise juste products qui est déjà à jour) */}
         <div className="space-y-4">
           {products.length === 0 ? (
             <div className="border-2 border-dashed border-gray-200 rounded-lg p-10 text-center text-gray-400 ">

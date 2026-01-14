@@ -50,6 +50,7 @@ export async function getOrdersAndStats() {
         const { articlesCount, totalCents } = computeOrderTotals(o.items);
         return {
             id: o.id,
+            reference: o.reference, // Ajout de la référence
             status: o.status,
             createdAt: o.createdAt.toISOString(),
             articlesCount,

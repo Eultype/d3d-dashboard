@@ -25,6 +25,7 @@ import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 
 type OrderRow = {
     id: string;
+    reference?: string | null; // Ajout du champ optionnel
     status: string;
     createdAt: string; // ISO
     articlesCount: number;
@@ -62,14 +63,17 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
 
                         {orders.map((o) => {
                             const href = `/dashboard/orders/${o.id}`;
-                            const shortId = o.id.slice(0, 10);
+                            // Si on a une référence (BOG-1001), on l'affiche, sinon on prend l'ID tronqué
+                            const displayRef = o.reference || `#${o.id.slice(0, 10)}`;
 
                             return (
                                 <TableRow key={o.id} className="hover:bg-muted/30 transition-colors">
                                     {/* Commande + nb articles */}
                                     <TableCell className="align-top">
                                         <Link href={href} className="block">
-                                            <div className="font-mono">#{shortId}</div>
+                                            <div className="font-mono font-medium text-blue-600 hover:text-blue-800">
+                                                {displayRef}
+                                            </div>
                                             <div className="mt-0.5 text-xs text-muted-foreground tabular-nums">
                                                 {o.articlesCount} article{o.articlesCount > 1 ? "s" : ""}
                                             </div>

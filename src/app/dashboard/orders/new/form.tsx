@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import StepOne from "./steps/step-1";
 import StepTwo from "./steps/step-2";
 import StepThree from "./steps/step-3";
 import StepFour from "./steps/step-4";
+import { createOrder } from "./actions";
 
 // --- Définition des types globaux ---
 
@@ -18,7 +20,6 @@ export type ProductItem = {
   needs3D: boolean;
 };
 
-// 👇 1. On définit la structure des détails client
 export type ClientDetails = {
   name: string;
   email: string;
@@ -32,20 +33,34 @@ export type OrderDraft = {
     delivery: string;
   };
   customerId: string | null;
-  // 👇 2. On ajoute ce champ pour stocker les infos lisibles
   clientDetails: ClientDetails | null;
   products: ProductItem[];
+
   discountType: string;
   internalNote: string;
 };
 
-export default function OrderForm() {
+// --- Définition des types pour les props ---
+
+export type ProductFromDB = {
+  id: string;
+  name: string;
+  priceCents: number;
+};
+
+type OrderFormProps = {
+  productsCatalog: ProductFromDB[];
+};
+
+export default function OrderForm({ productsCatalog }: OrderFormProps) {
+  const router = useRouter();
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [draft, setDraft] = useState<OrderDraft>({
     info: { prefix: "", channel: "", delivery: "" },
     customerId: null,
-    clientDetails: null, // 👇 3. Initialisé à null
+    clientDetails: null,
     products: [],
     discountType: "none",
     internalNote: "",
@@ -55,18 +70,47 @@ export default function OrderForm() {
     setDraft((prev) => ({ ...prev, ...patch }));
   };
 
-  const handleSubmit = () => {
-    console.log("Envoi de la commande finale : ", draft);
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      // Préparation des données pour l'action serveur
+      const payload = {
+        info: draft.info,
+        clientId: draft.customerId,
+        clientDetails: draft.clientDetails,
+        products: draft.products.map(p => ({
+          typeId: p.typeId,
+          quantity: p.quantity,
+          unitPrice: p.unitPrice
+        })),
+        internalNote: draft.internalNote
+      };
+
+      const result = await createOrder(payload);
+
+      if (result.success && result.orderId) {
+        // Redirection vers la page de la nouvelle commande
+        router.push(`/dashboard/orders/${result.orderId}`);
+      } else {
+        alert(result.message || "Une erreur est survenue lors de la création de la commande.");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Erreur technique:", error);
+      alert("Une erreur technique est survenue.");
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       {step === 1 && (
         <StepOne
-          draft={draft} // AJOUTÉ
-          onChange={updateDraft} // AJOUTÉ
+          draft={draft}
+          onChange={updateDraft}
           onNext={() => setStep(2)}
-          // onBack n'est pas nécessaire ici si c'est la page 1, ou redirige vers dashboard
         />
       )}
 
@@ -85,6 +129,7 @@ export default function OrderForm() {
           onChange={updateDraft}
           onNext={() => setStep(4)}
           onBack={() => setStep(2)}
+          productsCatalog={productsCatalog}
         />
       )}
 

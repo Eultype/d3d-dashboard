@@ -11,7 +11,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Stepper } from "@/components/ui/stepper";
 // Import du type global
-import { OrderDraft } from "../page";
+import type { OrderDraft } from "../../types";
 
 // On met à jour les props pour inclure draft et onChange
 type Props = {

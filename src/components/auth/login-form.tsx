@@ -39,7 +39,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="space-y-5">
+    <Card className="space-y-5 bg-white text-black">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
       </CardHeader>
@@ -57,7 +57,11 @@ export function LoginForm() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full bg-black text-white"
+            disabled={loading}
+          >
             {loading ? "Connexion..." : "Connexion"}
           </Button>
         </form>

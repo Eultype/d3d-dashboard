@@ -55,10 +55,8 @@ export default function StepOne({
 
       {/* Form Title */}
       <div className="pb-2">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Informations de la commande
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-2xl font-bold ">Informations de la commande</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Sélectionnez le préfixe, le canal et le mode de livraison
         </p>
       </div>
@@ -147,7 +145,7 @@ export default function StepOne({
 
           <Button
             onClick={onNext}
-            className="w-32 bg-slate-800 hover:bg-slate-900"
+            className="w-32 "
             // Optionnel : Désactiver si champs vides
             disabled={
               !draft.info.prefix || !draft.info.channel || !draft.info.delivery

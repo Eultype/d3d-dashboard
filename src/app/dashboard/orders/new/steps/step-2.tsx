@@ -117,10 +117,8 @@ export default function StepTwo({
 
       {/* Titre */}
       <div className="pb-2">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Informations client
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-2xl font-bold ">Informations client</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Recherchez un client existant ou créez-en un nouveau
         </p>
       </div>
@@ -156,18 +154,14 @@ export default function StepTwo({
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
             {/* Si un client TEMP est sélectionné, on peut proposer de le modifier */}
             {draft.customerId?.startsWith("TEMP") && (
-              <div className="bg-blue-50 text-blue-700 p-4 rounded-md text-sm mb-2">
+              <div className="p-4 rounded-md text-sm mb-2">
                 Nouveau client en cours de création :{" "}
                 <strong>{draft.clientDetails?.name}</strong>. Il sera enregistré
                 lors de la validation finale.
               </div>
             )}
 
-            <Button
-              type="button"
-              className="bg-[#0f172a]"
-              onClick={() => setIsNewClient(true)}
-            >
+            <Button type="button" onClick={() => setIsNewClient(true)}>
               {draft.customerId?.startsWith("TEMP")
                 ? "Modifier ce nouveau client"
                 : "Nouveau client"}
@@ -176,7 +170,7 @@ export default function StepTwo({
         </>
       ) : (
         // --- CAS 2 : MODE FORMULAIRE CRÉATION ---
-        <div className="rounded-lg border p-6 bg-white shadow-sm space-y-6">
+        <div className="rounded-lg border p-6  shadow-sm space-y-6">
           <div className="flex justify-between items-center border-b pb-4">
             <h3 className="font-semibold text-lg">Nouveau Client</h3>
             <Button variant="ghost" size="sm" onClick={handleReset}>
@@ -293,7 +287,6 @@ export default function StepTwo({
             <Button
               onClick={handleValidateNewClient}
               disabled={!formData.name || !formData.email} // Validation simple
-              className="bg-slate-800"
             >
               Confirmer ce client
             </Button>
@@ -316,7 +309,7 @@ export default function StepTwo({
           <Button
             type="button"
             onClick={onNext}
-            className="w-32 bg-slate-800"
+            className="w-32"
             disabled={!draft.customerId}
           >
             Continuer →

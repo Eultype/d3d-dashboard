@@ -311,7 +311,7 @@ export default function StepThree({
             ← Retour
           </Button>
           {/* IMPORTANT : Utiliser handleNext pour sauvegarder */}
-          <Button onClick={handleNext} className="w-32 ">
+          <Button onClick={handleNext} className="w-32 " disabled={products.length === 0}>
             Continuer →
           </Button>
         </div>

@@ -55,11 +55,11 @@ export default async function CustomerDetailPage({
                         <Link href="/dashboard/customers" className="hover:underline">
                             Clients
                         </Link>{" "}
-                        / <span className="text-foreground">#{customer.id.slice(0, 10)}</span>
+                        / <span className="text-foreground">{customer.name ?? "Client sans nom"}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-bold">Fiche client #{shortId}</h1>
+                        <h1 className="text-2xl font-bold">{customer.name ?? "Client sans nom"}</h1>
                         <CustomerTypeBadge companyName={customer.companyName} />
                         <CustomerActiveBadge isActive={customer.isActive} />
                     </div>

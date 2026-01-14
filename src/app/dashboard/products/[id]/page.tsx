@@ -57,11 +57,11 @@ export default async function ProductDetailPage({
                         <Link href="/dashboard/products" className="hover:underline">
                             Produits
                         </Link>{" "}
-                        / <span className="text-foreground">#{product.id.slice(0, 10)}</span>
+                        / <span className="text-foreground">{product.name}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-bold">Fiche produit #{shortId}</h1>
+                        <h1 className="text-2xl font-bold">{product.name}</h1>
                         <ProductActiveBadge isActive={product.isActive} />
                         {product.sku ? (
                             <Badge variant="secondary" className="font-mono">

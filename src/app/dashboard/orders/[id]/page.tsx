@@ -60,11 +60,11 @@ export default async function OrderDetailPage({
                         <Link href="/dashboard/orders" className="hover:underline">
                             Commandes
                         </Link>{" "}
-                        / <span className="text-foreground">#{shortId}</span>
+                        / <span className="text-foreground">{order.reference ?? shortId}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-bold">Commande #{shortId}</h1>
+                        <h1 className="text-2xl font-bold">Commande {order.reference ?? shortId}</h1>
                         <OrderStatusBadge status={order.status} />
                     </div>
 

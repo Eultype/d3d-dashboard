@@ -2,51 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import StepOne from "./steps/step-1";
-import StepTwo from "./steps/step-2";
-import StepThree from "./steps/step-3";
-import StepFour from "./steps/step-4";
-import { createOrder } from "./actions";
+import StepOne from "./steps/Step1";
+import StepTwo from "./steps/Step2";
+import StepThree from "./steps/Step3";
+import StepFour from "./steps/Step4";
+import { createOrder } from "../actions";
+import type { OrderDraft, ProductFromDB } from "../types";
 
-// --- Définition des types globaux ---
-
-export type ProductItem = {
-  uniqueId: string;
-  typeId: string;
-  label: string;
-  unitPrice: number;
-  quantity: number;
-  hasCustomText: boolean;
-  needs3D: boolean;
-};
-
-export type ClientDetails = {
-  name: string;
-  email: string;
-  phone: string;
-};
-
-export type OrderDraft = {
-  info: {
-    prefix: string;
-    channel: string;
-    delivery: string;
-  };
-  customerId: string | null;
-  clientDetails: ClientDetails | null;
-  products: ProductItem[];
-
-  discountType: string;
-  internalNote: string;
-};
 
 // --- Définition des types pour les props ---
-
-export type ProductFromDB = {
-  id: string;
-  name: string;
-  priceCents: number;
-};
 
 type OrderFormProps = {
   productsCatalog: ProductFromDB[];
@@ -61,6 +25,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
     info: { prefix: "", channel: "", delivery: "" },
     customerId: null,
     clientDetails: null,
+    newClientData: null,
     products: [],
     discountType: "none",
     internalNote: "",

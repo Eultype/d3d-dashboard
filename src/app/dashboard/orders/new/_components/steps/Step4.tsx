@@ -21,7 +21,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 // Import des types définis dans le parent
-import { OrderDraft } from "../page";
+import type { OrderDraft } from "../../types";
 
 // --- Types ---
 

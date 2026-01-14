@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import OrderForm from "./form";
+import OrderForm from "./_components/NewOrderForm";
 
 export const metadata = {
   title: "Nouvelle commande | D3D Dashboard",

@@ -8,7 +8,7 @@ import { CustomerSearch } from "@/components/dashboard/customer-search";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // Assurez-vous que le chemin est bon vers votre page.tsx où sont définis les types
-import type { OrderDraft, NewClientData } from "../../types";
+import { OrderDraft, NewClientData } from "@/types/order";
 
 type Props = {
   draft: OrderDraft;

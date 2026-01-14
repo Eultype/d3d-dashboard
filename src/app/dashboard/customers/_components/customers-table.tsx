@@ -22,17 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Eye, Pencil } from "lucide-react";
-
-type CustomerRow = {
-    id: string;
-    name: string | null;
-    email: string | null;
-    phone: string | null;
-    companyName: string | null;
-    vatNumber: string | null;
-    isActive: boolean;
-    createdAt: string; // ISO
-};
+import { CustomerRow } from "@/types/customer";
 
 function initials(name?: string | null) {
     if (!name) return "C";

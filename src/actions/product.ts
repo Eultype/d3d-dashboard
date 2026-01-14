@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { ProductFormState } from "@/types/product";
 
 // --- Fonctions Helper ---
 
@@ -37,17 +38,6 @@ const ProductFormSchema = z.object({
   priceCents: z.coerce.number().int().min(0, { message: "Le prix doit être un nombre positif." }),
   isActive: z.boolean(),
 });
-
-export type ProductFormState = {
-  errors?: {
-    name?: string[];
-    sku?: string[];
-    description?: string[];
-    imageFile?: string[]
-    priceCents?: string[];
-  };
-  message?: string | null;
-};
 
 // Fonction helper pour gérer l'upload
 async function uploadImage(imageFile: File | undefined | null, productName: string): Promise<string | null> {

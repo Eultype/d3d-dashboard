@@ -6,11 +6,10 @@ import StepOne from "./steps/Step1";
 import StepTwo from "./steps/Step2";
 import StepThree from "./steps/Step3";
 import StepFour from "./steps/Step4";
-import { createOrder } from "../actions";
-import type { OrderDraft, ProductFromDB } from "../types";
+import { createOrder } from "@/actions/order";
+import { OrderDraft, ProductFromDB } from "@/types/order";
 
-
-// --- Définition des types pour les props ---
+// --- Définition des types globaux ---
 
 type OrderFormProps = {
   productsCatalog: ProductFromDB[];

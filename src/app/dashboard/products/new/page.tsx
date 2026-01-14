@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ProductForm } from "@/components/dashboard/product/ProductForm";
+import { ProductForm } from "../_components/ProductForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

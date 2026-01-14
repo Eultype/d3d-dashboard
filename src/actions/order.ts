@@ -6,8 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { getNextOrderReference } from "@/lib/sequences";
 
-// Type temporaire pour les données reçues
-type OrderInputData = {
+// Type pour les données reçues
+export type OrderInputData = {
   info: {
     prefix: string;
     channel: string;
@@ -28,16 +28,7 @@ type OrderInputData = {
 };
 
 export async function createOrder(data: OrderInputData) {
-  console.log("🚀 [createOrder] Début de l'action serveur", JSON.stringify(data, null, 2));
-
-  // DEBUG PRISMA
-  console.log("🔍 [createOrder] Check Prisma:", {
-      prismaExists: !!prisma,
-      userModel: !!prisma?.user,
-      customerModel: !!prisma?.customer,
-      orderModel: !!prisma?.order,
-      sequenceModel: !!prisma?.sequence
-  });
+  // console.log("🚀 [createOrder] Début de l'action serveur", JSON.stringify(data, null, 2));
 
   if (!prisma.user || !prisma.customer) {
       console.error("🔥 [createOrder] CRITICAL: Prisma models are undefined!");
@@ -45,7 +36,6 @@ export async function createOrder(data: OrderInputData) {
   }
   
   const session = await getServerSession(authOptions);
-  console.log("👤 [createOrder] Employé connecté:", session?.user?.email);
   
   let userEmail = session?.user?.email;
 
@@ -75,7 +65,7 @@ export async function createOrder(data: OrderInputData) {
 
     // Si on doit créer un client et qu'on a les détails
     if (shouldCreateClient && data.clientDetails && data.clientDetails.name) {
-      console.log("👤 [createOrder] Création d'un nouveau client à la volée...");
+      // console.log("👤 [createOrder] Création d'un nouveau client à la volée...");
       
       // Petit check pour voir si l'email existe déjà (évite doublons)
       let existingCustomer = null;
@@ -86,7 +76,7 @@ export async function createOrder(data: OrderInputData) {
       }
 
       if (existingCustomer) {
-           console.log("ℹ️ [createOrder] Un client existe déjà avec cet email, on le lie.");
+           // console.log("ℹ️ [createOrder] Un client existe déjà avec cet email, on le lie.");
            finalCustomerId = existingCustomer.id;
       } else {
           // Création du nouveau client
@@ -99,7 +89,7 @@ export async function createOrder(data: OrderInputData) {
             },
           });
           finalCustomerId = newCustomer.id;
-          console.log("✅ [createOrder] Nouveau client créé avec ID:", finalCustomerId);
+          // console.log("✅ [createOrder] Nouveau client créé avec ID:", finalCustomerId);
       }
     } else if (isTempId) {
         // Cas critique : On a un ID TEMP mais pas de détails pour créer le client
@@ -109,18 +99,17 @@ export async function createOrder(data: OrderInputData) {
     }
 
     // 2. Génération de la référence unique (ex: BOG-1001)
-    console.log("🔢 [createOrder] Génération référence pour le préfixe:", data.info.prefix);
+    // console.log("🔢 [createOrder] Génération référence pour le préfixe:", data.info.prefix);
     const reference = await getNextOrderReference(data.info.prefix);
-    console.log("✅ [createOrder] Référence générée:", reference);
+    // console.log("✅ [createOrder] Référence générée:", reference);
 
     // 3. Préparation des lignes de commande
+    // Aggrégation pour éviter les doublons de produits (clé unique orderId_productId)
     const aggregatedProducts = data.products.reduce((acc, p) => {
       const existing = acc.get(p.typeId);
       if (existing) {
-        // Si le produit existe déjà, on additionne juste la quantité
         existing.quantity += p.quantity;
       } else {
-        // Sinon, on l'ajoute à la map
         acc.set(p.typeId, { ...p });
       }
       return acc;
@@ -133,7 +122,7 @@ export async function createOrder(data: OrderInputData) {
     }));
 
     // 4. Création de la commande
-    console.log("💾 [createOrder] Création en base...");
+    // console.log("💾 [createOrder] Création en base...");
     const newOrder = await prisma.order.create({
       data: {
         reference: reference,
@@ -155,7 +144,7 @@ export async function createOrder(data: OrderInputData) {
         }),
       },
     });
-    console.log("🎉 [createOrder] Commande créée avec succès, ID:", newOrder.id);
+    // console.log("🎉 [createOrder] Commande créée avec succès, ID:", newOrder.id);
 
     revalidatePath("/dashboard/orders");
     return { success: true, orderId: newOrder.id, reference: newOrder.reference };

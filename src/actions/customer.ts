@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { CustomerFormState } from "@/types/customer";
 
 // Schéma de base partagé pour les champs du formulaire
 const CustomerFormSchema = z.object({
@@ -19,23 +20,6 @@ const CustomerFormSchema = z.object({
   city: z.string().min(1, "La ville est requise"),
   country: z.string().min(1, "Le pays est requis"),
 });
-
-export type CustomerFormState = {
-  errors?: {
-    name?: string[];
-    email?: string[];
-    phone?: string[];
-    companyName?: string[];
-    vatNumber?: string[];
-    isActive?: string[];
-    addressLine1?: string[];
-    addressLine2?: string[];
-    postalCode?: string[];
-    city?: string[];
-    country?: string[];
-  };
-  message?: string | null;
-};
 
 
 // --- ACTION DE CRÉATION ---

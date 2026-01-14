@@ -2,28 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { updateCustomer, createCustomer, type CustomerFormState } from "@/actions/customer";
+import { updateCustomer, createCustomer } from "@/actions/customer";
+import { CustomerFormState, CustomerFormProps } from "@/types/customer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-
-type CustomerFormProps = {
-    customer?: {
-        id: string;
-        name: string;
-        email: string;
-        phone: string;
-        companyName: string;
-        vatNumber: string;
-        isActive: boolean;
-        addressLine1: string;
-        addressLine2: string;
-        postalCode: string;
-        city: string;
-        country: string;
-    };
-};
 
 function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
     const { pending } = useFormStatus();

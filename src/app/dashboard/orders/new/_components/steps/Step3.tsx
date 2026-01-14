@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Trash2, Upload, Plus } from "lucide-react";
 // Import des types du parent pour la cohérence
-import type { OrderDraft, ProductItem, ProductFromDB } from "../../types";
+import { OrderDraft, ProductItem, ProductFromDB } from "@/types/order";
 
 // Update des Props pour recevoir le state global et le catalogue
 type Props = {

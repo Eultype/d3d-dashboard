@@ -20,17 +20,7 @@ import {
 
 import { Eye, Pencil } from "lucide-react";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
-
-type ProductRow = {
-    id: string;
-    name: string;
-    sku: string;
-    description: string | null;
-    imageUrl: string | null;
-    isActive: boolean;
-    priceCents: number;
-    createdAt: string; // ISO
-};
+import { ProductRow } from "@/types/product";
 
 function formatPriceEUR(priceCents: number) {
     return new Intl.NumberFormat("fr-FR", {

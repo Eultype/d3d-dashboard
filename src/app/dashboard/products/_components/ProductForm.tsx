@@ -3,27 +3,14 @@
 import { useActionState, useState, useRef, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
-import { createProduct, updateProduct, type ProductFormState } from "@/actions/product";
+import { createProduct, updateProduct } from "@/actions/product";
+import { ProductFormState, ProductFormProps } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Field } from "@/components/ui/field";
-
-type ProductForForm = {
-    id: string;
-    name: string;
-    sku: string;
-    description: string | null;
-    imageUrl: string | null;
-    priceCents: number;
-    isActive: boolean;
-};
-
-type ProductFormProps = {
-    product?: ProductForForm;
-};
 
 function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
     const { pending } = useFormStatus();

@@ -4,7 +4,7 @@ import { getProductsAndStats } from "@/lib/data/products";
 import type { Metadata } from "next";
 import Link from "next/link";
 // Import des composants
-import { ProductsTable } from "./_components/products-table";
+import { ProductsTable } from "./_components/ProductsTable";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import { Package, CheckCircle2, XCircle } from "lucide-react";

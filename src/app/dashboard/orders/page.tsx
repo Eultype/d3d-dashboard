@@ -4,7 +4,7 @@ import { getOrdersAndStats } from "@/lib/data/orders";
 import type { Metadata } from "next";
 import Link from "next/link";
 // Import des composants
-import { OrdersTable } from "./_components/orders-table";
+import { OrdersTable } from "./_components/OrdersTable";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";

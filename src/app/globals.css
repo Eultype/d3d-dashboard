@@ -123,3 +123,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes fill-left-to-right {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-fill-ltr {
+  animation: fill-left-to-right 0.5s ease-in-out forwards;
+}
+
+@keyframes fill-circle-color {
+  from {
+    background-color: #d1d5db;
+    border-color: #d1d5db;
+    color: #4b5563;
+  }
+  to {
+    background-color: #1e40af;
+    border-color: #1e40af;
+    color: #ffffff;
+  }
+}
+
+.animate-fill-circle {
+  animation: fill-circle-color 0.3s ease-in-out forwards;
+}

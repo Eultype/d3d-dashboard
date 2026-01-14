@@ -74,6 +74,24 @@ export default function StepThree({
     }
   };
 
+  // Modifier un produit (quantité, prix, options)
+  const updateProduct = (
+    uniqueId: string,
+    field: keyof ProductItem,
+    value: any,
+  ) => {
+    setProducts(
+      products.map((p) =>
+        p.uniqueId === uniqueId ? { ...p, [field]: value } : p,
+      ),
+    );
+  };
+
+  // Supprimer un produit de la liste
+  const removeProduct = (uniqueId: string) => {
+    setProducts(products.filter((p) => p.uniqueId !== uniqueId));
+  };
+
   // Calcul du total global
   const calculateTotal = () => {
     return products.reduce((acc, p) => {

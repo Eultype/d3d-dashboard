@@ -1,5 +1,7 @@
 // components/ui/stepper.tsx
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 
 interface Step {
   number: number;
@@ -12,6 +14,18 @@ interface StepperProps {
 }
 
 export function Stepper({ steps, currentStep }: StepperProps) {
+  const [animatedActiveStep, setAnimatedActiveStep] = useState(currentStep);
+
+  useEffect(() => {
+    const delay = 500; // ms, matches the duration of animate-fill-ltr
+
+    const timer = setTimeout(() => {
+      setAnimatedActiveStep(currentStep);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [currentStep]);
+
   return (
     <div className="w-full mb-8">
       <div className="flex items-center justify-between">
@@ -23,9 +37,14 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                 className={`
                   w-12 h-12 rounded-full flex items-center justify-center font-semibold border-2
                   ${
-                    currentStep >= step.number
+                    animatedActiveStep > step.number
                       ? "bg-[#1e40af] border-[#1e40af] text-white"
                       : "bg-gray-300 border-gray-300 text-gray-600"
+                  }
+                  ${
+                    animatedActiveStep === step.number
+                      ? "animate-fill-circle"
+                      : ""
                   }
                 `}
               >
@@ -40,12 +59,11 @@ export function Stepper({ steps, currentStep }: StepperProps) {
             {index < steps.length - 1 && (
               <div className="flex-1 h-1 mx-2 bg-gray-300 -mt-6">
                 <div
-                  className={`h-full transition-all duration-300 ${
-                    currentStep > step.number ? "bg-[#1e40af]" : "bg-gray-300"
+                  className={`h-full bg-[#1e40af] ${
+                    currentStep > step.number ? "w-full" : "w-0"
+                  } ${
+                    currentStep === step.number + 1 ? "animate-fill-ltr" : ""
                   }`}
-                  style={{
-                    width: currentStep > step.number ? "100%" : "0%",
-                  }}
                 />
               </div>
             )}
@@ -55,3 +73,4 @@ export function Stepper({ steps, currentStep }: StepperProps) {
     </div>
   );
 }
+

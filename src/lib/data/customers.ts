@@ -49,8 +49,12 @@ export async function getCustomerPageData(id: string) {
     return prisma.customer.findUnique({
         where: { id },
         include: {
-            orders: {orderBy: { createdAt: "desc" }, take: 5, include: {
-                items: true,},
+            orders: {
+                orderBy: { createdAt: "desc" },
+                take: 5,
+                include: {
+                    items: true,
+                },
             },
         },
     });

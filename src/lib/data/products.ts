@@ -23,10 +23,17 @@ export async function getProductOrderItems(productId: string) {
         take: 5,
         include: {
             order: {
-                include: {
-                    customer: true,
+                select: {
+                    id: true,
+                    reference: true,
+                    createdAt: true,
                     items: true,
-                },
+                    customer: {
+                        select: {
+                            name: true,
+                        }
+                    }
+                }
             },
         },
     });

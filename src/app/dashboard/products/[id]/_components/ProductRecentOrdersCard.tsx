@@ -12,6 +12,7 @@ type ProductRecentOrdersCardProps = {
         unitPriceCents: number;
         order: {
             id: string;
+            reference: string | null;
             createdAt: Date;
             items: any[];
             customer: {
@@ -55,7 +56,7 @@ export function ProductRecentOrdersCard({ lastItems, productId }: ProductRecentO
                                 <div className="min-w-0">
                                     <div className="flex flex-wrap items-center gap-2 min-w-0">
                                         <span className="font-mono text-sm shrink-0">
-                                            #{order.id.slice(0, 8)}
+                                            {order.reference ?? `#${order.id.slice(0, 8)}`}
                                         </span>
                                         <Badge variant="secondary" className="shrink-0">
                                             x{it.quantity}

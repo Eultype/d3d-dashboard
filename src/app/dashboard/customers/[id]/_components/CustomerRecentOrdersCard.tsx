@@ -9,6 +9,7 @@ import { orderTotalCents } from "@/lib/orders";
 type CustomerRecentOrdersCardProps = {
     orders: {
         id: string;
+        reference: string | null;
         status: string;
         createdAt: Date;
         items: { quantity: number; unitPriceCents: number }[];
@@ -46,7 +47,7 @@ export function CustomerRecentOrdersCard({ orders, customerId }: CustomerRecentO
                                     <div className="min-w-0">
                                         <div className="flex min-w-0 flex-wrap items-center gap-2">
                                             <span className="shrink-0 font-mono text-sm">
-                                                #{order.id.slice(0, 8)}
+                                                {order.reference ?? `#${order.id.slice(0, 8)}`}
                                             </span>
                                             <Badge variant="secondary" className="shrink-0">
                                                 {order.status}

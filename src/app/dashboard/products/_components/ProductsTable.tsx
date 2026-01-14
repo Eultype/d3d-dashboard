@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import { formatDateFR } from "@/lib/dates";
 
 import {
     Table,
@@ -27,14 +26,6 @@ function formatPriceEUR(priceCents: number) {
         style: "currency",
         currency: "EUR",
     }).format((priceCents ?? 0) / 100);
-}
-
-function formatDateFR(date: Date) {
-    return date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
 }
 
 export function ProductsTable({ products }: { products: ProductRow[] }) {

@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { NavLink } from "@/components/dashboard/nav-link";
+import { NavLink } from "./_components/NavLink";
 import { ReactNode } from "react";
 import {
   ShoppingBag,

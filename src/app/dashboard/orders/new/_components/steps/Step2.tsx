@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Stepper } from "@/components/ui/stepper";
-import { CustomerSearch } from "@/components/dashboard/customer-search";
+import { CustomerSearch } from "@/components/dashboard/CustomerSearch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // Assurez-vous que le chemin est bon vers votre page.tsx où sont définis les types

@@ -118,16 +118,77 @@ export default function StepFour({
             </div>
           </CardHeader>
           <CardContent>
-            {draft.clientDetails ? (
-              // 👇 C'est ici que la magie opère
-              <div className="text-sm space-y-1">
-                <div className="font-bold ">{draft.clientDetails.name}</div>
-                <div className="">{draft.clientDetails.email}</div>
-                <div className="">{draft.clientDetails.phone}</div>
-              </div>
-            ) : (
-              <p className="text-sm ">Aucun client associé</p>
-            )}
+            {(() => {
+              // On priorise les données complètes du "Nouveau Client" si elles existent
+              // Sinon on affiche les infos basiques du client existant sélectionné
+              const client = draft.newClientData || draft.clientDetails;
+
+              if (!client) {
+                return <p className="text-sm">Aucun client associé</p>;
+              }
+
+              const isCompany = !!("companyName" in client && client.companyName?.trim());
+              const hasVat = !!("vatNumber" in client && client.vatNumber?.trim());
+              const hasAddress = !!("addressLine1" in client && client.addressLine1?.trim());
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+                  
+                  {/* BLOC 1 : CONTACT */}
+                  <div className="space-y-1">
+                    <div className="font-semibold text-gray-900 border-b pb-1 mb-2">Contact</div>
+                    <div className="font-medium">{client.name}</div>
+                    {client.email ? (
+                      <div className="text-muted-foreground break-words">{client.email}</div>
+                    ) : (
+                      <div className="text-muted-foreground italic">Pas d'email</div>
+                    )}
+                    {client.phone ? (
+                      <div className="text-muted-foreground">{client.phone}</div>
+                    ) : (
+                      <div className="text-muted-foreground italic">Pas de téléphone</div>
+                    )}
+                  </div>
+
+                  {/* BLOC 2 : ENTREPRISE */}
+                  <div className="space-y-1">
+                    <div className="font-semibold text-gray-900 border-b pb-1 mb-2">Entreprise</div>
+                    {isCompany ? (
+                      <div>{client.companyName}</div>
+                    ) : (
+                      <div className="text-muted-foreground italic">Particulier</div>
+                    )}
+                    <div className="pt-1">
+                      <span className="text-xs text-muted-foreground mr-2">TVA:</span>
+                      {hasVat ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground font-mono">
+                          {client.vatNumber}
+                        </span>
+                      ) : (
+                        <span>❌</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* BLOC 3 : ADRESSE */}
+                  <div className="space-y-1">
+                    <div className="font-semibold text-gray-900 border-b pb-1 mb-2">Adresse</div>
+                    {hasAddress ? (
+                      <>
+                        <div>{client.addressLine1}</div>
+                        {client.addressLine2 && <div>{client.addressLine2}</div>}
+                        <div>
+                          {client.postalCode} {client.city}
+                        </div>
+                        <div className="uppercase text-muted-foreground text-xs mt-1">{client.country}</div>
+                      </>
+                    ) : (
+                      <div className="text-muted-foreground italic">Non renseignée</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 

@@ -31,6 +31,12 @@ export async function GET(req: Request) {
       email: true,
       phone: true,
       companyName: true,
+      vatNumber: true,
+      addressLine1: true,
+      addressLine2: true,
+      postalCode: true,
+      city: true,
+      country: true,
     },
   });
 

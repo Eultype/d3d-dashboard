@@ -14,6 +14,13 @@ export type ClientDetails = {
   name: string;
   email: string;
   phone: string;
+  companyName?: string | null;
+  vatNumber?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  country?: string | null;
 };
 
 export type NewClientData = {

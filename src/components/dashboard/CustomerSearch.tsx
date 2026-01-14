@@ -11,6 +11,12 @@ type CustomerLite = {
   email: string | null;
   phone: string | null;
   companyName: string | null;
+  vatNumber: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
 };
 
 function useDebouncedValue<T>(value: T, delay = 250) {

@@ -31,6 +31,12 @@ export type CustomerLite = {
   email: string | null;
   phone: string | null;
   companyName: string | null;
+  vatNumber: string | null;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
 };
 
 export default function StepTwo({
@@ -86,6 +92,12 @@ export default function StepTwo({
       email: formData.email,
       phone: formData.phone,
       companyName: formData.companyName,
+      vatNumber: formData.vatNumber,
+      addressLine1: formData.addressLine1,
+      addressLine2: formData.addressLine2,
+      postalCode: formData.postalCode,
+      city: formData.city,
+      country: formData.country,
     };
 
     setSelected(newCustomerLite);
@@ -97,6 +109,13 @@ export default function StepTwo({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        companyName: formData.companyName,
+        vatNumber: formData.vatNumber,
+        addressLine1: formData.addressLine1,
+        addressLine2: formData.addressLine2,
+        postalCode: formData.postalCode,
+        city: formData.city,
+        country: formData.country,
       },
       newClientData: {
         ...formData,
@@ -137,6 +156,13 @@ export default function StepTwo({
                   name: c.name || "Inconnu",
                   email: c.email || "",
                   phone: c.phone || "",
+                  companyName: c.companyName,
+                  vatNumber: c.vatNumber,
+                  addressLine1: c.addressLine1,
+                  addressLine2: c.addressLine2,
+                  postalCode: c.postalCode,
+                  city: c.city,
+                  country: c.country,
                 },
                 newClientData: null, // IMPORTANT
               });

@@ -1,8 +1,14 @@
 export const dynamic = "force-dynamic";
 
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavLink } from "@/components/dashboard/nav-link";
 import { ReactNode } from "react";
-import { ShoppingBag, ClipboardList, Users, LayoutDashboard } from "lucide-react";
+import {
+  ShoppingBag,
+  ClipboardList,
+  Users,
+  LayoutDashboard,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "@/components/auth/logout-button";
 
@@ -53,9 +59,9 @@ export default async function DashboardLayout({
               label="Clients"
             />
             <NavLink
-                href="/dashboard/products"
-                icon={<ShoppingBag className="h-4 w-4" />}
-                label="Produits"
+              href="/dashboard/products"
+              icon={<ShoppingBag className="h-4 w-4" />}
+              label="Produits"
             />
           </nav>
         </aside>
@@ -73,6 +79,7 @@ export default async function DashboardLayout({
               </div>
 
               <div className="flex items-center gap-3">
+                <ThemeToggle />
                 <span className="text-sm text-muted-foreground">
                   {session.user?.email ?? "Utilisateur"}
                 </span>

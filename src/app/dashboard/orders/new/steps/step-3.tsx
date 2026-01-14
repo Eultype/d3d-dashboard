@@ -133,10 +133,8 @@ export default function StepThree({
 
       {/* Form Title */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">
-          Produits de la commande
-        </h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-2xl font-bold ">Produits de la commande</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           Ajoutez les produits avec leurs options
         </p>
       </div>
@@ -153,10 +151,7 @@ export default function StepThree({
                 value={selectedProductKey || ""}
                 onValueChange={setSelectedProductKey}
               >
-                <SelectTrigger
-                  id="select-product"
-                  className="w-full h-11 bg-gray-50/50"
-                >
+                <SelectTrigger id="select-product" className="w-full h-11 ">
                   <SelectValue placeholder="Sélectionner un produit à ajouter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -171,17 +166,17 @@ export default function StepThree({
           </div>
           <Button
             onClick={addProduct}
-            className=" shrink-0 bg-black "
+            className=" shrink-0  "
             disabled={!selectedProductKey}
           >
-            <Plus className="h-5 w-5 text-white" />
+            <Plus className="h-5 w-5 " />
           </Button>
         </div>
 
         {/* --- Liste des produits --- */}
         <div className="space-y-4">
           {products.length === 0 ? (
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-10 text-center text-gray-400 bg-gray-50/50">
+            <div className="border-2 border-dashed border-gray-200 rounded-lg p-10 text-center text-gray-400 ">
               <h3 className="font-medium">Aucun produit ajouté</h3>
               <p className="text-sm mt-1">
                 Sélectionnez un produit ci-dessus pour commencer
@@ -197,15 +192,13 @@ export default function StepThree({
               return (
                 <div
                   key={item.uniqueId}
-                  className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm space-y-6"
+                  className="border border-gray-200 rounded-lg p-6  shadow-sm space-y-6"
                 >
                   {/* Header Carte : Titre + Prix Unitaire + Trash */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900">
-                        {item.label}
-                      </h3>
-                      <p className="text-gray-500 text-sm">
+                      <h3 className="font-bold text-lg ">{item.label}</h3>
+                      <p className=" text-sm">
                         {item.unitPrice.toFixed(2)} € / unité
                       </p>
                     </div>
@@ -222,7 +215,7 @@ export default function StepThree({
                     <div className="space-y-2">
                       <Label
                         htmlFor={`qty-${item.uniqueId}`}
-                        className="text-sm font-medium text-gray-700"
+                        className="text-sm font-medium "
                       >
                         Quantité
                       </Label>
@@ -244,7 +237,7 @@ export default function StepThree({
                     <div className="space-y-2">
                       <Label
                         htmlFor={`price-${item.uniqueId}`}
-                        className="text-sm font-medium text-gray-700"
+                        className="text-sm font-medium "
                       >
                         Prix unitaire (€)
                       </Label>
@@ -300,17 +293,17 @@ export default function StepThree({
 
                   {/* Upload Zone */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">
+                    <Label className="text-sm font-medium ">
                       Photos client
                     </Label>
-                    <div className="border-2 border-dashed border-slate-200 rounded-lg h-24 flex items-center justify-center bg-slate-50/50 hover:bg-slate-100 transition-colors cursor-pointer">
+                    <div className="border-2 border-dashed border-slate-200 rounded-lg h-24 flex items-center justify-center  hover:bg-slate-100 transition-colors cursor-pointer">
                       <Upload className="h-6 w-6 text-slate-400" />
                     </div>
                   </div>
 
                   {/* Sous-total Item */}
                   <div className="text-right pt-2">
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold ">
                       Sous-total : {itemSubTotal.toFixed(2).replace(".", ",")} €
                     </span>
                   </div>
@@ -323,7 +316,7 @@ export default function StepThree({
         {/* Total Global */}
         {products.length > 0 && (
           <div className="flex justify-end pt-4">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold ">
               Total produits : {calculateTotal().toFixed(2).replace(".", ",")} €
             </h3>
           </div>
@@ -335,10 +328,7 @@ export default function StepThree({
             ← Retour
           </Button>
           {/* IMPORTANT : Utiliser handleNext pour sauvegarder */}
-          <Button
-            onClick={handleNext}
-            className="w-32 bg-slate-800 hover:bg-slate-900"
-          >
+          <Button onClick={handleNext} className="w-32 ">
             Continuer →
           </Button>
         </div>

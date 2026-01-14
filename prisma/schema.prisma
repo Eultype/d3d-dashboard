@@ -7,61 +7,51 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String      @id @default(cuid())
+  email     String      @unique
   password  String
-  createdAt DateTime @default(now())
-
+  createdAt DateTime    @default(now())
   notes     OrderNote[]
 }
 
 model Customer {
-  id          String   @id @default(cuid())
-
-  name        String?
-  email       String?  @unique
-  phone       String?
-
-  companyName String?
-  vatNumber   String?
-
-  addressLine1 String?
-  addressLine2 String?
-  postalCode   String?
+  id           String   @id @default(cuid())
+  name         String?
+  email        String?  @unique
+  phone        String?
+  companyName  String?
+  vatNumber    String?
+  createdAt    DateTime @default(now())
   city         String?
   country      String?
-
-  isActive    Boolean  @default(true)
-
-  createdAt   DateTime @default(now())
-  orders      Order[]
+  postalCode   String?
+  addressLine1 String?
+  addressLine2 String?
+  isActive     Boolean  @default(true)
+  orders       Order[]
 }
 
-
 model Order {
-  id         String   @id @default(cuid())
+  id         String      @id @default(cuid())
+    reference  String?   @unique
   status     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
-
-  notes      OrderNote[]
   files      File[]
+  customer   Customer?   @relation(fields: [customerId], references: [id])
   items      OrderItem[]
+  notes      OrderNote[]
 }
 
 model OrderNote {
   id        String   @id @default(cuid())
   content   String
   createdAt DateTime @default(now())
-
   orderId   String
-  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
   userId    String
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model File {
@@ -70,51 +60,39 @@ model File {
   url       String
   type      String
   createdAt DateTime @default(now())
-
   orderId   String
-  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-/* =========================
-   PRODUCTS (CATALOGUE)
-   ========================= */
-
 model Product {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
-  sku         String   @unique
+  sku         String      @unique
   description String?
   imageUrl    String?
-  priceCents  Int      @default(0)
-  isActive    Boolean  @default(true)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  priceCents  Int         @default(0)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   items       OrderItem[]
 }
 
-/* =========================
-   ORDER ITEMS (LINES)
-   ========================= */
-
 model OrderItem {
   id             String   @id @default(cuid())
-
   orderId        String
   productId      String
-
   quantity       Int      @default(1)
-  unitPriceCents Int      @default(0) // prix figé au moment de la commande
-
+  unitPriceCents Int      @default(0)
   createdAt      DateTime @default(now())
-
   order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product        Product  @relation(fields: [productId], references: [id])
 
+  @@unique([orderId, productId])
   @@index([orderId])
   @@index([productId])
+}
 
-  // 1 ligne max par produit par commande (on augmente quantity)
-  @@unique([orderId, productId])
+model Sequence {
+  id           String @id // ex: "BOG", "ERIC", "WEB"
+  currentValue Int
 }

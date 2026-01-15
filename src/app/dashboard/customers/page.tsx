@@ -16,9 +16,16 @@ export const metadata: Metadata = {
         "Gérez et suivez l’ensemble de vos clients : informations, statut, historique, entreprises, TVA et activités récentes.",
 };
 
+import { SearchInput } from "@/components/ui/search-input";
+
 // Page de listing clients
-export default async function CustomersPage() {
-    const { customers, stats } = await getCustomersAndStats();
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+    const { q } = await searchParams;
+    const { customers, stats } = await getCustomersAndStats(q);
 
     const { totalCustomers, actifs, entreprises, tvaRenseignee, nouveaux30j } = stats;
 
@@ -43,10 +50,13 @@ export default async function CustomersPage() {
                     </div>
                 </div>
 
-                {/* Nouveau client */}
-                <Button asChild>
-                    <Link href="/dashboard/customers/new">Nouveau client</Link>
-                </Button>
+                {/* Actions : Recherche + Nouveau */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <SearchInput placeholder="Rechercher un client..." className="w-full sm:w-64" />
+                    <Button asChild>
+                        <Link href="/dashboard/customers/new">Nouveau client</Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Stats (Total - Actifs - Entreprises - TVA - Nouveaux) */}

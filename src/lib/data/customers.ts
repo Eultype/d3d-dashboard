@@ -16,8 +16,20 @@ export async function getCustomerOrderItems(customerId: string) {
     });
 }
 
-export async function getCustomersAndStats() {
+export async function getCustomersAndStats(query?: string) {
+    const whereClause = query
+        ? {
+            OR: [
+                { name: { contains: query, mode: "insensitive" as const } },
+                { email: { contains: query, mode: "insensitive" as const } },
+                { companyName: { contains: query, mode: "insensitive" as const } },
+                { phone: { contains: query, mode: "insensitive" as const } },
+            ],
+        }
+        : {};
+
     const customers = await prisma.customer.findMany({
+        where: whereClause,
         orderBy: { createdAt: "desc" },
     });
 

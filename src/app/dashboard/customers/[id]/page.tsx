@@ -73,6 +73,10 @@ export default async function CustomerDetailPage({
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/customers">← Retour</Link>
                     </Button>
+                    {/* Bouton modifier */}
+                    <Button asChild variant="outline">
+                        <Link href={`/dashboard/customers/${customer.id}/edit`}>Modifier</Link>
+                    </Button>
                 </div>
             </div>
             {/* Informations du client */}

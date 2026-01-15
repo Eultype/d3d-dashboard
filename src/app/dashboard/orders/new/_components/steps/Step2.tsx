@@ -229,7 +229,7 @@ export default function StepTwo({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Téléphone</Label>
+                <Label>Téléphone *</Label>
                 <Input
                   name="phone"
                   value={formData.phone}
@@ -260,7 +260,7 @@ export default function StepTwo({
             {/* Champs Adresse */}
             <div className="grid gap-4 md:grid-cols-2 pt-4 border-t">
               <div className="space-y-2">
-                <Label>Adresse ligne 1</Label>
+                <Label>Adresse ligne 1 *</Label>
                 <Input
                   name="addressLine1"
                   value={formData.addressLine1}
@@ -278,7 +278,7 @@ export default function StepTwo({
               </div>
 
               <div className="space-y-2">
-                <Label>Code postal</Label>
+                <Label>Code postal *</Label>
                 <Input
                   name="postalCode"
                   value={formData.postalCode}
@@ -287,7 +287,7 @@ export default function StepTwo({
               </div>
 
               <div className="space-y-2">
-                <Label>Ville</Label>
+                <Label>Ville *</Label>
                 <Input
                   name="city"
                   value={formData.city}
@@ -296,7 +296,7 @@ export default function StepTwo({
               </div>
 
               <div className="space-y-2">
-                <Label>Pays</Label>
+                <Label>Pays *</Label>
                 <Input
                   name="country"
                   value={formData.country}
@@ -312,7 +312,15 @@ export default function StepTwo({
             </Button>
             <Button
               onClick={handleValidateNewClient}
-              disabled={!formData.name || !formData.email} // Validation simple
+              disabled={
+                !formData.name ||
+                !formData.email ||
+                !formData.phone ||
+                !formData.addressLine1 ||
+                !formData.postalCode ||
+                !formData.city ||
+                !formData.country
+              }
             >
               Confirmer ce client
             </Button>

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import { Package, CheckCircle2, XCircle } from "lucide-react";
 
+import { SearchInput } from "@/components/ui/search-input";
+
 // Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des produits",
@@ -17,8 +19,13 @@ export const metadata: Metadata = {
 };
 
 // Page de listing produits
-export default async function ProductsPage() {
-    const { products: rows, stats } = await getProductsAndStats();
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+    const { q } = await searchParams;
+    const { products: rows, stats } = await getProductsAndStats(q);
     const { totalProducts, activeProducts, inactiveProducts } = stats;
 
     return (
@@ -42,9 +49,12 @@ export default async function ProductsPage() {
                     </div>
                 </div>
 
-                <Button asChild>
-                    <Link href="/dashboard/products/new">Nouveau produit</Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <SearchInput placeholder="Rechercher un produit..." className="w-full sm:w-64" />
+                    <Button asChild>
+                        <Link href="/dashboard/products/new">Nouveau produit</Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Stats ( Total - Actifs - Inactifs */}

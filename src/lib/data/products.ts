@@ -66,8 +66,18 @@ export async function getProductRecentCustomers(productId: string) {
     return lastCustomers;
 }
 
-export async function getProductsAndStats() {
+export async function getProductsAndStats(query?: string) {
+    const whereClause = query
+        ? {
+            OR: [
+                { name: { contains: query, mode: "insensitive" as const } },
+                { sku: { contains: query, mode: "insensitive" as const } },
+            ],
+        }
+        : {};
+
     const products = await prisma.product.findMany({
+        where: whereClause,
         orderBy: { createdAt: "desc" },
         select: {
             id: true,

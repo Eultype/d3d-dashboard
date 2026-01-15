@@ -10,6 +10,7 @@ import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";
 // Import des lib
 import { formatEUR } from "@/lib/money";
+import { SearchInput } from "@/components/ui/search-input";
 
 // Metadata du dashboard
 export const metadata: Metadata = {
@@ -19,8 +20,13 @@ export const metadata: Metadata = {
 };
 
 // Page de listing commandes
-export default async function OrdersPage() {
-    const { orders: rows, stats } = await getOrdersAndStats();
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+    const { q } = await searchParams;
+    const { orders: rows, stats } = await getOrdersAndStats(q);
     const { totalOrders, aVerifier, enProd, terminees, caTotalCents } = stats;
 
     return (
@@ -42,9 +48,12 @@ export default async function OrdersPage() {
                     </div>
                 </div>
 
-                <Button asChild>
-                    <Link href="/dashboard/orders/new">Nouvelle commande</Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <SearchInput placeholder="Rechercher une commande..." className="w-full sm:w-64" />
+                    <Button asChild>
+                        <Link href="/dashboard/orders/new">Nouvelle commande</Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Stats (Total - À confirmer - En production - Terminées - CA total (hors livraison / TVA) */}

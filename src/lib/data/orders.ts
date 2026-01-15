@@ -39,8 +39,20 @@ function sumCents(values: number[]) {
     return values.reduce((s, v) => s + v, 0);
 }
 
-export async function getOrdersAndStats() {
+export async function getOrdersAndStats(query?: string) {
+    const whereClause: any = {};
+
+    if (query) {
+        whereClause.OR = [
+            { reference: { contains: query, mode: "insensitive" } },
+            // On peut chercher par client aussi
+            { customer: { name: { contains: query, mode: "insensitive" } } },
+            { customer: { email: { contains: query, mode: "insensitive" } } },
+        ];
+    }
+
     const orders = await prisma.order.findMany({
+        where: whereClause,
         include: {
             customer: true,
             items: {

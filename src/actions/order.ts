@@ -199,3 +199,44 @@ export async function createOrder(data: OrderInputData) {
     return { success: false, message: "Une erreur technique est survenue." };
   }
 }
+
+// --- ACTION DE MISE À JOUR DU STATUT ---
+const UpdateStatusSchema = z.object({
+  orderId: z.string(),
+  newStatus: z.enum(["A_VERIFIER", "PROD", "A_EXPEDIER", "A_RECUPERER", "TERMINE", "ANNULEE"]), // Liste à adapter selon tes besoins
+  trackingNumber: z.string().optional(),
+});
+
+export async function updateOrderStatus(orderId: string, newStatus: string, trackingNumber?: string) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return { success: false, message: "Non autorisé" };
+  }
+
+  // Validation
+  const validation = UpdateStatusSchema.safeParse({ orderId, newStatus, trackingNumber });
+  if (!validation.success) {
+    return { success: false, message: "Statut invalide" };
+  }
+
+  try {
+    // Si le statut passe à "A_EXPEDIER" ou "TERMINE", on pourrait sauvegarder le tracking ici
+    // Pour l'instant on fait simple : update du status
+    
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: newStatus,
+        // On pourrait ajouter un champ 'trackingNumber' à la table Order plus tard
+      },
+    });
+
+    // TODO: Ajouter ici la logique d'envoi d'email (ex: "Votre commande est expédiée")
+
+    revalidatePath(`/dashboard/orders/${orderId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur update status:", error);
+    return { success: false, message: "Erreur lors de la mise à jour" };
+  }
+}

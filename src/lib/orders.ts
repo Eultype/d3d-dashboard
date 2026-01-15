@@ -5,9 +5,11 @@ export function orderTotalCents(items: { quantity: number; unitPriceCents: numbe
 export function statusLabelFR(status: string) {
     switch (status) {
         case "A_VERIFIER":
-            return "Confirmation";
+            return "À confirmer";
         case "PROD":
-            return "En traitement";
+            return "En production";
+        case "A_EXPEDIER":
+            return "Expédition";
         case "TERMINE":
             return "Livrée";
         default:

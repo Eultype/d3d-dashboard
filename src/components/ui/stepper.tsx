@@ -39,7 +39,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   ${
                     animatedActiveStep > step.number
                       ? "bg-[#1e40af] border-[#1e40af] text-white"
-                      : "bg-gray-300 border-gray-300 text-gray-600"
+                      : "bg-gray-400 border-gray-300 "
                   }
                   ${
                     animatedActiveStep === step.number
@@ -50,9 +50,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               >
                 {step.number}
               </div>
-              <span className="mt-2 text-sm font-medium text-gray-700">
-                {step.label}
-              </span>
+              <span className="mt-2 text-sm font-medium ">{step.label}</span>
             </div>
 
             {/* Connecting Line */}
@@ -73,4 +71,3 @@ export function Stepper({ steps, currentStep }: StepperProps) {
     </div>
   );
 }
-

@@ -45,8 +45,8 @@ export type NewClientData = {
 export type OrderDraft = {
   info: {
     prefix: string;
-    channel: string;
     delivery: string;
+    manualNumber?: number | null;
   };
   customerId: string | null;
   clientDetails: ClientDetails | null;

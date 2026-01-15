@@ -11,8 +11,9 @@ import { z } from "zod";
 const OrderSchema = z.object({
   info: z.object({
     prefix: z.string().min(1, "Le préfixe est requis"),
-    channel: z.string().min(1, "Le canal est requis"),
+    // channel: supprimé
     delivery: z.string().min(1, "Le mode de livraison est requis"),
+    manualNumber: z.number().optional().nullable(),
   }),
   clientId: z.string().nullable(),
   clientDetails: z
@@ -129,8 +130,38 @@ export async function createOrder(data: OrderInputData) {
       finalCustomerId = null;
     }
 
-    // 3. Génération de la référence unique (ex: BOG-1001)
-    const reference = await getNextOrderReference(validData.info.prefix);
+    // 3. Génération de la référence unique
+    let reference = "";
+
+    if (validData.info.manualNumber) {
+      // CAS MANUEL (WEB)
+      reference = `${validData.info.prefix}-${validData.info.manualNumber}`;
+      
+      // Vérif doublon
+      const existing = await prisma.order.findUnique({ where: { reference } });
+      if (existing) {
+        return { success: false, message: `La référence ${reference} existe déjà.` };
+      }
+
+      // Mise à jour de la séquence si nécessaire (pour ne pas casser les futures auto)
+      // On ne met à jour que si le manuel est supérieur au courant
+      const currentSeq = await prisma.sequence.findUnique({ where: { id: validData.info.prefix } });
+      if (currentSeq && validData.info.manualNumber > currentSeq.currentValue) {
+        await prisma.sequence.update({
+          where: { id: validData.info.prefix },
+          data: { currentValue: validData.info.manualNumber },
+        });
+      } else if (!currentSeq) {
+        // Création séquence si inexistante
+        await prisma.sequence.create({
+          data: { id: validData.info.prefix, currentValue: validData.info.manualNumber },
+        });
+      }
+
+    } else {
+      // CAS AUTOMATIQUE (BOG/ERIC)
+      reference = await getNextOrderReference(validData.info.prefix);
+    }
 
     // 4. Préparation des lignes de commande
     // Aggrégation pour éviter les doublons de produits (clé unique orderId_productId)

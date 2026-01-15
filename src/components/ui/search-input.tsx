@@ -48,7 +48,7 @@ export function SearchInput({
       <Input
         type="search"
         placeholder={placeholder}
-        className="pl-9 pr-8"
+        className="pl-9"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />

@@ -21,7 +21,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [draft, setDraft] = useState<OrderDraft>({
-    info: { prefix: "", channel: "", delivery: "" },
+    info: { prefix: "", delivery: "" },
     customerId: null,
     clientDetails: null,
     newClientData: null,

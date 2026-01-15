@@ -8,6 +8,7 @@ type OrderFilesCardProps = {
         id: string;
         url: string;
         filename: string;
+        type: string;
     }[];
 };
 
@@ -24,7 +25,8 @@ export function OrderFilesCard({ files }: OrderFilesCardProps) {
                 ) : (
                     <div className="space-y-3">
                         {files.map((file) => {
-                            const isImg = isImageUrl(file.url);
+                            // On utilise le type MIME stocké en base (beaucoup plus fiable)
+                            const isImg = file.type.startsWith("image/");
 
                             return (
                                 <div

@@ -8,6 +8,11 @@ export type ProductItem = {
   quantity: number;
   hasCustomText: boolean;
   needs3D: boolean;
+  file?: {
+    url: string;
+    filename: string;
+    type: string;
+  } | null;
 };
 
 export type ClientDetails = {

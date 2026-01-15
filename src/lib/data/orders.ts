@@ -15,6 +15,13 @@ export async function getOrderDetails(id: string) {
             },
             files: {
                 orderBy: { createdAt: "desc" },
+                select: {
+                    id: true,
+                    url: true,
+                    filename: true,
+                    type: true,
+                    createdAt: true
+                }
             },
         },
     });

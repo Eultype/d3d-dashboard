@@ -47,7 +47,8 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
         products: draft.products.map(p => ({
           typeId: p.typeId,
           quantity: p.quantity,
-          unitPrice: p.unitPrice
+          unitPrice: p.unitPrice,
+          file: p.file // ✅ Ajout du fichier
         })),
         internalNote: draft.internalNote
       };

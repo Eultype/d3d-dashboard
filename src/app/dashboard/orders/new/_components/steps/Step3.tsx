@@ -15,9 +15,10 @@ import { Stepper } from "@/components/ui/stepper";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Trash2, Upload, Plus } from "lucide-react";
+import { Trash2, Upload, Plus, FileImage, Loader2 } from "lucide-react";
 // Import des types du parent pour la cohérence
 import { OrderDraft, ProductItem, ProductFromDB } from "@/types/order";
+import { uploadOrderFile } from "@/actions/upload";
 
 // Update des Props pour recevoir le state global et le catalogue
 type Props = {
@@ -47,6 +48,7 @@ export default function StepThree({
   const [selectedProductKey, setSelectedProductKey] = useState<string | null>(
     null,
   );
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
   // 🔑 INITIALISATION : On reprend les produits du draft s'ils existent, sinon tableau vide
   const [products, setProducts] = useState<ProductItem[]>(draft.products || []);
@@ -90,6 +92,32 @@ export default function StepThree({
   // Supprimer un produit de la liste
   const removeProduct = (uniqueId: string) => {
     setProducts(products.filter((p) => p.uniqueId !== uniqueId));
+  };
+
+  // Gestion de l'upload fichier
+  const handleFileUpload = async (uniqueId: string, file: File) => {
+    setUploadingId(uniqueId);
+    
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadOrderFile(formData);
+      if (res.success && res.url) {
+        updateProduct(uniqueId, "file", {
+          url: res.url,
+          filename: res.filename || file.name,
+          type: res.type || file.type,
+        });
+      } else {
+        alert("Erreur upload: " + res.message);
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur technique lors de l'upload.");
+    } finally {
+      setUploadingId(null);
+    }
   };
 
   // Calcul du total global
@@ -171,6 +199,8 @@ export default function StepThree({
               const itemSubTotal =
                 (item.unitPrice + (item.hasCustomText ? 10 : 0)) *
                 item.quantity;
+              
+              const isUploading = uploadingId === item.uniqueId;
 
               return (
                 <div
@@ -277,11 +307,64 @@ export default function StepThree({
                   {/* Upload Zone */}
                   <div className="space-y-2">
                     <Label className="text-sm font-medium ">
-                      Photos client
+                      Photo / Fichier client (Optionnel - Max 10MB)
                     </Label>
-                    <div className="border-2 border-dashed border-slate-200 rounded-lg h-24 flex items-center justify-center  hover:bg-slate-100 transition-colors cursor-pointer">
-                      <Upload className="h-6 w-6 text-slate-400" />
-                    </div>
+                    
+                    {item.file ? (
+                       // --- MODE FICHIER EXISTANT ---
+                       <div className="flex items-center justify-between border rounded-lg p-3 bg-slate-50">
+                          <div className="flex items-center gap-3">
+                             <div className="h-10 w-10 bg-white border rounded flex items-center justify-center overflow-hidden">
+                                {item.file.type.startsWith("image/") ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={item.file.url} alt="Aperçu" className="h-full w-full object-cover" />
+                                ) : (
+                                    <FileImage className="h-5 w-5 text-slate-400" />
+                                )}
+                             </div>
+                             <div className="text-sm">
+                                <div className="font-medium truncate max-w-[200px]">{item.file.filename}</div>
+                                <div className="text-xs text-muted-foreground text-green-600">Téléchargé avec succès</div>
+                             </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => updateProduct(item.uniqueId, "file", null)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                       </div>
+                    ) : (
+                       // --- MODE UPLOAD ---
+                       <label className={`
+                          border-2 border-dashed border-slate-200 rounded-lg h-24 flex flex-col items-center justify-center 
+                          hover:bg-slate-50 transition-colors cursor-pointer relative
+                          ${isUploading ? "opacity-50 pointer-events-none" : ""}
+                       `}>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(item.uniqueId, file);
+                            }}
+                          />
+                          {isUploading ? (
+                              <div className="flex flex-col items-center gap-2 text-slate-500">
+                                <Loader2 className="h-6 w-6 animate-spin" />
+                                <span className="text-xs">Envoi en cours...</span>
+                              </div>
+                          ) : (
+                              <>
+                                <Upload className="h-6 w-6 text-slate-400 mb-1" />
+                                <span className="text-sm text-slate-500">Cliquez pour ajouter une image</span>
+                              </>
+                          )}
+                       </label>
+                    )}
                   </div>
 
                   {/* Sous-total Item */}

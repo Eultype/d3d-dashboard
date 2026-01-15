@@ -122,16 +122,34 @@ export async function updateProduct(
   }
 
   const { id, imageFile, ...data } = validatedFields.data;
-  const imageUrl = await uploadImage(imageFile, data.name);
+  const newImageUrl = await uploadImage(imageFile, data.name);
 
   try {
+    // 1. Récupérer l'ancienne image AVANT update
+    const currentProduct = await prisma.product.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    // 2. Mise à jour en base
     await prisma.product.update({
       where: { id },
       data: {
         ...data,
-        ...(imageUrl && { imageUrl: imageUrl }),
+        ...(newImageUrl && { imageUrl: newImageUrl }),
       },
     });
+
+    // 3. Suppression de l'ancien fichier SEULEMENT si l'update a réussi
+    if (newImageUrl && currentProduct?.imageUrl) {
+      const oldImagePath = path.join(process.cwd(), "public", currentProduct.imageUrl);
+      try {
+        await fs.unlink(oldImagePath);
+      } catch (err) {
+        console.warn("⚠️ [Nettoyage] Impossible de supprimer l'ancienne image (peut-être déjà absente) :", oldImagePath);
+      }
+    }
+
   } catch (error) {
     return { message: "Erreur de base de données : Impossible de mettre à jour le produit." };
   }

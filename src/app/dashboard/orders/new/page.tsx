@@ -28,8 +28,8 @@ export default async function NewOrderPage() {
   return (
     <div className="max-w-5xl mx-auto py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Nouvelle commande</h1>
-        <p className="text-gray-500 mt-2">
+        <h1 className="text-3xl font-bold ">Nouvelle commande</h1>
+        <p className=" mt-2">
           Créez une nouvelle commande en 4 étapes simples.
         </p>
       </div>

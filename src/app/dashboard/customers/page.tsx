@@ -89,18 +89,7 @@ export default async function CustomersPage() {
             </div>
 
             {/* Table */}
-            <CustomersTable
-                customers={customers.map((c) => ({
-                    id: c.id,
-                    name: c.name,
-                    email: c.email,
-                    phone: c.phone,
-                    companyName: c.companyName,
-                    vatNumber: c.vatNumber,
-                    isActive: c.isActive,
-                    createdAt: c.createdAt.toISOString(),
-                }))}
-            />
+            <CustomersTable customers={customers} />
         </div>
     );
 }

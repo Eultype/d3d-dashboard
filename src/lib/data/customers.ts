@@ -21,6 +21,17 @@ export async function getCustomersAndStats() {
         orderBy: { createdAt: "desc" },
     });
 
+    const rows = customers.map((c) => ({
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        phone: c.phone,
+        companyName: c.companyName,
+        vatNumber: c.vatNumber,
+        isActive: c.isActive,
+        createdAt: c.createdAt.toISOString(),
+    }));
+
     // Stats
     const totalCustomers = customers.length;
     const actifs = customers.filter((c) => c.isActive).length;
@@ -34,7 +45,7 @@ export async function getCustomersAndStats() {
     const nouveaux30j = customers.filter((c) => new Date(c.createdAt) >= d30).length;
 
     return {
-        customers,
+        customers: rows,
         stats: {
             totalCustomers,
             actifs,

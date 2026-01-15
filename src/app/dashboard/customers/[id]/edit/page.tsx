@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerForm } from "../../_components/CustomerForm";
 
+// Page de modification du client
 export default async function CustomerEditPage({
                                                    params,
                                                }: {

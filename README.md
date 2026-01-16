@@ -13,7 +13,7 @@ Permet de gérer les commandes, les clients, le catalogue produits et le suivi d
 
 ## 🛠️ Stack Technique
 
-- **Framework :** [Next.js 14](https://nextjs.org/) (App Router, Server Actions)
+- **Framework :** [Next.js 16](https://nextjs.org/) (App Router, Server Actions)
 - **Langage :** TypeScript (Strict mode)
 - **Base de données :** PostgreSQL (via [Prisma ORM](https://www.prisma.io/))
 - **UI :** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)

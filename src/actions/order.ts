@@ -34,14 +34,16 @@ const OrderSchema = z.object({
         typeId: z.string().min(1, "ID produit manquant"),
         quantity: z.number().min(1, "Quantité minimum 1"),
         unitPrice: z.number().min(0, "Prix invalide"),
-        file: z
-          .object({
-            url: z.string(),
-            filename: z.string(),
-            type: z.string(),
-          })
-          .nullable()
-          .optional(),
+        files: z
+          .array(
+            z.object({
+              url: z.string(),
+              filename: z.string(),
+              type: z.string(),
+            })
+          )
+          .optional()
+          .default([]),
       })
     )
     .min(1, "La commande doit contenir au moins un produit"),
@@ -125,7 +127,7 @@ export async function createOrder(data: OrderInputData) {
         finalCustomerId = newCustomer.id;
       }
     } else if (isTempId) {
-      // Cas critique : On a un ID TEMP mais pas de détails pour créer le client
+      // Cas critique : On a un ID TEMP mais pas de détails client. La commande sera orpheline.
       console.warn("⚠️ [createOrder] ID Temporaire reçu sans détails client. La commande sera orpheline.");
       finalCustomerId = null;
     }
@@ -205,14 +207,14 @@ export async function createOrder(data: OrderInputData) {
     });
 
     // 6. Gestion des fichiers attachés aux produits
-    const filesToCreate = validData.products
-      .filter((p) => p.file)
-      .map((p) => ({
-        url: p.file!.url,
-        filename: p.file!.filename,
-        type: p.file!.type,
+    const filesToCreate = validData.products.flatMap((p) =>
+      (p.files || []).map((f) => ({
+        url: f.url,
+        filename: f.filename,
+        type: f.type,
         orderId: newOrder.id,
-      }));
+      }))
+    );
 
     if (filesToCreate.length > 0) {
       await prisma.file.createMany({

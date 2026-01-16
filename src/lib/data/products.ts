@@ -66,7 +66,10 @@ export async function getProductRecentCustomers(productId: string) {
     return lastCustomers;
 }
 
-export async function getProductsAndStats(query?: string) {
+export async function getProductsAndStats(query?: string, page: number = 1) {
+    const PAGE_SIZE = 2;
+    const skip = (page - 1) * PAGE_SIZE;
+
     const whereClause = query
         ? {
             OR: [
@@ -76,20 +79,28 @@ export async function getProductsAndStats(query?: string) {
         }
         : {};
 
-    const products = await prisma.product.findMany({
-        where: whereClause,
-        orderBy: { createdAt: "desc" },
-        select: {
-            id: true,
-            name: true,
-            sku: true,
-            description: true,
-            imageUrl: true,
-            isActive: true,
-            priceCents: true,
-            createdAt: true,
-        },
-    });
+    const [products, totalCount, countActive, countInactive] = await Promise.all([
+        prisma.product.findMany({
+            where: whereClause,
+            take: PAGE_SIZE,
+            skip: skip,
+            orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                name: true,
+                sku: true,
+                description: true,
+                imageUrl: true,
+                isActive: true,
+                priceCents: true,
+                createdAt: true,
+            },
+        }),
+        prisma.product.count({ where: whereClause }),
+        // Stats globales (indépendantes de la recherche, sauf Total)
+        prisma.product.count({ where: { isActive: true } }),
+        prisma.product.count({ where: { isActive: false } }),
+    ]);
 
     const rows = products.map((p) => ({
         id: p.id,
@@ -102,18 +113,20 @@ export async function getProductsAndStats(query?: string) {
         createdAt: p.createdAt.toISOString(),
     }));
 
-    // Stats
-    const totalProducts = products.length;
-    const activeProducts = products.filter((p) => p.isActive).length;
-    const inactiveProducts = products.filter((p) => !p.isActive).length;
+    const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
     return {
         products: rows,
         stats: {
-            totalProducts,
-            activeProducts,
-            inactiveProducts,
+            totalProducts: totalCount,
+            activeProducts: countActive,
+            inactiveProducts: countInactive,
         },
+        pagination: {
+            totalPages,
+            currentPage: page,
+            totalCount,
+        }
     };
 }
 

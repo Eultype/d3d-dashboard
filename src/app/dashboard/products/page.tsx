@@ -11,6 +11,8 @@ import { Package, CheckCircle2, XCircle } from "lucide-react";
 
 import { SearchInput } from "@/components/ui/search-input";
 
+import { PaginationControls } from "@/components/ui/pagination-controls";
+
 // Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des produits",
@@ -22,10 +24,12 @@ export const metadata: Metadata = {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-    const { q } = await searchParams;
-    const { products: rows, stats } = await getProductsAndStats(q);
+    const { q, page } = await searchParams;
+    const currentPage = Number(page) || 1;
+
+    const { products: rows, stats, pagination } = await getProductsAndStats(q, currentPage);
     const { totalProducts, activeProducts, inactiveProducts } = stats;
 
     return (
@@ -84,6 +88,13 @@ export default async function ProductsPage({
 
             {/* Tableau produits */}
             <ProductsTable products={rows} />
+
+            {/* Pagination */}
+            <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalCount={pagination.totalCount}
+            />
         </div>
     );
 }

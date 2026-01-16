@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
 
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { SearchInput } from "@/components/ui/search-input";
+
 // Metadata du dashboard
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Gestion des clients",
@@ -16,16 +19,16 @@ export const metadata: Metadata = {
         "Gérez et suivez l’ensemble de vos clients : informations, statut, historique, entreprises, TVA et activités récentes.",
 };
 
-import { SearchInput } from "@/components/ui/search-input";
-
 // Page de listing clients
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-    const { q } = await searchParams;
-    const { customers, stats } = await getCustomersAndStats(q);
+    const { q, page } = await searchParams;
+    const currentPage = Number(page) || 1;
+
+    const { customers, stats, pagination } = await getCustomersAndStats(q, currentPage);
 
     const { totalCustomers, actifs, entreprises, tvaRenseignee, nouveaux30j } = stats;
 
@@ -100,6 +103,13 @@ export default async function CustomersPage({
 
             {/* Table */}
             <CustomersTable customers={customers} />
+
+            {/* Pagination */}
+            <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalCount={pagination.totalCount}
+            />
         </div>
     );
 }

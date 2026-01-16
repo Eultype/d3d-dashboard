@@ -16,22 +16,42 @@ export async function getCustomerOrderItems(customerId: string) {
     });
 }
 
-export async function getCustomersAndStats(query?: string) {
+export async function getCustomersAndStats(query?: string, page: number = 1) {
+    const PAGE_SIZE = 13;
+    const skip = (page - 1) * PAGE_SIZE;
+
     const whereClause = query
         ? {
             OR: [
                 { name: { contains: query, mode: "insensitive" as const } },
                 { email: { contains: query, mode: "insensitive" as const } },
                 { companyName: { contains: query, mode: "insensitive" as const } },
-                { phone: { contains: query, mode: "insensitive" as const } },
             ],
         }
         : {};
 
-    const customers = await prisma.customer.findMany({
-        where: whereClause,
-        orderBy: { createdAt: "desc" },
-    });
+    const now = new Date();
+    const d30 = new Date(now);
+    d30.setDate(d30.getDate() - 30);
+
+    const [customers, totalCount, countActive, countCompany, countVat, countNew] = await Promise.all([
+        prisma.customer.findMany({
+            where: whereClause,
+            take: PAGE_SIZE,
+            skip: skip,
+            orderBy: { createdAt: "desc" },
+        }),
+        prisma.customer.count({ where: whereClause }),
+        // Stats globales (on peut appliquer le filtre de recherche ou non, généralement non pour les stats globales)
+        // Ici je choisis de ne PAS appliquer le filtre de recherche aux stats "globales" du dashboard (Actifs, Entreprises...),
+        // sauf pour le "Total" qui doit refléter la recherche.
+        // Si tu veux que "Actifs" change quand tu cherches "Dupont", il faut ajouter `where: { ...whereClause, isActive: true }`.
+        // Pour l'instant, je garde les stats GLOBALES (sans filtre de recherche) pour les indicateurs métier, sauf Total.
+        prisma.customer.count({ where: { isActive: true } }),
+        prisma.customer.count({ where: { NOT: { companyName: null }, companyName: { not: "" } } }), // Entreprises (nom non vide)
+        prisma.customer.count({ where: { NOT: { vatNumber: null }, vatNumber: { not: "" } } }), // TVA renseignée
+        prisma.customer.count({ where: { createdAt: { gte: d30 } } }), // Nouveaux 30j
+    ]);
 
     const rows = customers.map((c) => ({
         id: c.id,
@@ -44,27 +64,22 @@ export async function getCustomersAndStats(query?: string) {
         createdAt: c.createdAt.toISOString(),
     }));
 
-    // Stats
-    const totalCustomers = customers.length;
-    const actifs = customers.filter((c) => c.isActive).length;
-    const entreprises = customers.filter((c) => !!c.companyName?.trim()).length;
-    const tvaRenseignee = customers.filter((c) => !!c.vatNumber?.trim()).length;
-
-    // “Nouveaux (30j)”
-    const now = new Date();
-    const d30 = new Date(now);
-    d30.setDate(d30.getDate() - 30);
-    const nouveaux30j = customers.filter((c) => new Date(c.createdAt) >= d30).length;
+    const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
     return {
         customers: rows,
         stats: {
-            totalCustomers,
-            actifs,
-            entreprises,
-            tvaRenseignee,
-            nouveaux30j,
+            totalCustomers: totalCount, // Total de la recherche
+            actifs: countActive,
+            entreprises: countCompany,
+            tvaRenseignee: countVat,
+            nouveaux30j: countNew,
         },
+        pagination: {
+            totalPages,
+            currentPage: page,
+            totalCount,
+        }
     };
 }
         

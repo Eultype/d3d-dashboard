@@ -331,50 +331,54 @@ export default function StepThree({
                     </Label>
 
                     <div className="space-y-2">
-                      {item.files && item.files.length > 0 && item.files.map((fileItem, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between border rounded-lg p-3 "
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="h-10 w-10  border rounded flex items-center justify-center overflow-hidden">
-                              {fileItem.type.startsWith("image/") ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={fileItem.url}
-                                  alt="Aperçu"
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                <FileImage className="h-5 w-5 text-slate-400" />
-                              )}
-                            </div>
-                            <div className="text-sm">
-                              <div className="font-medium truncate max-w-[200px]">
-                                {fileItem.filename}
-                              </div>
-                              <div className="text-xs text-muted-foreground text-green-600">
-                                Téléchargé avec succès
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => removeFile(item.uniqueId, fileItem.url)}
+                      {item.files &&
+                        item.files.length > 0 &&
+                        item.files.map((fileItem, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between border rounded-lg p-3 "
                           >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10  border rounded flex items-center justify-center overflow-hidden">
+                                {fileItem.type.startsWith("image/") ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={fileItem.url}
+                                    alt="Aperçu"
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <FileImage className="h-5 w-5 text-slate-400" />
+                                )}
+                              </div>
+                              <div className="text-sm">
+                                <div className="font-medium truncate max-w-[200px]">
+                                  {fileItem.filename}
+                                </div>
+                                <div className="text-xs text-muted-foreground text-green-600">
+                                  Téléchargé avec succès
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                              onClick={() =>
+                                removeFile(item.uniqueId, fileItem.url)
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
                     </div>
 
                     {/* --- ZONE UPLOAD (Toujours visible pour en ajouter d'autres) --- */}
                     <label
                       className={`
                         border-2 border-dashed border-slate-200 rounded-lg h-24 flex flex-col items-center justify-center
-                        hover:bg-slate-50 transition-colors cursor-pointer relative
+                        hover:bg-gray-400 transition-colors cursor-pointer relative
                         ${isUploading ? "opacity-50 pointer-events-none" : ""}
                       `}
                     >
@@ -386,7 +390,7 @@ export default function StepThree({
                         onChange={(e) => {
                           if (e.target.files) {
                             Array.from(e.target.files).forEach((file) =>
-                              handleFileUpload(item.uniqueId, file)
+                              handleFileUpload(item.uniqueId, file),
                             );
                           }
                         }}

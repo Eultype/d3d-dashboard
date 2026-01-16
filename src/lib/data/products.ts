@@ -67,7 +67,7 @@ export async function getProductRecentCustomers(productId: string) {
 }
 
 export async function getProductsAndStats(query?: string, page: number = 1) {
-    const PAGE_SIZE = 2;
+    const PAGE_SIZE = 13;
     const skip = (page - 1) * PAGE_SIZE;
 
     const whereClause = query

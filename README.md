@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# D3D Dashboard - Gestion de Commandes
 
-## Getting Started
+Application de gestion interne pour l'atelier de gravure **D3D Crystal**.
+Permet de gérer les commandes, les clients, le catalogue produits et le suivi de production.
 
-First, run the development server:
+## 🚀 Fonctionnalités Clés
 
+- **Gestion des Commandes :** Création multi-étapes, upload de fichiers clients, suivi de statut interactif.
+- **Facturation :** Génération de numéros de séquence (Auto/Manuel), impression PDF propre.
+- **Clients & Produits :** Gestion complète (CRUD), recherche instantanée, historique.
+- **Dashboard :** Vue d'ensemble avec statistiques en temps réel.
+- **Sécurité :** Authentification, Validation stricte (Zod), Uploads sécurisés.
+
+## 🛠️ Stack Technique
+
+- **Framework :** [Next.js 14](https://nextjs.org/) (App Router, Server Actions)
+- **Langage :** TypeScript (Strict mode)
+- **Base de données :** PostgreSQL (via [Prisma ORM](https://www.prisma.io/))
+- **UI :** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
+- **Auth :** NextAuth.js v4
+
+## 📦 Installation
+
+### Pré-requis
+- Node.js 18+
+- PostgreSQL (Local ou Docker)
+
+### 1. Cloner et installer les dépendances
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo_url>
+cd d3d-dashboard
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configurer l'environnement
+Copiez le fichier d'exemple (créez-en un si absent) :
+```bash
+cp .env.example .env
+```
+Remplissez les variables :
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/d3d_db"
+NEXTAUTH_SECRET="votre_cle_secrete_super_longue"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Initialiser la Base de Données
+```bash
+npx prisma migrate dev --name init
+npx prisma db seed # (Optionnel : si un seed.ts est configuré)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Lancer le serveur de développement
+```bash
+npm run dev
+```
+L'application est accessible sur [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+## 🗂️ Structure du Projet
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── actions/        # Server Actions (Mutations : create, update, upload...)
+├── app/            # Pages & Routes (App Router)
+│   ├── api/        # Routes API (Search, Cron...)
+│   ├── dashboard/  # Espace protégé (Admin)
+│   └── (auth)/     # Login
+├── components/     # Composants UI (Shadcn + Métier)
+├── lib/            # Utilitaires & Data Access Layer
+│   ├── data/       # Fonctions de lecture DB (Getters)
+│   └── ...         # Helpers (Dates, Money, Prisma...)
+├── types/          # Définitions TypeScript partagées
+└── scripts/        # Scripts de maintenance (Cleanup...)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Commandes Utiles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Commande | Description |
+| :--- | :--- |
+| `npm run dev` | Lance le serveur de développement |
+| `npm run build` | Compile l'application pour la production |
+| `npm run start` | Lance le serveur de production (après build) |
+| `npm run lint` | Vérifie la qualité du code (ESLint) |
+| `npm run cleanup` | Nettoie les fichiers uploadés orphelins (> 24h) |
 
-## Deploy on Vercel
+## 🔒 Sécurité & Maintenance
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Uploads :** Les fichiers clients sont stockés dans `public/uploads/orders`. Lancez régulièrement `npm run cleanup` pour supprimer les fichiers abandonnés.
+- **Rôles :** Actuellement, tout utilisateur connecté a les droits d'administration.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Développé avec ❤️ par **Reda** ([@redasnkrs](https://github.com/redasnkrs)) et **Samuël** ([@Eultype](https://github.com/Eultype)) pour **D3D Crystal**.

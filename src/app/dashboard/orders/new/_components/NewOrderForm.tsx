@@ -48,7 +48,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
           typeId: p.typeId,
           quantity: p.quantity,
           unitPrice: p.unitPrice,
-          file: p.file // ✅ Ajout du fichier
+          files: p.files // ✅ Ajout des fichiers
         })),
         internalNote: draft.internalNote
       };

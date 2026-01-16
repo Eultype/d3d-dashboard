@@ -372,7 +372,7 @@ export default function StepThree({
                         ) : (
                           <>
                             <Upload className="h-6 w-6  mb-1" />
-                            <span className="text-sm text-slate-500">
+                            <span className="text-sm ">
                               Cliquez pour ajouter une image
                             </span>
                           </>

@@ -3,8 +3,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 export async function uploadOrderFile(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return { success: false, message: "Non autorisé. Veuillez vous connecter." };
+  }
+
   const file = formData.get("file") as File | null;
 
   if (!file) {

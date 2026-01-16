@@ -1,8 +1,11 @@
+// Import Next
 import Link from "next/link";
+import type { Metadata } from "next";
+// Import des composants
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerForm } from "../_components/CustomerForm";
-import type { Metadata } from "next";
+
 
 export const metadata: Metadata = {
     title: "D3D | Créer un client",

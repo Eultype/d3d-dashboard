@@ -1,4 +1,6 @@
+// Import des datas
 import { getCustomerPageData, getCustomerOrderItems } from "@/lib/data/customers";
+//Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type {Metadata} from "next";

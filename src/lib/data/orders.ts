@@ -40,7 +40,10 @@ function sumCents(values: number[]) {
     return values.reduce((s, v) => s + v, 0);
 }
 
-export async function getOrdersAndStats(query?: string) {
+export async function getOrdersAndStats(query?: string, page: number = 1) {
+    const PAGE_SIZE = 13;
+    const skip = (page - 1) * PAGE_SIZE;
+
     const whereClause: Prisma.OrderWhereInput = {};
 
     if (query) {
@@ -52,25 +55,46 @@ export async function getOrdersAndStats(query?: string) {
         ];
     }
 
-    const orders = await prisma.order.findMany({
-        where: whereClause,
-        include: {
-            customer: true,
-            items: {
-                select: {
-                    quantity: true,
-                    unitPriceCents: true,
+    // On lance les requêtes en parallèle pour la perf
+    const [orders, totalCount, groups, allItemsForCA] = await Promise.all([
+        prisma.order.findMany({
+            where: whereClause,
+            take: PAGE_SIZE,
+            skip: skip,
+            include: {
+                customer: true,
+                items: {
+                    select: {
+                        quantity: true,
+                        unitPriceCents: true,
+                    },
                 },
             },
-        },
-        orderBy: { createdAt: "desc" },
-    });
+            orderBy: { createdAt: "desc" },
+        }),
+        prisma.order.count({ where: whereClause }),
+        prisma.order.groupBy({
+            by: ['status'],
+            where: whereClause,
+            _count: {
+                status: true,
+            },
+        }),
+        // CA Global (Total Absolu de la base, sans filtre de recherche)
+        // Si tu voulais appliquer le filtre de recherche au CA, il faudrait mettre 'where: whereClause' ici aussi.
+        // Mais ta demande est "CA TOTAL tout le temps".
+        prisma.orderItem.findMany({
+            select: { quantity: true, unitPriceCents: true }
+        }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
     const rows = orders.map((o) => {
         const { articlesCount, totalCents } = computeOrderTotals(o.items);
         return {
             id: o.id,
-            reference: o.reference, // Ajout de la référence
+            reference: o.reference,
             status: o.status,
             createdAt: o.createdAt.toISOString(),
             articlesCount,
@@ -84,25 +108,34 @@ export async function getOrdersAndStats(query?: string) {
         };
     });
 
-    // Stats
-    const totalOrders = orders.length;
-    const aVerifier = orders.filter((o) => o.status === "A_VERIFIER").length;
-    const enProd = orders.filter((o) => o.status === "PROD").length;
-    const terminees = orders.filter((o) => o.status === "TERMINE").length;
+    // Mapping des stats globales depuis le groupBy
+    const statsMap = groups.reduce((acc, curr) => {
+        acc[curr.status] = curr._count.status;
+        return acc;
+    }, {} as Record<string, number>);
 
-    const caTotalCents = sumCents(rows.map((r) => r.totalCents));
-    // const aTraiter = aVerifier + enProd; // Not directly used in stats, keep if needed elsewhere
+    const totalOrders = totalCount;
+    const aVerifier = statsMap["A_VERIFIER"] || 0;
+    const enProd = statsMap["PROD"] || 0;
+    const terminees = statsMap["TERMINE"] || 0;
+
+    // CA Global
+    const caTotalCents = allItemsForCA.reduce((sum, item) => sum + (item.quantity * item.unitPriceCents), 0);
 
     return {
-        orders: rows, // Return processed rows for the table
+        orders: rows,
         stats: {
             totalOrders,
             aVerifier,
             enProd,
             terminees,
             caTotalCents,
-            // aTraiter, // if needed
         },
+        pagination: {
+            totalPages,
+            currentPage: page,
+            totalCount,
+        }
     };
 }
 

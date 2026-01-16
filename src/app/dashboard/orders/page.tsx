@@ -11,6 +11,7 @@ import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-r
 // Import des lib
 import { formatEUR } from "@/lib/money";
 import { SearchInput } from "@/components/ui/search-input";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 // Metadata du dashboard
 export const metadata: Metadata = {
@@ -23,10 +24,12 @@ export const metadata: Metadata = {
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-    const { q } = await searchParams;
-    const { orders: rows, stats } = await getOrdersAndStats(q);
+    const { q, page } = await searchParams;
+    const currentPage = Number(page) || 1;
+
+    const { orders: rows, stats, pagination } = await getOrdersAndStats(q, currentPage);
     const { totalOrders, aVerifier, enProd, terminees, caTotalCents } = stats;
 
     return (
@@ -91,12 +94,19 @@ export default async function OrdersPage({
                     icon={<Euro className="h-4 w-4" />}
                     label="CA total"
                     value={formatEUR(caTotalCents)}
-                    hint={`Hors livraison / TVA`}
+                    hint="Hors livraison / TVA"
                 />
             </div>
 
             {/* Tableau commandes */}
             <OrdersTable orders={rows} />
+
+            {/* Pagination */}
+            <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalCount={pagination.totalCount}
+            />
         </div>
     );
 }

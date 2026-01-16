@@ -14,7 +14,7 @@ type ProductRecentOrdersCardProps = {
             id: string;
             reference: string | null;
             createdAt: Date;
-            items: any[];
+            items: { id: string }[];
             customer: {
                 name: string | null;
             } | null;

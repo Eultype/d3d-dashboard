@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 import { formatEUR } from "@/lib/money";
 import Image from "next/image";
+import { Product } from "@prisma/client";
 
-export function ProductInfoCard({ product }: { product: any }) {
+export function ProductInfoCard({ product }: { product: Product }) {
   const price = formatEUR(product.priceCents ?? 0);
 
   return (

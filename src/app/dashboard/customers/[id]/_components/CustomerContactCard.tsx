@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Customer } from "@prisma/client";
 
-export function CustomerContactCard({ customer }: { customer: any }) {
+export function CustomerContactCard({ customer }: { customer: Customer }) {
   return (
     <Card>
       <CardHeader>

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function getOrderDetails(id: string) {
     return prisma.order.findUnique({
@@ -40,7 +41,7 @@ function sumCents(values: number[]) {
 }
 
 export async function getOrdersAndStats(query?: string) {
-    const whereClause: any = {};
+    const whereClause: Prisma.OrderWhereInput = {};
 
     if (query) {
         whereClause.OR = [

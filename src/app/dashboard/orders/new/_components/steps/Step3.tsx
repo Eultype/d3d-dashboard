@@ -77,17 +77,19 @@ export default function StepThree({
     }
   };
 
-  // Modifier un produit (quantité, prix, options)
-  const updateProduct = (
+  // Modifier un produit (quantité, prix, options, fichiers)
+  const updateProduct = <K extends keyof ProductItem>(
     uniqueId: string,
-    field: keyof ProductItem,
-    value: any | ((prev: any) => any),
+    field: K,
+    value: ProductItem[K] | ((prev: ProductItem[K]) => ProductItem[K]),
   ) => {
     setProducts((prevProducts) =>
       prevProducts.map((p) => {
         if (p.uniqueId === uniqueId) {
           const newValue =
-            typeof value === "function" ? value(p[field]) : value;
+            typeof value === "function"
+              ? (value as (prev: ProductItem[K]) => ProductItem[K])(p[field])
+              : value;
           return { ...p, [field]: newValue };
         }
         return p;
@@ -115,8 +117,8 @@ export default function StepThree({
           filename: res.filename || file.name,
           type: res.type || file.type,
         };
-        // Utilisation de la mise à jour fonctionnelle pour éviter les problèmes de concurrence
-        updateProduct(uniqueId, "files", (currentFiles: any[]) => [
+        // Mise à jour : ajout au tableau existant
+        updateProduct(uniqueId, "files", (currentFiles: NonNullable<ProductItem["files"]>) => [
           ...(currentFiles || []),
           newFile,
         ]);
@@ -133,7 +135,7 @@ export default function StepThree({
 
   // Fonction pour supprimer un fichier spécifique d'un produit
   const removeFile = (uniqueId: string, fileUrl: string) => {
-    updateProduct(uniqueId, "files", (currentFiles: any[]) =>
+    updateProduct(uniqueId, "files", (currentFiles: NonNullable<ProductItem["files"]>) =>
       (currentFiles || []).filter((f) => f.url !== fileUrl),
     );
   };

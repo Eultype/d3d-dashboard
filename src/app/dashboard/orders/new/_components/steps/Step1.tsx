@@ -46,7 +46,7 @@ export default function StepOne({
   const [isCheckingRef, setIsCheckingRef] = useState(false);
 
   // Fonction helper pour mettre à jour une partie spécifique de "info"
-  const updateInfo = (field: keyof typeof draft.info, value: any) => {
+  const updateInfo = (field: keyof typeof draft.info, value: string | number | null) => {
     onChange({
       info: {
         ...draft.info,

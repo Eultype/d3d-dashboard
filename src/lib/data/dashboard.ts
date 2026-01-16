@@ -55,9 +55,9 @@ export async function getDashboardStats() {
     };
   });
 
-  const todoOrders = recent.filter((o) =>
-    [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER].includes(o.status as any)
-  );
+  // À traiter = “ce qui nécessite une action maintenant”
+  const targetStatuses: string[] = [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER];
+  const todoOrders = recent.filter((o) => targetStatuses.includes(o.status));
 
   return {
     stats: {

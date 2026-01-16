@@ -7,7 +7,15 @@ import { formatDateFR } from "@/lib/dates";
 import { CheckCircle2 } from "lucide-react";
 
 type TodoOrdersCardProps = {
-  orders: any[];
+  orders: {
+    id: string;
+    reference?: string | null;
+    status: string;
+    createdAt: Date;
+    customer: {
+      name: string | null;
+    } | null;
+  }[];
   countToProcess: number;
 };
 

@@ -7,7 +7,18 @@ import { formatDateFR } from "@/lib/dates";
 import { ArrowRight, Eye } from "lucide-react";
 
 type RecentOrdersCardProps = {
-  orders: any[];
+  orders: {
+    id: string;
+    reference?: string | null;
+    status: string;
+    createdAt: Date;
+    totalCents: number;
+    articlesCount: number;
+    customer: {
+      name: string | null;
+      email: string | null;
+    } | null;
+  }[];
 };
 
 export function RecentOrdersCard({ orders }: RecentOrdersCardProps) {

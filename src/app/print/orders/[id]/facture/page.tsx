@@ -33,7 +33,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
             {/* Feuille A4 */}
             <section
                 className={[
-                    "mx-auto w-full bg-white shadow-sm ring-1 ring-black/5",
+                    "mx-auto w-full bg-white text-black shadow-sm ring-1 ring-black/5",
                     "max-w-[900px]",
                     "print:shadow-none print:ring-0",
                     // “A4 feel” (suffisant pour Chrome print)

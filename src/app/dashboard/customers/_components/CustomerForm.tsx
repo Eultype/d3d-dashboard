@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { updateCustomer, createCustomer } from "@/actions/customer";
 import { CustomerFormState, CustomerFormProps } from "@/types/customer";
 import { Button } from "@/components/ui/button";
@@ -23,11 +25,26 @@ function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
 export function CustomerForm({ customer }: CustomerFormProps) {
     const isEditMode = !!customer;
     const action = isEditMode ? updateCustomer : createCustomer;
+    const router = useRouter();
 
-    const initialState: CustomerFormState = { errors: {}, message: null };
+    const initialState: CustomerFormState = { errors: {}, message: null, success: false };
     const [state, dispatch] = useActionState(action, initialState);
 
     const [isActive, setIsActive] = useState<boolean>(customer?.isActive ?? true);
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success(state.message);
+            if (isEditMode) {
+                router.push(`/dashboard/customers/${customer?.id}`);
+            } else {
+                router.push(`/dashboard/customers/${state.customerId}`);
+            }
+        } else if (state.message) {
+            toast.error(state.message);
+        }
+    }, [state, isEditMode, router, customer?.id]);
+
 
     return (
         <form action={dispatch} className="space-y-6">
@@ -108,7 +125,7 @@ export function CustomerForm({ customer }: CustomerFormProps) {
 
             <div className="flex items-center justify-between mt-6">
                 <div>
-                    {state.message && <p className="text-sm text-red-600">{state.message}</p>}
+                    {/* General error message is now handled by the toast */}
                 </div>
                 <div className="flex justify-end">
                     <SubmitButton isEditMode={isEditMode} />

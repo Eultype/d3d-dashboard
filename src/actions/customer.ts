@@ -48,8 +48,9 @@ export async function createCustomer(
     };
   }
 
+  let customer;
   try {
-    await prisma.customer.create({
+    customer = await prisma.customer.create({
       data: validatedFields.data,
     });
   } catch (error) {
@@ -57,7 +58,7 @@ export async function createCustomer(
   }
 
   revalidatePath("/dashboard/customers");
-  redirect("/dashboard/customers");
+  return { success: true, message: "Client créé avec succès.", customerId: customer.id };
 }
 
 
@@ -105,5 +106,5 @@ export async function updateCustomer(
 
   revalidatePath(`/dashboard/customers/${id}`);
   revalidatePath("/dashboard/customers");
-  redirect(`/dashboard/customers/${id}`);
+  return { success: true, message: "Client mis à jour avec succès." };
 }

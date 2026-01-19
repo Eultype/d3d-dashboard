@@ -16,6 +16,8 @@ export type CustomerFormState = {
     country?: string[];
   };
   message?: string | null;
+  success?: boolean;
+  customerId?: string;
 };
 
 // Structure d'un client pour l'affichage dans le tableau

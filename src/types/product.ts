@@ -10,6 +10,8 @@ export type ProductFormState = {
     priceCents?: string[];
   };
   message?: string | null;
+  success?: boolean;
+  productId?: string;
 };
 
 // Structure d'un produit pour l'affichage dans le tableau

@@ -2,7 +2,9 @@
 
 import { useActionState, useState, useRef, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 import { createProduct, updateProduct } from "@/actions/product";
 import { ProductFormState, ProductFormProps } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -26,8 +28,9 @@ function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
 export function ProductForm({ product }: ProductFormProps) {
     const isEditMode = !!product;
     const action = isEditMode ? updateProduct : createProduct;
+    const router = useRouter();
 
-    const initialState: ProductFormState = { errors: {}, message: null };
+    const initialState: ProductFormState = { errors: {}, message: null, success: false };
     const [state, dispatch] = useActionState(action, initialState);
 
     const [isActive, setIsActive] = useState<boolean>(product?.isActive ?? true);
@@ -42,6 +45,19 @@ export function ProductForm({ product }: ProductFormProps) {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
         };
     }, [previewUrl]);
+
+    useEffect(() => {
+        if (state.success) {
+            toast.success(state.message);
+            if (isEditMode) {
+                router.push(`/dashboard/products/${product?.id}`);
+            } else {
+                router.push(`/dashboard/products/${state.productId}`);
+            }
+        } else if (state.message) {
+            toast.error(state.message);
+        }
+    }, [state, isEditMode, router, product?.id]);
 
     // Quand on sélectionne un fichier, on génère l’URL temporaire pour prévisualiser
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +121,7 @@ export function ProductForm({ product }: ProductFormProps) {
                     />
                     {state.errors?.description && (
                         <p className="text-sm text-red-600 -mt-2">{state.errors.description[0]}</p>
-                    )}
+                        )}
                 </Field>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -188,9 +204,7 @@ export function ProductForm({ product }: ProductFormProps) {
             {/* Footer actions */}
             <div className="p-5 sm:p-6 border-t flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    {state.message && (
-                        <p className="text-sm text-red-600 -mt-2">{state.message}</p>
-                    )}
+                    {/* General error message is now handled by the toast */}
                 </div>
 
                 <div className="flex justify-end">

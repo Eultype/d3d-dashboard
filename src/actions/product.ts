@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -79,8 +78,9 @@ export async function createProduct(
   const { imageFile, ...productData } = validatedFields.data;
   const imageUrl = await uploadImage(imageFile, productData.name);
 
+  let product;
   try {
-    await prisma.product.create({
+    product = await prisma.product.create({
       data: {
         ...productData,
         imageUrl: imageUrl,
@@ -91,7 +91,7 @@ export async function createProduct(
   }
 
   revalidatePath("/dashboard/products");
-  redirect("/dashboard/products");
+  return { success: true, message: "Produit créé avec succès.", productId: product.id };
 }
 
 
@@ -156,5 +156,5 @@ export async function updateProduct(
 
   revalidatePath(`/dashboard/products/${id}`);
   revalidatePath("/dashboard/products");
-  redirect(`/dashboard/products/${id}`);
+  return { success: true, message: "Produit mis à jour avec succès." };
 }

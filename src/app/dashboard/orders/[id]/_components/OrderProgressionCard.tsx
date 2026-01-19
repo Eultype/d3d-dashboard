@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { statusLabelFR } from "@/lib/orders";
 import { updateOrderStatus } from "@/actions/order";
 import { Loader2, Check } from "lucide-react";
+import { toast } from "sonner"; // Import toast
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +25,7 @@ export function OrderProgressionCard({ order }: { order: { id: string; status: s
   const steps = [
     { key: "A_VERIFIER", label: "Confirmation" },
     { key: "PROD", label: "Traitement" },
-    { key: "A_EXPEDIER", label: "Expédition" }, // J'ai corrigé EXPEDITION -> A_EXPEDIER pour matcher l'action
+    { key: "A_EXPEDIER", label: "Expédition" },
     { key: "TERMINE", label: "Livrée" },
   ];
 
@@ -39,15 +40,17 @@ export function OrderProgressionCard({ order }: { order: { id: string; status: s
   const confirmChange = async () => {
     if (!targetStep) return;
     setIsLoading(true);
-    
+
     try {
       const res = await updateOrderStatus(order.id, targetStep.key);
-      if (!res.success) {
-        alert(res.message || "Erreur lors de la mise à jour");
+      if (res.success) {
+        toast.success(`Statut mis à jour vers '${targetStep.label}' !`);
+      } else {
+        toast.error(res.message || "Erreur lors de la mise à jour du statut.");
       }
     } catch (error) {
       console.error(error);
-      alert("Erreur technique");
+      toast.error("Une erreur technique est survenue. Contactez le support.");
     } finally {
       setIsLoading(false);
       setTargetStep(null);

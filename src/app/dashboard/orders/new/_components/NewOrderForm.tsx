@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import StepOne from "./steps/Step1";
 import StepTwo from "./steps/Step2";
 import StepThree from "./steps/Step3";
@@ -56,15 +57,16 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
       const result = await createOrder(payload);
 
       if (result.success && result.orderId) {
+        toast.success(`Commande ${result.reference} créée avec succès !`);
         // Redirection vers la page de la nouvelle commande
         router.push(`/dashboard/orders/${result.orderId}`);
       } else {
-        alert(result.message || "Une erreur est survenue lors de la création de la commande.");
+        toast.error(result.message || "Une erreur est survenue lors de la création de la commande.");
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error("Erreur technique:", error);
-      alert("Une erreur technique est survenue.");
+      toast.error("Une erreur technique est survenue. Contactez le support.");
       setIsSubmitting(false);
     }
   };

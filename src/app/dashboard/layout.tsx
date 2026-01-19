@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { NotificationsBell } from "./_components/NotificationsBell"; // Import Bell
+import { getNotificationsForUser } from "@/lib/data/notifications"; // Import data function
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -25,6 +27,9 @@ export default async function DashboardLayout({
   if (!session) {
     redirect("/");
   }
+
+  // Fetch initial notifications
+  const initialNotifications = await getNotificationsForUser();
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,6 +84,7 @@ export default async function DashboardLayout({
               </div>
 
               <div className="flex items-center gap-3">
+                <NotificationsBell initialNotifications={initialNotifications} />
                 <ThemeToggle />
                 <span className="text-sm text-muted-foreground">
                   {session.user?.email ?? "Utilisateur"}

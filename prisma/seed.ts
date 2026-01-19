@@ -27,12 +27,35 @@ async function main() {
     });
 
     // ======================
+    // SAMUEL USER
+    // ======================
+    const samuel = await prisma.user.upsert({
+        where: { email: "samuel@test.com" },
+        update: { password: passwordHash },
+        create: {
+            email: "samuel@test.com",
+            password: passwordHash,
+        },
+    });
+
+    // ======================
+    // REDA USER
+    // ======================
+    const reda = await prisma.user.upsert({
+        where: { email: "reda@test.com" },
+        update: { password: passwordHash },
+        create: {
+            email: "reda@test.com",
+            password: passwordHash,
+        },
+    });
+
+    // ======================
     // CLIENTS
     // ======================
     const customer1 = await prisma.customer.upsert({
         where: { email: "jean.dupont@test.com" },
         update: {
-            // si tu relances la seed, tu veux généralement repartir propre
             isActive: true,
             addressLine2: "Bâtiment B, 2e étage",
         },
@@ -55,7 +78,6 @@ async function main() {
         where: { email: "marie.martin@test.com" },
         update: {
             isActive: true,
-            // on évite "" => null (plus propre en DB)
             addressLine2: null,
         },
         create: {
@@ -145,7 +167,7 @@ async function main() {
     await prisma.file.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
-    await prisma.sequence.deleteMany(); // Ajout du nettoyage des séquences
+    await prisma.sequence.deleteMany(); 
 
     // ======================
     // SEQUENCES
@@ -164,7 +186,7 @@ async function main() {
     // ======================
     const order1 = await prisma.order.create({
         data: {
-            reference: "SEED-001", // Ajout d'une référence manuelle unique
+            reference: "SEED-001",
             status: "A_VERIFIER",
             customerId: customer1.id,
             items: {
@@ -206,7 +228,7 @@ async function main() {
     // ======================
     const order2 = await prisma.order.create({
         data: {
-            reference: "SEED-002", // Ajout d'une référence manuelle unique
+            reference: "SEED-002",
             status: "PROD",
             customerId: customer2.id,
             items: {
@@ -243,7 +265,7 @@ async function main() {
     // ======================
     const order3 = await prisma.order.create({
         data: {
-            reference: "SEED-003", // Ajout d'une référence manuelle unique
+            reference: "SEED-003",
             status: "TERMINE",
             customerId: null,
             items: {

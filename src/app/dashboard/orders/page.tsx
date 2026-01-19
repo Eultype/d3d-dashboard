@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 // Import des composants
 import { OrdersTable } from "./_components/OrdersTable";
+import { OrdersFilter } from "./_components/OrdersFilter";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";
@@ -24,12 +25,12 @@ export const metadata: Metadata = {
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; status?: string }>;
 }) {
-    const { q, page } = await searchParams;
+    const { q, page, status } = await searchParams;
     const currentPage = Number(page) || 1;
 
-    const { orders: rows, stats, pagination } = await getOrdersAndStats(q, currentPage);
+    const { orders: rows, stats, pagination } = await getOrdersAndStats(q, currentPage, status);
     const { totalOrders, aVerifier, enProd, terminees, caTotalCents } = stats;
 
     return (
@@ -52,6 +53,7 @@ export default async function OrdersPage({
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2">
+                    <OrdersFilter />
                     <SearchInput placeholder="Rechercher une commande..." className="w-full sm:w-64" />
                     <Button asChild>
                         <Link href="/dashboard/orders/new">Nouvelle commande</Link>

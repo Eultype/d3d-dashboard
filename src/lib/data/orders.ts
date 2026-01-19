@@ -40,7 +40,7 @@ function sumCents(values: number[]) {
     return values.reduce((s, v) => s + v, 0);
 }
 
-export async function getOrdersAndStats(query?: string, page: number = 1) {
+export async function getOrdersAndStats(query?: string, page: number = 1, status?: string) {
     const PAGE_SIZE = 13;
     const skip = (page - 1) * PAGE_SIZE;
 
@@ -53,6 +53,10 @@ export async function getOrdersAndStats(query?: string, page: number = 1) {
             { customer: { name: { contains: query, mode: "insensitive" } } },
             { customer: { email: { contains: query, mode: "insensitive" } } },
         ];
+    }
+
+    if (status && status !== "ALL") {
+        whereClause.status = status;
     }
 
     // On lance les requêtes en parallèle pour la perf

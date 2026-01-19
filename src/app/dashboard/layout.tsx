@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavLink } from "./_components/NavLink";
 import { ReactNode } from "react";
@@ -11,12 +9,20 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { NotificationsBell } from "./_components/NotificationsBell"; // Import Bell
+// import { NotificationsBell } from "./_components/NotificationsBell"; // Import Bell
 import { getNotificationsForUser } from "@/lib/data/notifications"; // Import data function
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
+// import dynamic from "next/dynamic"; // Import dynamic
+import ClientSideHeaderElements from "./_components/ClientSideHeaderElements"; // New import
+
+// Dynamically import the client-side header elements component with SSR disabled
+// const ClientSideHeaderElements = dynamic(
+//   () => import("./_components/ClientSideHeaderElements"),
+//   { ssr: false, loading: () => <div className="flex items-center gap-3"><span className="text-sm text-muted-foreground">Chargement...</span></div> } // Add a loading fallback
+// );
 
 export default async function DashboardLayout({
   children,
@@ -29,7 +35,7 @@ export default async function DashboardLayout({
   }
 
   // Fetch initial notifications
-  const initialNotifications = await getNotificationsForUser();
+  const initialNotifications = await getNotificationsForUser(); // Move this inside the ClientSideHeaderElements component if needed client side only, or pass via props.
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,14 +89,10 @@ export default async function DashboardLayout({
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <NotificationsBell initialNotifications={initialNotifications} />
-                <ThemeToggle />
-                <span className="text-sm text-muted-foreground">
-                  {session.user?.email ?? "Utilisateur"}
-                </span>
-                <LogoutButton />
-              </div>
+              <ClientSideHeaderElements
+                sessionUserEmail={session.user?.email ?? "Utilisateur"}
+                initialNotifications={initialNotifications}
+              />
             </div>
           </header>
 

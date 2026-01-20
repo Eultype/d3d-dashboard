@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -55,8 +56,18 @@ export default function StepFour({
 
   const shippingCost = draft.info?.shippingCost || 0;
 
+  // Calcul de la remise
+  const discountValue = draft.discountValue || 0;
+  let discountAmount = 0;
+
+  if (draft.discountType === "percent") {
+    discountAmount = subTotal * (discountValue / 100);
+  } else if (draft.discountType === "amount") {
+    discountAmount = discountValue;
+  }
+
   // Calcul du total TTC
-  const total = subTotal + shippingCost;
+  const total = Math.max(0, subTotal - discountAmount) + shippingCost;
   
   // Calcul de la TVA (incluse dans le total)
   const taxRate = draft.info?.taxRate || 21;
@@ -65,6 +76,10 @@ export default function StepFour({
   // Handlers pour mettre à jour le draft global directement
   const handleDiscountChange = (value: string) => {
     onChange({ discountType: value });
+  };
+
+  const handleDiscountValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange({ discountValue: parseFloat(e.target.value) || 0 });
   };
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -101,10 +116,6 @@ export default function StepFour({
             <div className="flex justify-between">
               <span className="">Préfixe</span>
               <span className="font-medium ">{draft.info?.prefix || "-"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="">Canal</span>
-              <span className="font-medium ">{draft.info?.channel || "-"}</span>
             </div>
             <div className="flex justify-between">
               <span className="">Livraison</span>
@@ -281,22 +292,41 @@ export default function StepFour({
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Type de remise */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium ">Type de remise</label>
-              <Select
-                value={draft.discountType || "none"}
-                onValueChange={handleDiscountChange}
-              >
-                <SelectTrigger className="w-full sm:w-1/2 bg-gray-50 border-gray-200">
-                  <SelectValue placeholder="Aucune remise" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Aucune remise</SelectItem>
-                  <SelectItem value="percent">Pourcentage (%)</SelectItem>
-                  <SelectItem value="amount">Montant fixe (€)</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Remise */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium ">Type de remise</label>
+                <Select
+                  value={draft.discountType || "none"}
+                  onValueChange={handleDiscountChange}
+                >
+                  <SelectTrigger className="bg-gray-50 border-gray-200">
+                    <SelectValue placeholder="Aucune remise" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucune remise</SelectItem>
+                    <SelectItem value="percent">Pourcentage (%)</SelectItem>
+                    <SelectItem value="amount">Montant fixe (€)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {draft.discountType && draft.discountType !== "none" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium ">
+                    Valeur ({draft.discountType === "percent" ? "%" : "€"})
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step={draft.discountType === "percent" ? "1" : "0.01"}
+                    value={draft.discountValue || ""}
+                    onChange={handleDiscountValueChange}
+                    className="bg-gray-50 border-gray-200"
+                    placeholder="0"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Calculs */}
@@ -307,6 +337,15 @@ export default function StepFour({
                   {subTotal.toFixed(2).replace(".", ",")} €
                 </span>
               </div>
+
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span className="">Remise</span>
+                  <span className="font-medium ">
+                    -{discountAmount.toFixed(2).replace(".", ",")} €
+                  </span>
+                </div>
+              )}
 
               <div className="flex justify-between text-sm">
                 <span className="">Livraison ({draft.info?.delivery})</span>

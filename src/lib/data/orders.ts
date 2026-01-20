@@ -88,6 +88,8 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
         prisma.order.findMany({
             select: {
                 shippingCostCents: true,
+                discountType: true,
+                discountValue: true,
                 items: {
                     select: { quantity: true, unitPriceCents: true }
                 }
@@ -99,13 +101,23 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
 
     const rows = orders.map((o) => {
         const { articlesCount, totalCents: itemsTotalCents } = computeOrderTotals(o.items);
+        
+        let discountAmount = 0;
+        if (o.discountType === "percent" && o.discountValue) {
+            discountAmount = itemsTotalCents * (o.discountValue / 100);
+        } else if (o.discountType === "amount" && o.discountValue) {
+            discountAmount = o.discountValue;
+        }
+
+        const totalWithDiscount = Math.max(0, itemsTotalCents - discountAmount);
+
         return {
             id: o.id,
             reference: o.reference,
             status: o.status,
             createdAt: o.createdAt.toISOString(),
             articlesCount,
-            totalCents: itemsTotalCents + o.shippingCostCents,
+            totalCents: totalWithDiscount + o.shippingCostCents,
             customer: o.customer
                 ? {
                     name: o.customer.name,
@@ -129,7 +141,17 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
     // CA Global
     const caTotalCents = allOrdersForCA.reduce((sum, order) => {
         const itemsTotal = order.items.reduce((itSum, item) => itSum + (item.quantity * item.unitPriceCents), 0);
-        return sum + itemsTotal + order.shippingCostCents;
+        
+        let discountAmount = 0;
+        if (order.discountType === "percent" && order.discountValue) {
+            discountAmount = itemsTotal * (order.discountValue / 100);
+        } else if (order.discountType === "amount" && order.discountValue) {
+            discountAmount = order.discountValue;
+        }
+
+        const totalWithDiscount = Math.max(0, itemsTotal - discountAmount);
+
+        return sum + totalWithDiscount + order.shippingCostCents;
     }, 0);
 
     return {

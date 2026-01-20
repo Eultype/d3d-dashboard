@@ -42,6 +42,8 @@ const OrderSchema = z.object({
     )
     .min(1, "La commande doit contenir au moins un produit"),
   internalNote: z.string().optional(),
+  discountType: z.string().optional(),
+  discountValue: z.number().optional(),
 });
 export type OrderInputData = z.infer<typeof OrderSchema>;
 
@@ -151,6 +153,10 @@ export async function createOrder(data: OrderInputData) {
         shippingType: validData.info.delivery,
         shippingCostCents: Math.round(validData.info.shippingCost * 100),
         taxRate: validData.info.taxRate,
+        discountType: validData.discountType,
+        discountValue: (validData.discountType === 'amount' && validData.discountValue) 
+            ? validData.discountValue * 100 
+            : validData.discountValue,
         customerId: finalCustomerId,
         items: { create: orderItems },
         ...(validData.internalNote && { notes: { create: { content: validData.internalNote, userId: user.id } } }),

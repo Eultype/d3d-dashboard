@@ -44,14 +44,22 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
       const payload = {
         info: draft.info,
         clientId: draft.customerId,
-        clientDetails: draft.clientDetails,
+        clientDetails: draft.clientDetails ? {
+          ...draft.clientDetails,
+          addressLine1: draft.clientDetails.addressLine1 || "",
+          postalCode: draft.clientDetails.postalCode || "",
+          city: draft.clientDetails.city || "",
+          country: draft.clientDetails.country || "",
+        } : null,
         products: draft.products.map(p => ({
           typeId: p.typeId,
           quantity: p.quantity,
           unitPrice: p.unitPrice,
-          files: p.files // ✅ Ajout des fichiers
+          files: p.files || [] // ✅ Ajout des fichiers
         })),
-        internalNote: draft.internalNote
+        internalNote: draft.internalNote,
+        discountType: draft.discountType,
+        discountValue: draft.discountValue,
       };
 
       const result = await createOrder(payload);

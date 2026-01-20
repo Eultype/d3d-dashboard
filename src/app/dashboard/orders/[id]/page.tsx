@@ -41,8 +41,16 @@ export default async function OrderDetailPage({
     const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(order.createdAt));
 
     const sousTotalCents = orderTotalCents(order.items);
+    
+    let discountAmountCents = 0;
+    if (order.discountType === "percent" && order.discountValue) {
+        discountAmountCents = Math.round(sousTotalCents * (order.discountValue / 100));
+    } else if (order.discountType === "amount" && order.discountValue) {
+        discountAmountCents = Math.round(order.discountValue);
+    }
+    
     const livraisonCents = order.shippingCostCents || 0;
-    const totalCents = sousTotalCents + livraisonCents;
+    const totalCents = Math.max(0, sousTotalCents - discountAmountCents) + livraisonCents;
     
     const taxRate = order.taxRate || 21;
     const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));
@@ -124,6 +132,7 @@ export default async function OrderDetailPage({
                         tvaCents={tvaCents}
                         taxRate={order.taxRate}
                         totalCents={totalCents}
+                        discountAmountCents={discountAmountCents}
                     />
                     {/* Client */}
                     <OrderCustomerCard customer={order.customer} />

@@ -10,6 +10,7 @@ type OrderSummaryCardProps = {
     livraisonCents: number;
     shippingType?: string | null;
     tvaCents: number;
+    taxRate?: number;
     totalCents: number;
 };
 
@@ -19,6 +20,7 @@ export function OrderSummaryCard({
     livraisonCents,
     shippingType,
     tvaCents,
+    taxRate = 21,
     totalCents,
 }: OrderSummaryCardProps) {
     return (
@@ -44,12 +46,18 @@ export function OrderSummaryCard({
                     label={shippingType ? `Livraison (${shippingType})` : "Livraison"} 
                     value={<span className="tabular-nums">{formatEUR(livraisonCents)}</span>} 
                 />
-                <InfoRow label="TVA" value={<span className="tabular-nums">{formatEUR(tvaCents)}</span>} />
                 <div className="h-px bg-border" />
-                <InfoRow
-                    label={<span className="font-semibold text-foreground">Total</span>}
-                    value={<span className="font-bold tabular-nums">{formatEUR(totalCents)}</span>}
-                />
+                <div className="space-y-1">
+                    <InfoRow
+                        label={<span className="font-semibold text-foreground">Total</span>}
+                        value={<span className="font-bold tabular-nums">{formatEUR(totalCents)}</span>}
+                    />
+                    <div className="flex justify-end">
+                        <span className="text-[11px] text-muted-foreground italic">
+                            Dont TVA ({taxRate}%) : {formatEUR(tvaCents)}
+                        </span>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     );

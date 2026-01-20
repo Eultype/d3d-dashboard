@@ -38,6 +38,7 @@ model Order {
   status             String
   shippingType       String?
   shippingCostCents  Int         @default(0)
+  taxRate            Float       @default(21.0)
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
   customerId         String?

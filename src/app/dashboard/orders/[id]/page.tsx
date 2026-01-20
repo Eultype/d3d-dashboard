@@ -42,8 +42,10 @@ export default async function OrderDetailPage({
 
     const sousTotalCents = orderTotalCents(order.items);
     const livraisonCents = order.shippingCostCents || 0;
-    const tvaCents = 0;
-    const totalCents = sousTotalCents + livraisonCents + tvaCents;
+    const totalCents = sousTotalCents + livraisonCents;
+    
+    const taxRate = order.taxRate || 21;
+    const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));
 
     const articlesCount = order.items.reduce((sum, it) => sum + it.quantity, 0);
 
@@ -120,6 +122,7 @@ export default async function OrderDetailPage({
                         livraisonCents={livraisonCents}
                         shippingType={order.shippingType}
                         tvaCents={tvaCents}
+                        taxRate={order.taxRate}
                         totalCents={totalCents}
                     />
                     {/* Client */}

@@ -55,8 +55,12 @@ export default function StepFour({
 
   const shippingCost = draft.info?.shippingCost || 0;
 
-  // Calcul du total
+  // Calcul du total TTC
   const total = subTotal + shippingCost;
+  
+  // Calcul de la TVA (incluse dans le total)
+  const taxRate = draft.info?.taxRate || 21;
+  const vatAmount = total - (total / (1 + taxRate / 100));
 
   // Handlers pour mettre à jour le draft global directement
   const handleDiscountChange = (value: string) => {
@@ -314,6 +318,10 @@ export default function StepFour({
               <div className="flex justify-between items-center text-lg font-bold  pt-2">
                 <span>Total</span>
                 <span>{total.toFixed(2).replace(".", ",")} €</span>
+              </div>
+
+              <div className="flex justify-end text-xs text-muted-foreground italic">
+                <span>Dont TVA ({taxRate}%) : {vatAmount.toFixed(2).replace(".", ",")} €</span>
               </div>
             </div>
           </CardContent>

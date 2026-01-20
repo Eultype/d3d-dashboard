@@ -24,9 +24,11 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
     const date = formatDateFR(new Date(order.createdAt));
 
     const sousTotalCents = orderTotalCents(order.items);
-    const livraisonCents = 0;
-    const tvaCents = 0;
-    const totalCents = sousTotalCents + livraisonCents + tvaCents;
+    const livraisonCents = order.shippingCostCents || 0;
+    const totalCents = sousTotalCents + livraisonCents;
+    
+    const taxRate = order.taxRate || 21;
+    const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));
 
     return (
         <main className="min-h-screen p-6 print:p-0">
@@ -162,25 +164,28 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                         <div className="w-full max-w-md rounded-2xl border border-neutral-200 p-4">
                             <div className="space-y-2 text-sm">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-neutral-600">Sous-total</span>
+                                    <span className="text-neutral-600">Sous-total produits</span>
                                     <span className="tabular-nums">{formatEUR(sousTotalCents)}</span>
                                 </div>
 
                                 <div className="flex items-center justify-between">
-                                    <span className="text-neutral-600">Livraison</span>
+                                    <span className="text-neutral-600">
+                                        Livraison {order.shippingType ? `(${order.shippingType})` : ""}
+                                    </span>
                                     <span className="tabular-nums">{formatEUR(livraisonCents)}</span>
                                 </div>
 
+                                <div className="my-3 h-px bg-neutral-100" />
+
                                 <div className="flex items-center justify-between">
-                                    <span className="text-neutral-600">TVA</span>
-                                    <span className="tabular-nums">{formatEUR(tvaCents)}</span>
+                                    <span className="text-base font-semibold">Total TTC</span>
+                                    <span className="text-base font-bold tabular-nums">{formatEUR(totalCents)}</span>
                                 </div>
 
-                                <div className="my-3 h-px bg-neutral-200" />
-
-                                <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold">Total</span>
-                                    <span className="text-base font-bold tabular-nums">{formatEUR(totalCents)}</span>
+                                <div className="flex justify-end pt-1">
+                                    <span className="text-[10px] text-neutral-500 italic">
+                                        Dont TVA ({taxRate}%) : {formatEUR(tvaCents)}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +206,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
             </section>
 
             {/* Petit hint écran (pas imprimé) */}
-            <div className="mx-auto mt-4 max-w-[900px] text-xs text-neutral-500 print:hidden">
+            <div className="mx-auto mt-4 max-w-[900px] text-xs text-center text-neutral-500 print:hidden">
                 Astuce : dans la boîte d’impression, mets “Marges : Aucune” ou “Par défaut” et “Arrière-plans : Activés” pour un rendu encore plus propre.
             </div>
         </main>

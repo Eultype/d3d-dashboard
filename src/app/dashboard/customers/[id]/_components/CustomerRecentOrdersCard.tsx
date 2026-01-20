@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // Import des lib
 import { formatDateFR } from "@/lib/dates";
 import { formatEUR } from "@/lib/money";
-import { orderTotalCents } from "@/lib/orders";
+import { calculateOrderTotal } from "@/lib/orders";
 
 type CustomerRecentOrdersCardProps = {
     orders: {
@@ -16,6 +16,9 @@ type CustomerRecentOrdersCardProps = {
         status: string;
         createdAt: Date;
         items: { quantity: number; unitPriceCents: number }[];
+        shippingCostCents: number;
+        discountType?: string | null;
+        discountValue?: number | null;
     }[];
     customerId: string;
 };
@@ -41,7 +44,12 @@ export function CustomerRecentOrdersCard({ orders, customerId }: CustomerRecentO
                     )}
 
                     {orders.map((order) => {
-                        const totalCents = orderTotalCents(order.items);
+                        const { totalCents } = calculateOrderTotal(
+                            order.items,
+                            order.shippingCostCents,
+                            order.discountType,
+                            order.discountValue
+                        );
                         const total = formatEUR(totalCents);
 
                         return (

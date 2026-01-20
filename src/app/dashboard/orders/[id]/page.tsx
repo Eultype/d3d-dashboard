@@ -14,7 +14,7 @@ import { OrderSummaryCard } from "./_components/OrderSummaryCard";
 import { OrderCustomerCard } from "./_components/OrderCustomerCard";
 import { Button } from "@/components/ui/button";
 // Import des lib
-import { orderTotalCents } from "@/lib/orders";
+import { calculateOrderTotal } from "@/lib/orders";
 import { formatDateTimeFR } from "@/lib/dates";
 
 // Metadata du dashboard
@@ -40,17 +40,14 @@ export default async function OrderDetailPage({
     const shortId = order.id.slice(0, 10);
     const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(order.createdAt));
 
-    const sousTotalCents = orderTotalCents(order.items);
-    
-    let discountAmountCents = 0;
-    if (order.discountType === "percent" && order.discountValue) {
-        discountAmountCents = Math.round(sousTotalCents * (order.discountValue / 100));
-    } else if (order.discountType === "amount" && order.discountValue) {
-        discountAmountCents = Math.round(order.discountValue);
-    }
+    const { totalCents, discountAmountCents, subTotalCents: sousTotalCents } = calculateOrderTotal(
+        order.items,
+        order.shippingCostCents || 0,
+        order.discountType,
+        order.discountValue
+    );
     
     const livraisonCents = order.shippingCostCents || 0;
-    const totalCents = Math.max(0, sousTotalCents - discountAmountCents) + livraisonCents;
     
     const taxRate = order.taxRate || 21;
     const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));

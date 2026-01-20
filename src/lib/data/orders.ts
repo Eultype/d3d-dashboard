@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { calculateOrderTotal } from "@/lib/orders";
 
 export async function getOrderDetails(id: string) {
     return prisma.order.findUnique({
@@ -100,16 +101,14 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
     const rows = orders.map((o) => {
-        const { articlesCount, totalCents: itemsTotalCents } = computeOrderTotals(o.items);
+        const { articlesCount } = computeOrderTotals(o.items);
         
-        let discountAmount = 0;
-        if (o.discountType === "percent" && o.discountValue) {
-            discountAmount = itemsTotalCents * (o.discountValue / 100);
-        } else if (o.discountType === "amount" && o.discountValue) {
-            discountAmount = o.discountValue;
-        }
-
-        const totalWithDiscount = Math.max(0, itemsTotalCents - discountAmount);
+        const { totalCents } = calculateOrderTotal(
+            o.items,
+            o.shippingCostCents,
+            o.discountType,
+            o.discountValue
+        );
 
         return {
             id: o.id,
@@ -117,7 +116,7 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
             status: o.status,
             createdAt: o.createdAt.toISOString(),
             articlesCount,
-            totalCents: totalWithDiscount + o.shippingCostCents,
+            totalCents: totalCents,
             customer: o.customer
                 ? {
                     name: o.customer.name,
@@ -140,18 +139,13 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
 
     // CA Global
     const caTotalCents = allOrdersForCA.reduce((sum, order) => {
-        const itemsTotal = order.items.reduce((itSum, item) => itSum + (item.quantity * item.unitPriceCents), 0);
-        
-        let discountAmount = 0;
-        if (order.discountType === "percent" && order.discountValue) {
-            discountAmount = itemsTotal * (order.discountValue / 100);
-        } else if (order.discountType === "amount" && order.discountValue) {
-            discountAmount = order.discountValue;
-        }
-
-        const totalWithDiscount = Math.max(0, itemsTotal - discountAmount);
-
-        return sum + totalWithDiscount + order.shippingCostCents;
+        const { totalCents } = calculateOrderTotal(
+            order.items,
+            order.shippingCostCents,
+            order.discountType,
+            order.discountValue
+        );
+        return sum + totalCents;
     }, 0);
 
     return {

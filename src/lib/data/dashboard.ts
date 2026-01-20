@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { orderTotalCents } from "@/lib/orders";
+import { calculateOrderTotal } from "@/lib/orders";
 
 export async function getDashboardStats() {
   const STATUS = {
@@ -39,9 +39,14 @@ export async function getDashboardStats() {
   const countToProcess = countToVerify + countToShip + countToPickUp;
 
   const recent = lastOrders.map((o) => {
-    const itemsTotalCents = orderTotalCents(o.items);
+    const { totalCents } = calculateOrderTotal(
+      o.items,
+      o.shippingCostCents,
+      o.discountType,
+      o.discountValue
+    );
     const articlesCount = o.items.reduce((sum, it) => sum + it.quantity, 0);
-    
+
     return {
       id: o.id,
       reference: o.reference,
@@ -51,7 +56,7 @@ export async function getDashboardStats() {
         ? { name: o.customer.name, email: o.customer.email }
         : null,
       articlesCount,
-      totalCents: itemsTotalCents + o.shippingCostCents,
+      totalCents,
     };
   });
 

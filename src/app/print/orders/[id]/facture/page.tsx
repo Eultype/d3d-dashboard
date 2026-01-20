@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from 'next/image';
 import { formatEUR } from "@/lib/money";
-import { orderTotalCents } from "@/lib/orders";
+import { calculateOrderTotal } from "@/lib/orders";
 import { formatDateFR } from "@/lib/dates";
 
 
@@ -23,9 +23,13 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
     const shortId = order.id.slice(0, 10);
     const date = formatDateFR(new Date(order.createdAt));
 
-    const sousTotalCents = orderTotalCents(order.items);
+    const { totalCents, discountAmountCents, subTotalCents: sousTotalCents } = calculateOrderTotal(
+        order.items,
+        order.shippingCostCents || 0,
+        order.discountType,
+        order.discountValue
+    );
     const livraisonCents = order.shippingCostCents || 0;
-    const totalCents = sousTotalCents + livraisonCents;
     
     const taxRate = order.taxRate || 21;
     const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));
@@ -73,7 +77,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
 
                         <div className="text-right">
                             <p className="text-xs uppercase tracking-wide text-neutral-500">Facture</p>
-                            <h1 className="mt-1 text-2xl font-bold">FAC-{order.reference.slice(-4)}</h1>
+                            <h1 className="mt-1 text-2xl font-bold">FAC-{order.reference ? order.reference.slice(-4) : "????"}</h1>
 
                             <div className="mt-3 inline-grid gap-1 text-sm">
                                 <div className="flex justify-end gap-3">
@@ -167,6 +171,13 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                     <span className="text-neutral-600">Sous-total produits</span>
                                     <span className="tabular-nums">{formatEUR(sousTotalCents)}</span>
                                 </div>
+                                
+                                {discountAmountCents > 0 && (
+                                    <div className="flex items-center justify-between text-neutral-600">
+                                        <span>Remise</span>
+                                        <span className="tabular-nums">-{formatEUR(discountAmountCents)}</span>
+                                    </div>
+                                )}
 
                                 <div className="flex items-center justify-between">
                                     <span className="text-neutral-600">

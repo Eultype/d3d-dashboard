@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from 'next/image';
 import { formatEUR } from "@/lib/money";
 import { orderTotalCents } from "@/lib/orders";
 import { formatDateFR } from "@/lib/dates";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 
 export default async function FacturePage({ params }: { params: Promise<{ id?: string }> }) {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        redirect("/api/auth/signin");
+    }
+
     const { id } = await params;
     if (!id) return notFound();
 

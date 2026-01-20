@@ -21,24 +21,39 @@ const CustomerFormSchema = z.object({
 });
 
 
+// --- HELPERS ---
+
+/**
+ * Extrait et nettoie les données du FormData pour le schéma Customer
+ */
+function parseCustomerFormData(formData: FormData) {
+  const getOptional = (key: string) => {
+    const val = formData.get(key) as string;
+    return val?.trim() === "" ? null : val;
+  };
+
+  return {
+    name: formData.get("name") as string,
+    email: formData.get("email") as string,
+    phone: formData.get("phone") as string,
+    companyName: getOptional("companyName"),
+    vatNumber: getOptional("vatNumber"),
+    isActive: formData.get("isActive") === "true",
+    addressLine1: formData.get("addressLine1") as string,
+    addressLine2: getOptional("addressLine2"),
+    postalCode: formData.get("postalCode") as string,
+    city: formData.get("city") as string,
+    country: formData.get("country") as string,
+  };
+}
+
 // --- ACTION DE CRÉATION ---
 export async function createCustomer(
   previousState: CustomerFormState | undefined,
   formData: FormData,
 ): Promise<CustomerFormState> {
-  const validatedFields = CustomerFormSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
-    companyName: formData.get("companyName"),
-    vatNumber: formData.get("vatNumber"),
-    isActive: formData.get("isActive") === "true",
-    addressLine1: formData.get("addressLine1"),
-    addressLine2: formData.get("addressLine2"),
-    postalCode: formData.get("postalCode"),
-    city: formData.get("city"),
-    country: formData.get("country"),
-  });
+  const data = parseCustomerFormData(formData);
+  const validatedFields = CustomerFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
     return {
@@ -47,17 +62,16 @@ export async function createCustomer(
     };
   }
 
-  let customer;
   try {
-    customer = await prisma.customer.create({
+    const customer = await prisma.customer.create({
       data: validatedFields.data,
     });
+    revalidatePath("/dashboard/customers");
+    return { success: true, message: "Client créé avec succès.", customerId: customer.id };
   } catch (error) {
+    console.error("❌ [createCustomer] Error:", error);
     return { message: "Erreur de base de données : Impossible de créer le client." };
   }
-
-  revalidatePath("/dashboard/customers");
-  return { success: true, message: "Client créé avec succès.", customerId: customer.id };
 }
 
 
@@ -70,20 +84,12 @@ export async function updateCustomer(
   previousState: CustomerFormState | undefined,
   formData: FormData,
 ): Promise<CustomerFormState> {
-  const validatedFields = UpdateCustomerSchema.safeParse({
-    id: formData.get("id"),
-    name: formData.get("name"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
-    companyName: formData.get("companyName"),
-    vatNumber: formData.get("vatNumber"),
-    isActive: formData.get("isActive") === "true",
-    addressLine1: formData.get("addressLine1"),
-    addressLine2: formData.get("addressLine2"),
-    postalCode: formData.get("postalCode"),
-    city: formData.get("city"),
-    country: formData.get("country"),
-  });
+  const data = {
+    ...parseCustomerFormData(formData),
+    id: formData.get("id") as string,
+  };
+
+  const validatedFields = UpdateCustomerSchema.safeParse(data);
 
   if (!validatedFields.success) {
     return {
@@ -92,18 +98,19 @@ export async function updateCustomer(
     };
   }
 
-  const { id, ...data } = validatedFields.data;
+  const { id, ...updateData } = validatedFields.data;
 
   try {
     await prisma.customer.update({
       where: { id },
-      data,
+      data: updateData,
     });
+    
+    revalidatePath(`/dashboard/customers/${id}`);
+    revalidatePath("/dashboard/customers");
+    return { success: true, message: "Client mis à jour avec succès." };
   } catch (error) {
+    console.error("❌ [updateCustomer] Error:", error);
     return { message: "Erreur de base de données : Impossible de mettre à jour le client." };
   }
-
-  revalidatePath(`/dashboard/customers/${id}`);
-  revalidatePath("/dashboard/customers");
-  return { success: true, message: "Client mis à jour avec succès." };
 }

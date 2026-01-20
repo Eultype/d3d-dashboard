@@ -1,5 +1,5 @@
 // Import des datas
-import { getCustomerPageData, getCustomerOrderItems } from "@/lib/data/customers";
+import { getCustomerFullDetails } from "@/lib/data/customers";
 //Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -30,18 +30,17 @@ export default async function CustomerDetailPage({
     const { id } = await params;
     if (!id) return notFound();
 
-    // On utilise la nouvelle fonction optimisée
-    const customer = await getCustomerPageData(id); 
-    const lastItems = await getCustomerOrderItems(id);
+    // Récupération de toutes les données en une seule fois via la fonction consolidée
+    const { customer, lastItems } = await getCustomerFullDetails(id); 
 
     if (!customer) return notFound();
 
-    // Les commandes sont maintenant une propriété de l'objet customer
+    // Les commandes sont extraites de l'objet customer
     const orders = customer.orders; 
 
     // Date + heure
     const { date: createdDate, time: createdTime } = formatDateTimeFR(
-        new Date(customer.createdAt)
+        customer.createdAt
     );
 
     return (

@@ -32,6 +32,34 @@ export type CustomerRow = {
     createdAt: string; // ISO
 };
 
+// Structure pour les commandes récentes d'un client
+export type CustomerRecentOrder = {
+    id: string;
+    reference: string | null;
+    status: string;
+    createdAt: Date;
+    items: { quantity: number; unitPriceCents: number }[];
+    shippingCostCents: number;
+    discountType?: string | null;
+    discountValue?: number | null;
+};
+
+// Structure pour les derniers items commandés par un client
+export type CustomerLastOrderItem = {
+    id: string;
+    quantity: number;
+    unitPriceCents: number;
+    orderId: string;
+    order: {
+        createdAt: Date;
+        reference: string | null;
+    };
+    product: {
+        name: string;
+        sku: string | null;
+    };
+};
+
 // Props du composant formulaire (pour édition)
 export type CustomerFormProps = {
     customer?: {

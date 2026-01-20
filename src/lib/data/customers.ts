@@ -1,19 +1,49 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getCustomerOrderItems(customerId: string) {
-    return prisma.orderItem.findMany({
-        where: {
-            order: { customerId: customerId },
-        },
-        orderBy: {
-            createdAt: "desc"
-        },
-        take: 5,
-        include: {
-            product: true,
-            order: true,
-        },
-    });
+export async function getCustomerFullDetails(id: string) {
+    const [customer, lastItems] = await Promise.all([
+        // 1. Récupère le client + ses 5 dernières commandes
+        prisma.customer.findUnique({
+            where: { id },
+            include: {
+                orders: {
+                    orderBy: { createdAt: "desc" },
+                    take: 5,
+                    include: {
+                        items: true,
+                    },
+                },
+            },
+        }),
+        // 2. Récupère les 5 derniers produits individuels commandés (OrderItem)
+        prisma.orderItem.findMany({
+            where: {
+                order: { customerId: id },
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            take: 5,
+            include: {
+                product: true,
+                order: {
+                    select: {
+                        reference: true,
+                        createdAt: true
+                    }
+                },
+            },
+        }),
+    ]);
+
+    return {
+        customer,
+        lastItems: lastItems.map(item => ({
+            ...item,
+            // On s'assure que la date est bien formatée si besoin ou reste un objet Date
+            createdAt: item.createdAt, 
+        }))
+    };
 }
 
 export async function getCustomersAndStats(query?: string, page: number = 1) {
@@ -83,19 +113,3 @@ export async function getCustomersAndStats(query?: string, page: number = 1) {
         }
     };
 }
-        
-export async function getCustomerPageData(id: string) {
-    return prisma.customer.findUnique({
-        where: { id },
-        include: {
-            orders: {
-                orderBy: { createdAt: "desc" },
-                take: 5,
-                include: {
-                    items: true,
-                },
-            },
-        },
-    });
-}
-        

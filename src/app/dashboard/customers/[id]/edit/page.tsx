@@ -3,10 +3,17 @@ import { prisma } from "@/lib/prisma";
 // Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 // Import des composants
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomerForm } from "../../_components/CustomerForm";
+
+// Metadata de la modification d'un client
+export const metadata: Metadata = {
+    title: "D3D | Modifier un client",
+    description: "Modifiez les informations d’un client existant dans votre base de données.",
+};
 
 // Page de modification du client
 export default async function CustomerEditPage({

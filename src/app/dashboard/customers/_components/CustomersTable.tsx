@@ -1,29 +1,20 @@
 "use client";
 
+// Import Next
 import Link from "next/link";
-import { formatDateFR } from "@/lib/dates";
-
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-
+// Import des composants
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
+// Import de Lucide React
 import { Eye, Pencil } from "lucide-react";
+// Import des lib
+import { formatDateFR } from "@/lib/dates";
+// Import des types
 import { CustomerRow } from "@/types/customer";
 
+// Initiales dans le tableau (mini logo)
 function initials(name?: string | null) {
     if (!name) return "C";
     const parts = name.trim().split(/\s+/);
@@ -32,6 +23,7 @@ function initials(name?: string | null) {
     return (first + last).toUpperCase();
 }
 
+// Composant listing clients
 export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
     return (
         <TooltipProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import StepOne from "./steps/Step1";
@@ -14,22 +14,51 @@ import { OrderDraft, ProductFromDB } from "@/types/order";
 
 type OrderFormProps = {
   productsCatalog: ProductFromDB[];
+  userRole?: string;
+  userPrefix?: string; // Ajout du préfixe dynamique
+  prefilledCustomer?: any;
 };
 
-export default function OrderForm({ productsCatalog }: OrderFormProps) {
+export default function OrderForm({ productsCatalog, userRole, userPrefix, prefilledCustomer }: OrderFormProps) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const isReseller = userRole === "REVENDEUR";
+
+  // Si revendeur, on commence direct à l'étape 3
+  const [step, setStep] = useState(isReseller ? 3 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [draft, setDraft] = useState<OrderDraft>({
-    info: { prefix: "", delivery: "", shippingCost: 0, taxRate: 21 },
-    customerId: null,
-    clientDetails: null,
+    info: { 
+      prefix: isReseller && userPrefix ? userPrefix : "", // Utilise le préfixe du revendeur
+      delivery: isReseller ? "Livraison Belgique" : "",
+      shippingCost: isReseller ? 12 : 0, 
+      taxRate: 21,
+      manualNumber: null 
+    },
+    customerId: prefilledCustomer?.id || null,
+    clientDetails: prefilledCustomer ? {
+      name: prefilledCustomer.name,
+      email: prefilledCustomer.email,
+      phone: prefilledCustomer.phone,
+      addressLine1: prefilledCustomer.addressLine1,
+      postalCode: prefilledCustomer.postalCode,
+      city: prefilledCustomer.city,
+      country: prefilledCustomer.country,
+      companyName: prefilledCustomer.companyName,
+      vatNumber: prefilledCustomer.vatNumber,
+    } : null,
     newClientData: null,
     products: [],
     discountType: "none",
     internalNote: "",
   });
+
+  // Si on est revendeur et qu'on n'a pas de client associé, on avertit
+  useEffect(() => {
+    if (isReseller && !prefilledCustomer) {
+      toast.error("Votre compte revendeur n'est pas lié à une fiche client. Veuillez contacter l'administrateur.");
+    }
+  }, [isReseller, prefilledCustomer]);
 
   const updateDraft = (patch: Partial<OrderDraft>) => {
     setDraft((prev) => ({ ...prev, ...patch }));
@@ -81,7 +110,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
 
   return (
     <div className="space-y-6">
-      {step === 1 && (
+      {step === 1 && !isReseller && (
         <StepOne
           draft={draft}
           onChange={updateDraft}
@@ -89,7 +118,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
         />
       )}
 
-      {step === 2 && (
+      {step === 2 && !isReseller && (
         <StepTwo
           draft={draft}
           onChange={updateDraft}
@@ -103,7 +132,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
           draft={draft}
           onChange={updateDraft}
           onNext={() => setStep(4)}
-          onBack={() => setStep(2)}
+          onBack={isReseller ? undefined : () => setStep(2)} // Disable back for Reseller
           productsCatalog={productsCatalog}
         />
       )}

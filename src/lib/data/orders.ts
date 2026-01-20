@@ -41,11 +41,16 @@ function sumCents(values: number[]) {
     return values.reduce((s, v) => s + v, 0);
 }
 
-export async function getOrdersAndStats(query?: string, page: number = 1, status?: string) {
+export async function getOrdersAndStats(query?: string, page: number = 1, status?: string, userContext?: { userId: string, role: string }) {
     const PAGE_SIZE = 13;
     const skip = (page - 1) * PAGE_SIZE;
 
     const whereClause: Prisma.OrderWhereInput = {};
+
+    // Sécurité : Si Revendeur, on ne montre que ses commandes
+    if (userContext && userContext.role === "REVENDEUR") {
+        whereClause.createdById = userContext.userId;
+    }
 
     if (query) {
         whereClause.OR = [
@@ -58,6 +63,12 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
 
     if (status && status !== "ALL") {
         whereClause.status = status;
+    }
+
+    // Filtre pour le CA global (Doit aussi respecter le scope utilisateur)
+    const caWhereClause: Prisma.OrderWhereInput = {};
+    if (userContext && userContext.role === "REVENDEUR") {
+        caWhereClause.createdById = userContext.userId;
     }
 
     // On lance les requêtes en parallèle pour la perf
@@ -85,8 +96,9 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
                 status: true,
             },
         }),
-        // CA Global (Total Absolu de la base, sans filtre de recherche)
+        // CA Global (Total Absolu de la base ou du revendeur)
         prisma.order.findMany({
+            where: caWhereClause,
             select: {
                 shippingCostCents: true,
                 discountType: true,

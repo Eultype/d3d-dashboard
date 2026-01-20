@@ -64,16 +64,25 @@ export default async function DashboardLayout({
               icon={<ClipboardList className="h-4 w-4" />}
               label="Commandes"
             />
-            <NavLink
-              href="/dashboard/customers"
-              icon={<Users className="h-4 w-4" />}
-              label="Clients"
-            />
-            <NavLink
-              href="/dashboard/products"
-              icon={<ShoppingBag className="h-4 w-4" />}
-              label="Produits"
-            />
+            {session.user.role === "ADMIN" && (
+                <>
+                    <NavLink
+                    href="/dashboard/customers"
+                    icon={<Users className="h-4 w-4" />}
+                    label="Clients"
+                    />
+                    <NavLink
+                    href="/dashboard/products"
+                    icon={<ShoppingBag className="h-4 w-4" />}
+                    label="Produits"
+                    />
+                    <NavLink
+                      href="/dashboard/resellers/new"
+                      icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
+                      label="Nouveau Revendeur"
+                    />
+                </>
+            )}
           </nav>
         </aside>
 

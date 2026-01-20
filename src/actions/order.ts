@@ -158,6 +158,7 @@ export async function createOrder(data: OrderInputData) {
             ? validData.discountValue * 100 
             : validData.discountValue,
         customerId: finalCustomerId,
+        createdById: user.id,
         items: { create: orderItems },
         ...(validData.internalNote && { notes: { create: { content: validData.internalNote, userId: user.id } } }),
       },

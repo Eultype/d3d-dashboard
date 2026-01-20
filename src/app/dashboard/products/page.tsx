@@ -20,13 +20,22 @@ export const metadata: Metadata = {
         "Gérez et suivez l’ensemble de vos produits : activation, détails, stock, historique des ventes et actions associées.",
 };
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
 // Page de listing produits
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; status?: string }>;
 }) {
-    const { q, page } = await searchParams;
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+        redirect("/dashboard");
+    }
+
+    const { q, page, status } = await searchParams;
     const currentPage = Number(page) || 1;
 
     const { products: rows, stats, pagination } = await getProductsAndStats(q, currentPage);

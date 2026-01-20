@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { calculateOrderTotal } from "@/lib/orders";
+import { Prisma } from "@prisma/client";
 
-export async function getDashboardStats() {
+export async function getDashboardStats(userContext?: { userId: string, role: string }) {
   const STATUS = {
     A_VERIFIER: "A_VERIFIER",
     PROD: "PROD",
@@ -9,6 +10,23 @@ export async function getDashboardStats() {
     A_RECUPERER: "A_RECUPERER",
     TERMINE: "TERMINE",
   } as const;
+
+  const whereClause: Prisma.OrderWhereInput = {};
+
+  // Sécurité : "Fail Safe" (Si pas Admin, on restreint)
+  let strictFilter = true;
+  if (userContext && userContext.role === "ADMIN") {
+    strictFilter = false;
+  }
+
+  if (strictFilter) {
+     if (userContext?.userId) {
+         whereClause.createdById = userContext.userId;
+     } else {
+         // Fallback si session invalide
+         whereClause.createdById = "00000000-0000-0000-0000-000000000000";
+     }
+  }
 
   const [
     countToVerify,
@@ -18,12 +36,13 @@ export async function getDashboardStats() {
     countDone,
     lastOrders,
   ] = await Promise.all([
-    prisma.order.count({ where: { status: STATUS.A_VERIFIER } }),
-    prisma.order.count({ where: { status: STATUS.PROD } }),
-    prisma.order.count({ where: { status: STATUS.A_EXPEDIER } }),
-    prisma.order.count({ where: { status: STATUS.A_RECUPERER } }),
-    prisma.order.count({ where: { status: STATUS.TERMINE } }),
+    prisma.order.count({ where: { ...whereClause, status: STATUS.A_VERIFIER } }),
+    prisma.order.count({ where: { ...whereClause, status: STATUS.PROD } }),
+    prisma.order.count({ where: { ...whereClause, status: STATUS.A_EXPEDIER } }),
+    prisma.order.count({ where: { ...whereClause, status: STATUS.A_RECUPERER } }),
+    prisma.order.count({ where: { ...whereClause, status: STATUS.TERMINE } }),
     prisma.order.findMany({
+      where: whereClause,
       orderBy: { createdAt: "desc" },
       take: 5,
       include: {

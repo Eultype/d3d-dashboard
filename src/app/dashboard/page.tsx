@@ -10,6 +10,10 @@ import { DashboardStats } from "./_components/DashboardStats";
 import { RecentOrdersCard } from "./_components/RecentOrdersCard";
 import { TodoOrdersCard } from "./_components/TodoOrdersCard";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
 export const metadata: Metadata = {
   title: "D3D | Dashboard | Vue d'ensemble",
   description:
@@ -17,7 +21,15 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const { stats, recent, todoOrders } = await getDashboardStats();
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+      redirect("/");
+  }
+
+  const { stats, recent, todoOrders } = await getDashboardStats({ 
+      userId: session.user.id, 
+      role: session.user.role as string 
+  });
 
   return (
     <div className="space-y-6">

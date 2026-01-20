@@ -3,6 +3,10 @@ import { getOrdersAndStats } from "@/lib/data/orders";
 //Import Next
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
 // Import des composants
 import { OrdersTable } from "./_components/OrdersTable";
 import { OrdersFilter } from "./_components/OrdersFilter";
@@ -27,10 +31,20 @@ export default async function OrdersPage({
 }: {
   searchParams: Promise<{ q?: string; page?: string; status?: string }>;
 }) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+        redirect("/");
+    }
+
     const { q, page, status } = await searchParams;
     const currentPage = Number(page) || 1;
 
-    const { orders: rows, stats, pagination } = await getOrdersAndStats(q, currentPage, status);
+    const { orders: rows, stats, pagination } = await getOrdersAndStats(
+        q, 
+        currentPage, 
+        status, 
+        { userId: session.user.id, role: session.user.role as string }
+    );
     const { totalOrders, aVerifier, enProd, terminees, caTotalCents } = stats;
 
     return (

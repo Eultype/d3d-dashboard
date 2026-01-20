@@ -7,7 +7,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { ProductFormState } from "@/types/product";
 
-// --- Fonctions Helper ---
+// --- HELPERS ---
+
+/**
+ * Extrait et nettoie les données du FormData pour le schéma Product
+ */
+function parseProductFormData(formData: FormData) {
+  return {
+    name: formData.get("name") as string,
+    sku: formData.get("sku") as string,
+    description: (formData.get("description") as string) || null,
+    priceCents: formData.get("priceCents"),
+    isActive: formData.get("isActive") === "true",
+    imageFile: formData.get("imageFile") as File,
+  };
+}
 
 // Crée un nom de fichier "slug" à partir d'un texte
 const slugify = (text: string) =>
@@ -59,14 +73,8 @@ export async function createProduct(
   previousState: ProductFormState | undefined,
   formData: FormData,
 ): Promise<ProductFormState> {
-  const validatedFields = ProductFormSchema.safeParse({
-    name: formData.get("name"),
-    sku: formData.get("sku"),
-    description: formData.get("description"),
-    priceCents: formData.get("priceCents"),
-    isActive: formData.get("isActive") === "true",
-    imageFile: formData.get("imageFile"),
-  });
+  const data = parseProductFormData(formData);
+  const validatedFields = ProductFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
     return {
@@ -78,20 +86,19 @@ export async function createProduct(
   const { imageFile, ...productData } = validatedFields.data;
   const imageUrl = await uploadImage(imageFile, productData.name);
 
-  let product;
   try {
-    product = await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         ...productData,
         imageUrl: imageUrl,
       },
     });
+    revalidatePath("/dashboard/products");
+    return { success: true, message: "Produit créé avec succès.", productId: product.id };
   } catch (error) {
+    console.error("❌ [createProduct] Error:", error);
     return { message: "Erreur de base de données : Impossible de créer le produit." };
   }
-
-  revalidatePath("/dashboard/products");
-  return { success: true, message: "Produit créé avec succès.", productId: product.id };
 }
 
 
@@ -104,15 +111,12 @@ export async function updateProduct(
   previousState: ProductFormState | undefined,
   formData: FormData,
 ): Promise<ProductFormState> {
-  const validatedFields = UpdateProductSchema.safeParse({
-    id: formData.get("id"),
-    name: formData.get("name"),
-    sku: formData.get("sku"),
-    description: formData.get("description"),
-    priceCents: formData.get("priceCents"),
-    isActive: formData.get("isActive") === "true",
-    imageFile: formData.get("imageFile"),
-  });
+  const data = {
+    ...parseProductFormData(formData),
+    id: formData.get("id") as string,
+  };
+
+  const validatedFields = UpdateProductSchema.safeParse(data);
 
   if (!validatedFields.success) {
     return {
@@ -121,8 +125,8 @@ export async function updateProduct(
     };
   }
 
-  const { id, imageFile, ...data } = validatedFields.data;
-  const newImageUrl = await uploadImage(imageFile, data.name);
+  const { id, imageFile, ...updateData } = validatedFields.data;
+  const newImageUrl = await uploadImage(imageFile, updateData.name);
 
   try {
     // 1. Récupérer l'ancienne image AVANT update
@@ -135,7 +139,7 @@ export async function updateProduct(
     await prisma.product.update({
       where: { id },
       data: {
-        ...data,
+        ...updateData,
         ...(newImageUrl && { imageUrl: newImageUrl }),
       },
     });
@@ -150,11 +154,11 @@ export async function updateProduct(
       }
     }
 
+    revalidatePath(`/dashboard/products/${id}`);
+    revalidatePath("/dashboard/products");
+    return { success: true, message: "Produit mis à jour avec succès." };
   } catch (error) {
+    console.error("❌ [updateProduct] Error:", error);
     return { message: "Erreur de base de données : Impossible de mettre à jour le produit." };
   }
-
-  revalidatePath(`/dashboard/products/${id}`);
-  revalidatePath("/dashboard/products");
-  return { success: true, message: "Produit mis à jour avec succès." };
 }

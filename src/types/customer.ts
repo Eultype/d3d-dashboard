@@ -75,8 +75,5 @@ export type CustomerFormProps = {
         postalCode: string;
         city: string;
         country: string;
-        // On autorise null si jamais les données viennent brutes de la DB, 
-        // mais idéalement on nettoie avant.
-        // Ici je reste strict par rapport à votre code actuel.
     };
 };

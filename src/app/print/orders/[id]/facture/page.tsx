@@ -200,7 +200,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                     <span className="text-base font-bold tabular-nums">{formatEUR(totalCents)}</span>
                                 </div>
 
-                                <div className="flex justify-end pt-1">
+                                <div className="flex justify-end">
                                     <span className="text-[10px] text-neutral-500 italic">
                                         Dont TVA ({taxRate}%) : {formatEUR(tvaCents)}
                                     </span>

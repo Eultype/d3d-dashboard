@@ -75,11 +75,13 @@ export function CustomerLastProductsCard({ lastItems }: { lastItems: CustomerLas
                                     </div>
                                 </div>
                                 {/* Bouton voir commande */}
-                                <Button asChild size="sm" variant="ghost" className="h-8 w-8 p-0">
-                                    <Link href={`/dashboard/orders/${item.orderId}`}>
-                                        <span className="sr-only">Voir la commande</span>
-                                        <ArrowRight className="h-4 w-4" />
-                                    </Link>
+                                <Button
+                                    asChild
+                                    size="sm"
+                                    variant="outline"
+                                    className="shrink-0"
+                                >
+                                    <Link href={`/dashboard/orders/${item.orderId}`}>Voir</Link>
                                 </Button>
                             </div>
                         </div>

@@ -52,7 +52,7 @@ export type OrderDraft = {
   };
   customerId: string | null;
   clientDetails: ClientDetails | null;
-  newClientData?: NewClientData | null; // AJOUTÉ
+  newClientData?: NewClientData | null;
   products: ProductItem[];
   discountType: string;
   discountValue?: number;

@@ -15,7 +15,8 @@ import { CustomerFormState, CustomerFormProps } from "@/types/customer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Bouton de soumission (Envoyer)
 function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
@@ -23,13 +24,13 @@ function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
     const buttonText = isEditMode ? "Enregistrer" : "Créer le client";
     const pendingText = isEditMode ? "Enregistrement..." : "Création...";
     return (
-        <Button aria-disabled={pending} type="submit">
+        <Button aria-disabled={pending} type="submit" className="min-w-[150px]">
             {pending ? pendingText : buttonText}
         </Button>
     );
 }
 
-// Page formulaire de création d'un client
+// Page formulaire de création / mise à jour d'un client
 export function CustomerForm({ customer }: CustomerFormProps) {
     const isEditMode = !!customer;
     const action = isEditMode ? updateCustomer : createCustomer;
@@ -53,101 +54,115 @@ export function CustomerForm({ customer }: CustomerFormProps) {
         }
     }, [state, isEditMode, router, customer?.id]);
 
+    const formatErrors = (errors?: string[]) => errors?.map(m => ({ message: m }));
 
     return (
-        <form action={dispatch} className="space-y-6">
+        <form action={dispatch} className="space-y-8">
             {/* Champ caché pour l’id en mode édition */}
             {isEditMode && <input type="hidden" name="id" value={customer.id} />}
 
-            {/* Bloc 1: Infos principales */}
-            <div className="grid gap-4 md:grid-cols-2">
-                {/* Nom */}
-                <div className="space-y-2">
-                    <Label htmlFor="name">Nom</Label>
-                    <Input id="name" name="name" defaultValue={customer?.name ?? ""} />
-                    {/* Message d’erreur pour “nom” */}
-                    {state.errors?.name && <p className="text-sm text-red-600 mt-1">{state.errors.name[0]}</p>}
-                </div>
+            {/* Section 1: Informations de contact */}
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {/* Nom */}
+                        <Field>
+                            <FieldLabel htmlFor="name">Nom / Prénom *</FieldLabel>
+                            <Input id="name" name="name" defaultValue={customer?.name ?? ""} placeholder="Ex: Jean Dupont" />
+                            <FieldError errors={formatErrors(state.errors?.name)} />
+                        </Field>
 
-                {/* Email */}
-                <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" defaultValue={customer?.email ?? ""} />
-                    {state.errors?.email && <p className="text-sm text-red-600 mt-1">{state.errors.email[0]}</p>}
-                </div>
+                        {/* Email */}
+                        <Field>
+                            <FieldLabel htmlFor="email">Email *</FieldLabel>
+                            <Input id="email" name="email" type="email" defaultValue={customer?.email ?? ""} placeholder="jean.dupont@exemple.com" />
+                            <FieldError errors={formatErrors(state.errors?.email)} />
+                        </Field>
 
-                {/* Téléphone */}
-                <div className="space-y-2">
-                    <Label htmlFor="phone">Téléphone</Label>
-                    <Input id="phone" name="phone" type="tel" defaultValue={customer?.phone ?? ""} />
-                    {state.errors?.phone && <p className="text-sm text-red-600 mt-1">{state.errors.phone[0]}</p>}
-                </div>
+                        {/* Téléphone */}
+                        <Field>
+                            <FieldLabel htmlFor="phone">Téléphone *</FieldLabel>
+                            <Input id="phone" name="phone" type="tel" defaultValue={customer?.phone ?? ""} placeholder="+32 4XX XX XX XX" />
+                            <FieldError errors={formatErrors(state.errors?.phone)} />
+                        </Field>
 
-                {/* Société */}
-                <div className="space-y-2">
-                    <Label htmlFor="companyName">Société</Label>
-                    <Input id="companyName" name="companyName" defaultValue={customer?.companyName ?? ""} />
-                    {state.errors?.companyName && <p className="text-sm text-red-600 mt-1">{state.errors.companyName[0]}</p>}
-                </div>
+                        {/* Société */}
+                        <Field>
+                            <FieldLabel htmlFor="companyName">Société</FieldLabel>
+                            <Input id="companyName" name="companyName" defaultValue={customer?.companyName ?? ""} placeholder="Nom de l'entreprise (optionnel)" />
+                            <FieldError errors={formatErrors(state.errors?.companyName)} />
+                        </Field>
 
-                {/* Numéro de TVA */}
-                <div className="space-y-2">
-                    <Label htmlFor="vatNumber">TVA</Label>
-                    <Input id="vatNumber" name="vatNumber" defaultValue={customer?.vatNumber ?? ""} />
-                    {state.errors?.vatNumber && <p className="text-sm text-red-600 mt-1">{state.errors.vatNumber[0]}</p>}
-                </div>
+                        {/* Numéro de TVA */}
+                        <Field>
+                            <FieldLabel htmlFor="vatNumber">Numéro de TVA</FieldLabel>
+                            <Input id="vatNumber" name="vatNumber" defaultValue={customer?.vatNumber ?? ""} placeholder="BE 0XXX.XXX.XXX" />
+                            <FieldError errors={formatErrors(state.errors?.vatNumber)} />
+                        </Field>
 
-                {/* Statut actif/inactif */}
-                <div className="flex items-center gap-3 pt-6">
-                    <Switch checked={isActive} onCheckedChange={setIsActive} name="isActiveSwitch" />
-                    <input type="hidden" name="isActive" value={String(isActive)} />
-                    <span className="text-sm text-muted-foreground">
-                        Client {isActive ? "actif" : "inactif"}
-                    </span>
-                    {state.errors?.isActive && <p className="text-sm text-red-600 mt-1">{state.errors.isActive[0]}</p>}
-                </div>
+                        {/* Statut actif/inactif */}
+                        <div className="flex items-center gap-3 pt-6">
+                            <Switch checked={isActive} onCheckedChange={setIsActive} id="isActive-switch" />
+                            <input type="hidden" name="isActive" value={String(isActive)} />
+                            <label htmlFor="isActive-switch" className="text-sm font-medium cursor-pointer">
+                                Client {isActive ? "actif" : "inactif"}
+                            </label>
+                            <FieldError errors={formatErrors(state.errors?.isActive)} />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Section 2: Adresse de facturation */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold px-1">Adresse de facturation</h3>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            {/* Ligne 1 */}
+                            <Field className="md:col-span-2">
+                                <FieldLabel htmlFor="addressLine1">Adresse (Ligne 1) *</FieldLabel>
+                                <Input id="addressLine1" name="addressLine1" defaultValue={customer?.addressLine1 ?? ""} placeholder="Rue de l'Exemple, 123" />
+                                <FieldError errors={formatErrors(state.errors?.addressLine1)} />
+                            </Field>
+
+                            {/* Ligne 2 */}
+                            <Field className="md:col-span-2">
+                                <FieldLabel htmlFor="addressLine2">Adresse (Ligne 2)</FieldLabel>
+                                <Input id="addressLine2" name="addressLine2" defaultValue={customer?.addressLine2 ?? ""} placeholder="Appartement, bureau, étage..." />
+                                <FieldError errors={formatErrors(state.errors?.addressLine2)} />
+                            </Field>
+
+                            {/* Code postal */}
+                            <Field>
+                                <FieldLabel htmlFor="postalCode">Code postal *</FieldLabel>
+                                <Input id="postalCode" name="postalCode" defaultValue={customer?.postalCode ?? ""} placeholder="1000" />
+                                <FieldError errors={formatErrors(state.errors?.postalCode)} />
+                            </Field>
+
+                            {/* Ville */}
+                            <Field>
+                                <FieldLabel htmlFor="city">Ville *</FieldLabel>
+                                <Input id="city" name="city" defaultValue={customer?.city ?? ""} placeholder="Bruxelles" />
+                                <FieldError errors={formatErrors(state.errors?.city)} />
+                            </Field>
+
+                            {/* Pays */}
+                            <Field className="md:col-span-2">
+                                <FieldLabel htmlFor="country">Pays *</FieldLabel>
+                                <Input id="country" name="country" defaultValue={customer?.country ?? "Belgique"} placeholder="Belgique" />
+                                <FieldError errors={formatErrors(state.errors?.country)} />
+                            </Field>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Bloc 2 : Adresse */}
-            <div className="grid gap-4 md:grid-cols-2 mt-6">
-                {/* Adresse ligne 1 */}
-                <div className="space-y-2">
-                    <Label htmlFor="addressLine1">Adresse ligne 1</Label>
-                    <Input id="addressLine1" name="addressLine1" defaultValue={customer?.addressLine1 ?? ""} />
-                    {state.errors?.addressLine1 && <p className="text-sm text-red-600 mt-1">{state.errors.addressLine1[0]}</p>}
-                </div>
-
-                {/* Adresse ligne 2 */}
-                <div className="space-y-2">
-                    <Label htmlFor="addressLine2">Adresse ligne 2</Label>
-                    <Input id="addressLine2" name="addressLine2" defaultValue={customer?.addressLine2 ?? ""} />
-                    {state.errors?.addressLine2 && <p className="text-sm text-red-600 mt-1">{state.errors.addressLine2[0]}</p>}
-                </div>
-
-                {/* Code postal */}
-                <div className="space-y-2">
-                    <Label htmlFor="postalCode">Code postal</Label>
-                    <Input id="postalCode" name="postalCode" defaultValue={customer?.postalCode ?? ""} />
-                    {state.errors?.postalCode && <p className="text-sm text-red-600 mt-1">{state.errors.postalCode[0]}</p>}
-                </div>
-
-                {/* Ville */}
-                <div className="space-y-2">
-                    <Label htmlFor="city">Ville</Label>
-                    <Input id="city" name="city" defaultValue={customer?.city ?? ""} />
-                    {state.errors?.city && <p className="text-sm text-red-600 mt-1">{state.errors.city[0]}</p>}
-                </div>
-
-                {/* Pays */}
-                <div className="space-y-2">
-                    <Label htmlFor="country">Pays</Label>
-                    <Input id="country" name="country" defaultValue={customer?.country ?? ""} />
-                    {state.errors?.country && <p className="text-sm text-red-600 mt-1">{state.errors.country[0]}</p>}
-                </div>
-            </div>
-
-            {/* Bouton de soumission */}
-            <div className="flex items-center justify-end mt-6">
+            {/* Boutons d'action */}
+            <div className="flex items-center justify-end gap-3 pt-4">
+                <Button type="button" variant="ghost" onClick={() => router.back()}>
+                    Annuler
+                </Button>
                 <SubmitButton isEditMode={isEditMode} />
             </div>
         </form>

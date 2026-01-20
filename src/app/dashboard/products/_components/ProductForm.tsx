@@ -1,30 +1,37 @@
 "use client";
 
+// Import React
 import { useActionState, useState, useRef, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+// Import Next
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+// Import action
 import { createProduct, updateProduct } from "@/actions/product";
+// Import types
 import { ProductFormState, ProductFormProps } from "@/types/product";
+// Import composant
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Field } from "@/components/ui/field";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Card, CardContent } from "@/components/ui/card";
 
+// Bouton de soumission (Envoyer)
 function SubmitButton({ isEditMode }: { isEditMode: boolean }) {
     const { pending } = useFormStatus();
     const buttonText = isEditMode ? "Enregistrer les modifications" : "Créer le produit";
     const pendingText = isEditMode ? "Enregistrement..." : "Création...";
     return (
-        <Button aria-disabled={pending} type="submit" className="w-full sm:w-auto">
+        <Button aria-disabled={pending} type="submit" className="min-w-[150px]">
             {pending ? pendingText : buttonText}
         </Button>
     );
 }
 
+// Page formulaire de création mise à jour d'un produit
 export function ProductForm({ product }: ProductFormProps) {
     const isEditMode = !!product;
     const action = isEditMode ? updateProduct : createProduct;
@@ -70,146 +77,142 @@ export function ProductForm({ product }: ProductFormProps) {
         }
     };
 
+    const formatErrors = (errors?: string[]) => errors?.map(m => ({ message: m }));
     const imageToShow = previewUrl || product?.imageUrl;
 
     return (
-        <form action={dispatch} className="space-y-6">
+        <form action={dispatch} className="space-y-8">
             {isEditMode && <input type="hidden" name="id" value={product.id} />}
 
-            {/* Container */}
-            <div className="p-5 sm:p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Bloc 1: Informations principales */}
+            <Card>
+                <CardContent className="pt-6 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Nom */}
+                        <Field>
+                            <FieldLabel htmlFor="name">Nom du produit *</FieldLabel>
+                            <Input
+                                id="name"
+                                name="name"
+                                defaultValue={product?.name ?? ""}
+                                required
+                                placeholder="Ex: Hoodie Premium"
+                            />
+                            <FieldError errors={formatErrors(state.errors?.name)} />
+                        </Field>
+
+                        {/* SKU */}
+                        <Field>
+                            <FieldLabel htmlFor="sku">SKU (Référence unique) *</FieldLabel>
+                            <Input
+                                id="sku"
+                                name="sku"
+                                defaultValue={product?.sku ?? ""}
+                                placeholder="Ex: HD-PRM-BLK-M"
+                            />
+                            <FieldError errors={formatErrors(state.errors?.sku)} />
+                        </Field>
+                    </div>
+
+                    {/* Description */}
                     <Field>
-                        <Label htmlFor="name">Nom du produit</Label>
-                        <Input
-                            id="name"
-                            name="name"
-                            defaultValue={product?.name ?? ""}
-                            required
-                            placeholder="Ex: Hoodie Premium"
-                            className={state.errors?.name ? "border-red-500 focus-visible:ring-red-500" : ""}
+                        <FieldLabel htmlFor="description">Description</FieldLabel>
+                        <Textarea
+                            id="description"
+                            name="description"
+                            defaultValue={product?.description ?? ""}
+                            rows={4}
+                            placeholder="Description détaillée du produit..."
                         />
-                        {state.errors?.name && (
-                            <p className="text-sm text-red-600 -mt-2">{state.errors.name[0]}</p>
-                        )}
+                        <FieldError errors={formatErrors(state.errors?.description)} />
                     </Field>
 
-                    <Field>
-                        <Label htmlFor="sku">SKU (Référence unique)</Label>
-                        <Input
-                            id="sku"
-                            name="sku"
-                            defaultValue={product?.sku ?? ""}
-                            placeholder="Ex: HD-PRM-BLK-M"
-                            className={state.errors?.sku ? "border-red-500 focus-visible:ring-red-500" : ""}
-                        />
-                        {state.errors?.sku && (
-                            <p className="text-sm text-red-600 -mt-2">{state.errors.sku[0]}</p>
-                        )}
-                    </Field>
-                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Image */}
+                        <Field>
+                            <FieldLabel htmlFor="imageFile">Image du produit</FieldLabel>
 
-                <Field>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                        id="description"
-                        name="description"
-                        defaultValue={product?.description ?? ""}
-                        rows={4}
-                        placeholder="Description du produit..."
-                        className={state.errors?.description ? "border-red-500 focus-visible:ring-red-500" : ""}
-                    />
-                    {state.errors?.description && (
-                        <p className="text-sm text-red-600 -mt-2">{state.errors.description[0]}</p>
-                        )}
-                </Field>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Field>
-                        <Label htmlFor="imageFile">Image du produit</Label>
-
-                        {/* Preview dynamique */}
-                        {imageToShow && (
-                            <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3">
-                                <div className="relative h-16 w-16 overflow-hidden rounded-lg border bg-background">
-                                    <Image
-                                        src={imageToShow}
-                                        alt={product?.name ?? "Image produit"}
-                                        fill
-                                        className="object-cover"
-                                    />
+                            {/* Preview dynamique */}
+                            {imageToShow && (
+                                <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 mb-2">
+                                    <div className="relative h-16 w-16 overflow-hidden rounded-lg border bg-background shrink-0">
+                                        <Image
+                                            src={imageToShow}
+                                            alt={product?.name ?? "Image produit"}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-medium truncate">
+                                            {product?.name ?? "Image actuelle"}
+                                        </p>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            {previewUrl ? "Prévisualisation (non enregistrée)" : "Aperçu de l’image enregistrée"}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="min-w-0">
-                                    <p className="text-sm font-medium truncate">
-                                        {product?.name ?? "Image actuelle"}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {previewUrl ? "Prévisualisation (non enregistrée)" : "Aperçu de l’image enregistrée"}
+                            )}
+
+                            <Input
+                                id="imageFile"
+                                name="imageFile"
+                                type="file"
+                                accept="image/png, image/jpeg, image/webp"
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
+                            />
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                                PNG, JPEG ou WEBP — Max 2MB.
+                            </p>
+                            <FieldError errors={formatErrors(state.errors?.imageFile)} />
+                        </Field>
+
+                        {/* Prix et Statut */}
+                        <div className="space-y-6">
+                            <Field>
+                                <FieldLabel htmlFor="priceCents">Prix (en centimes) *</FieldLabel>
+                                <Input
+                                    id="priceCents"
+                                    name="priceCents"
+                                    type="number"
+                                    defaultValue={product?.priceCents ?? 0}
+                                    required
+                                />
+                                <FieldError errors={formatErrors(state.errors?.priceCents)} />
+                            </Field>
+
+                            {/* Switch statut */}
+                            <div className="rounded-xl border p-4 flex items-center justify-between bg-muted/10">
+                                <div>
+                                    <p className="text-sm font-medium">Statut du produit</p>
+                                    <p className="text-[11px] text-muted-foreground">
+                                        {isActive ? "Le produit est visible dans le catalogue" : "Le produit est masqué"}
                                     </p>
                                 </div>
-                            </div>
-                        )}
-
-                        <Input
-                            id="imageFile"
-                            name="imageFile"
-                            type="file"
-                            accept="image/png, image/jpeg, image/webp"
-                            className={state.errors?.imageFile ? "border-red-500 focus-visible:ring-red-500" : ""}
-                            onChange={handleFileChange}
-                            ref={fileInputRef}
-                        />
-                        <p className="text-xs text-muted-foreground -mt-2">
-                            PNG/JPEG/WEBP — max 2MB.
-                        </p>
-                        {state.errors?.imageFile && (
-                            <p className="text-sm text-red-600 -mt-2">{state.errors.imageFile[0]}</p>
-                        )}
-                    </Field>
-
-                    <Field>
-                        <Label htmlFor="priceCents">Prix (en centimes)</Label>
-                        <Input
-                            id="priceCents"
-                            name="priceCents"
-                            type="number"
-                            defaultValue={product?.priceCents ?? 0}
-                            required
-                            className={state.errors?.priceCents ? "border-red-500 focus-visible:ring-red-500" : ""}
-                        />
-                        {state.errors?.priceCents && (
-                            <p className="text-sm text-red-600 -mt-2">{state.errors.priceCents[0]}</p>
-                        )}
-
-                        {/* Switch juste en dessous du prix */}
-                        <div className="rounded-xl border p-4 flex items-center justify-between mt-5">
-                            <div>
-                                <p className="text-sm font-medium">Statut</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {isActive ? "Le produit est visible" : "Le produit est masqué"}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Switch id="isActive" checked={isActive} onCheckedChange={setIsActive} />
-                                <input type="hidden" name="isActive" value={String(isActive)} />
-                                <Label htmlFor="isActive" className="text-sm text-muted-foreground cursor-pointer">
-                                    {isActive ? "Actif" : "Inactif"}
-                                </Label>
+                                <div className="flex items-center gap-3">
+                                    <Switch id="isActive-switch" checked={isActive} onCheckedChange={setIsActive} />
+                                    <input type="hidden" name="isActive" value={String(isActive)} />
+                                    <label htmlFor="isActive-switch" className="text-xs font-medium cursor-pointer">
+                                        {isActive ? "Actif" : "Inactif"}
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </Field>
-                </div>
-            </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Footer actions */}
-            <div className="p-5 sm:p-6 border-t flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    {/* General error message is now handled by the toast */}
-                </div>
-
-                <div className="flex justify-end">
-                    <SubmitButton isEditMode={isEditMode} />
-                </div>
+            <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                <Button 
+                    type="button" 
+                    variant="ghost" 
+                    onClick={() => router.back()}
+                >
+                    Annuler
+                </Button>
+                <SubmitButton isEditMode={isEditMode} />
             </div>
         </form>
     );

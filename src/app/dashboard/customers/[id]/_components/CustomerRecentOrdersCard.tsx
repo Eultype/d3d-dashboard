@@ -81,13 +81,10 @@ export function CustomerRecentOrdersCard({ orders, customerId }: { orders: Custo
                                     <Button
                                         asChild
                                         size="sm"
-                                        variant="ghost"
-                                        className="h-8 w-8 p-0"
+                                        variant="outline"
+                                        className="shrink-0"
                                     >
-                                        <Link href={`/dashboard/orders/${order.id}`}>
-                                            <span className="sr-only">Voir</span>
-                                            <ArrowRight className="h-4 w-4" />
-                                        </Link>
+                                        <Link href={`/dashboard/orders/${order.id}`}>Voir</Link>
                                     </Button>
                                 </div>
                             </div>

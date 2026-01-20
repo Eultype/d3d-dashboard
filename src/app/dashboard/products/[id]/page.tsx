@@ -1,5 +1,5 @@
 // Import des datas
-import { getProductDetails, getProductOrderItems, getProductRecentCustomers } from "@/lib/data/products";
+import { getProductFullDetails } from "@/lib/data/products";
 // Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -12,10 +12,9 @@ import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 // Import des lib
-import { formatEUR } from "@/lib/money";
 import { formatDateTimeFR } from "@/lib/dates";
 
-//
+// Metadata du détails produit
 export const metadata: Metadata = {
     title: "D3D | Dashboard | Détails produit",
     description:
@@ -31,19 +30,18 @@ export default async function ProductDetailPage({
     const { id } = await params;
     if (!id) return notFound();
 
-    const product = await getProductDetails(id);
+    const { product, lastItems, lastCustomers } = await getProductFullDetails(id);
 
     if (!product) return notFound();
 
-    const lastItems = await getProductOrderItems(product.id);
-    const lastCustomers = await getProductRecentCustomers(product.id);
-    const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(product.createdAt));
+    const { date: createdDate, time: createdTime } = formatDateTimeFR(product.createdAt);
 
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
+                    {/* Fil d'Ariane */}
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
                             Dashboard
@@ -55,16 +53,21 @@ export default async function ProductDetailPage({
                         / <span className="text-foreground">{product.name}</span>
                     </div>
 
+                    {/* Titre du produit, statut (actif/inactif), SKU éventuel */}
                     <div className="flex flex-wrap items-center gap-3">
+                        {/* Titre du produit */}
                         <h1 className="text-2xl font-bold">{product.name}</h1>
+                        {/* Statut (actif/inatif) */}
                         <ProductActiveBadge isActive={product.isActive} />
                         {product.sku ? (
                             <Badge variant="secondary" className="font-mono">
+                                {/* Badge SKU */}
                                 {product.sku}
                             </Badge>
                         ) : null}
                     </div>
 
+                    {/* Date de création du produit */}
                     <p className="text-sm text-muted-foreground">
                         Créé le {createdDate} à {createdTime}
                     </p>

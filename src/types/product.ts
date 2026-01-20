@@ -37,6 +37,29 @@ export type ProductFormData = {
     isActive: boolean;
 };
 
+// Structure pour les derniers items commandés (dans la page produit)
+export type ProductRecentOrderItem = {
+    id: string;
+    quantity: number;
+    unitPriceCents: number;
+    order: {
+        id: string;
+        reference: string | null;
+        createdAt: Date;
+        items: { id: string }[];
+        customer: {
+            name: string | null;
+        } | null;
+    };
+};
+
+// Structure pour les derniers clients (dans la page produit)
+export type ProductRecentCustomer = {
+    id: string;
+    name: string | null;
+    email: string | null;
+};
+
 // Props du composant formulaire
 export type ProductFormProps = {
     product?: ProductFormData;

@@ -7,11 +7,10 @@ import Link from "next/link";
 import { ProductsTable } from "./_components/ProductsTable";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
-import { Package, CheckCircle2, XCircle } from "lucide-react";
-
 import { SearchInput } from "@/components/ui/search-input";
-
 import { PaginationControls } from "@/components/ui/pagination-controls";
+// Import Lucide React
+import { Package, CheckCircle2, XCircle } from "lucide-react";
 
 // Metadata du dashboard
 export const metadata: Metadata = {
@@ -37,6 +36,7 @@ export default async function ProductsPage({
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
+                    {/* Fil d'Ariane */}
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
                             Dashboard
@@ -45,6 +45,7 @@ export default async function ProductsPage({
                         <span className="text-foreground">Produits</span>
                     </div>
 
+                    {/* Titre principal et description */}
                     <div>
                         <h1 className="text-2xl font-bold">Produits</h1>
                         <p className="text-sm text-muted-foreground">
@@ -53,8 +54,11 @@ export default async function ProductsPage({
                     </div>
                 </div>
 
+                {/* Zone d’actions : champ de recherche et bouton “Nouveau produit” */}
                 <div className="flex flex-col sm:flex-row gap-2">
+                    {/* Champ de recherche */}
                     <SearchInput placeholder="Rechercher un produit..." className="w-full sm:w-64" />
+                    {/* Bouton nouveau produit */}
                     <Button asChild>
                         <Link href="/dashboard/products/new">Nouveau produit</Link>
                     </Button>

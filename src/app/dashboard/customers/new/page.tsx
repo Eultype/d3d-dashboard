@@ -32,7 +32,7 @@ export default function CustomerCreatePage() {
                 </div>
                 {/* Bouton pour retourner à la liste des clients (annuler) */}
                 <Button asChild variant="ghost">
-                    <Link href="/dashboard/customers">← Annuler</Link>
+                    <Link href="/dashboard/customers">← Retour</Link>
                 </Button>
             </div>
 

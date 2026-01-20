@@ -29,8 +29,6 @@ export async function getOrderDetails(id: string) {
     });
 }
 
-import { formatEUR } from "@/lib/money"; // Used in calculateStats
-
 function computeOrderTotals(items: { quantity: number; unitPriceCents: number }[]) {
     const articlesCount = items.reduce((sum, it) => sum + it.quantity, 0);
     const totalCents = items.reduce((sum, it) => sum + it.quantity * it.unitPriceCents, 0);

@@ -1,58 +1,45 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getProductDetails(id: string) {
-    return prisma.product.findUnique({
-        where: { id },
-        select: {
-            id: true,
-            name: true,
-            sku: true,
-            description: true,
-            imageUrl: true,
-            isActive: true,
-            priceCents: true,
-            createdAt: true,
-            updatedAt: true, // ADDED
-        },
-    });
-}
-
-export async function getProductOrderItems(productId: string) {
-    return prisma.orderItem.findMany({
-        where: { productId: productId },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-        include: {
-            order: {
-                select: {
-                    id: true,
-                    reference: true,
-                    createdAt: true,
-                    items: true,
-                    customer: {
-                        select: {
-                            name: true,
-                        }
+export async function getProductFullDetails(id: string) {
+    const [product, lastItems, lastCustomersRaw] = await Promise.all([
+        // 1. Infos de base
+        prisma.product.findUnique({
+            where: { id },
+        }),
+        // 2. Dernières commandes (via OrderItem)
+        prisma.orderItem.findMany({
+            where: { productId: id },
+            orderBy: { createdAt: "desc" },
+            take: 5,
+            include: {
+                order: {
+                    select: {
+                        id: true,
+                        reference: true,
+                        createdAt: true,
+                        items: true,
+                        customer: { select: { name: true } }
                     }
-                }
+                },
             },
-        },
-    });
-}
+        }),
+        // 3. Derniers clients uniques
+        prisma.orderItem.findMany({
+            where: {
+                productId: id,
+                order: { customerId: { not: null } },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 20,
+            include: {
+                order: { include: { customer: true } },
+            },
+        })
+    ]);
 
-export async function getProductRecentCustomers(productId: string) {
-    const lastCustomersRaw = await prisma.orderItem.findMany({
-        where: {
-            productId: productId,
-            order: { customerId: { not: null } },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-        include: {
-            order: { include: { customer: true } },
-        },
-    });
+    if (!product) return { product: null, lastItems: [], lastCustomers: [] };
 
+    // Logique pour clients uniques
     const seen = new Set<string>();
     const lastCustomers = lastCustomersRaw
         .map((x) => x.order.customer)
@@ -64,7 +51,11 @@ export async function getProductRecentCustomers(productId: string) {
         })
         .slice(0, 5);
 
-    return lastCustomers;
+    return {
+        product,
+        lastItems,
+        lastCustomers
+    };
 }
 
 export async function getProductsAndStats(query?: string, page: number = 1) {

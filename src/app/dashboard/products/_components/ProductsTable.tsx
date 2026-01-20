@@ -1,24 +1,14 @@
+// Import Next
 import Link from "next/link";
-import { formatDateFR } from "@/lib/dates";
-
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import { Eye, Pencil } from "lucide-react";
+// Import composants
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
+// Import Lucide React
+import { Eye, Pencil } from "lucide-react";
+// Import lib
+import { formatDateFR } from "@/lib/dates";
+// Import type
 import { ProductRow } from "@/types/product";
 
 function formatPriceEUR(priceCents: number) {
@@ -31,10 +21,10 @@ function formatPriceEUR(priceCents: number) {
 export function ProductsTable({ products }: { products: ProductRow[] }) {
     return (
         <TooltipProvider>
-            {/* EXACTEMENT comme OrdersTable : table dans une card */}
             <div className="overflow-hidden rounded-lg border bg-background">
                 <Table>
                     <TableHeader>
+                        {/* Ligne d'en-tête du tableau des produits */}
                         <TableRow className="bg-muted/40">
                             <TableHead className="py-2">Produit</TableHead>
                             <TableHead className="w-[160px]">SKU</TableHead>
@@ -45,6 +35,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                         </TableRow>
                     </TableHeader>
 
+                    {/* Si aucun produit */}
                     <TableBody>
                         {products.length === 0 && (
                             <TableRow>
@@ -68,9 +59,9 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                     {/* Produit (image + nom + desc) */}
                                     <TableCell>
                                         <div className="flex items-center gap-3 min-w-0">
+                                            {/* Image */}
                                             <div className="h-10 w-10 rounded-md border bg-muted overflow-hidden flex items-center justify-center">
                                                 {p.imageUrl ? (
-                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={p.imageUrl}
                                                         alt={p.name}
@@ -85,7 +76,9 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                             </div>
 
                                             <div className="min-w-0">
+                                                {/* Nom */}
                                                 <div className="font-medium truncate">{p.name}</div>
+                                                {/* Description */}
                                                 <div className="text-xs text-muted-foreground truncate">
                                                     {p.description ?? "Aucune description"}
                                                 </div>

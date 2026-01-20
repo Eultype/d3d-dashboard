@@ -192,14 +192,27 @@ export default function StepOne({
           <FieldLabel>Mode De Livraison *</FieldLabel>
           <Select
             value={draft.info.delivery}
-            onValueChange={(val) => updateInfo("delivery", val)}
+            onValueChange={(val) => {
+              let cost = 0;
+              if (val === "Livraison Belgique") cost = 12;
+              if (val === "Livraison Hors Belgique") cost = 17;
+              
+              onChange({
+                info: {
+                  ...draft.info,
+                  delivery: val,
+                  shippingCost: cost
+                }
+              });
+            }}
           >
             <SelectTrigger className="w-full pl-4 pr-10 h-12">
               <SelectValue placeholder="Sélectionner un mode" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Retrait Atelier">Retrait Atelier</SelectItem>
-              <SelectItem value="Livraison">Livraison</SelectItem>
+              <SelectItem value="Retrait Atelier">Retrait Atelier (Gratuit)</SelectItem>
+              <SelectItem value="Livraison Belgique">Livraison Belgique (12€)</SelectItem>
+              <SelectItem value="Livraison Hors Belgique">Livraison Hors Belgique (17€)</SelectItem>
             </SelectContent>
           </Select>
         </Field>

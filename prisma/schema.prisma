@@ -33,16 +33,18 @@ model Customer {
 }
 
 model Order {
-  id         String      @id @default(cuid())
-    reference  String?   @unique
-  status     String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  customerId String?
-  files      File[]
-  customer   Customer?   @relation(fields: [customerId], references: [id])
-  items      OrderItem[]
-  notes      OrderNote[]
+  id                 String      @id @default(cuid())
+  reference          String?     @unique
+  status             String
+  shippingType       String?
+  shippingCostCents  Int         @default(0)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  customerId         String?
+  files              File[]
+  customer           Customer?   @relation(fields: [customerId], references: [id])
+  items              OrderItem[]
+  notes              OrderNote[]
 }
 
 model OrderNote {

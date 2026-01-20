@@ -60,7 +60,7 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
     }
 
     // On lance les requêtes en parallèle pour la perf
-    const [orders, totalCount, groups, allItemsForCA] = await Promise.all([
+    const [orders, totalCount, groups, allOrdersForCA] = await Promise.all([
         prisma.order.findMany({
             where: whereClause,
             take: PAGE_SIZE,
@@ -85,24 +85,27 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
             },
         }),
         // CA Global (Total Absolu de la base, sans filtre de recherche)
-        // Si tu voulais appliquer le filtre de recherche au CA, il faudrait mettre 'where: whereClause' ici aussi.
-        // Mais ta demande est "CA TOTAL tout le temps".
-        prisma.orderItem.findMany({
-            select: { quantity: true, unitPriceCents: true }
+        prisma.order.findMany({
+            select: {
+                shippingCostCents: true,
+                items: {
+                    select: { quantity: true, unitPriceCents: true }
+                }
+            }
         }),
     ]);
 
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
     const rows = orders.map((o) => {
-        const { articlesCount, totalCents } = computeOrderTotals(o.items);
+        const { articlesCount, totalCents: itemsTotalCents } = computeOrderTotals(o.items);
         return {
             id: o.id,
             reference: o.reference,
             status: o.status,
             createdAt: o.createdAt.toISOString(),
             articlesCount,
-            totalCents,
+            totalCents: itemsTotalCents + o.shippingCostCents,
             customer: o.customer
                 ? {
                     name: o.customer.name,
@@ -124,7 +127,10 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
     const terminees = statsMap["TERMINE"] || 0;
 
     // CA Global
-    const caTotalCents = allItemsForCA.reduce((sum, item) => sum + (item.quantity * item.unitPriceCents), 0);
+    const caTotalCents = allOrdersForCA.reduce((sum, order) => {
+        const itemsTotal = order.items.reduce((itSum, item) => itSum + (item.quantity * item.unitPriceCents), 0);
+        return sum + itemsTotal + order.shippingCostCents;
+    }, 0);
 
     return {
         orders: rows,

@@ -41,7 +41,7 @@ export default async function OrderDetailPage({
     const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(order.createdAt));
 
     const sousTotalCents = orderTotalCents(order.items);
-    const livraisonCents = 0;
+    const livraisonCents = order.shippingCostCents || 0;
     const tvaCents = 0;
     const totalCents = sousTotalCents + livraisonCents + tvaCents;
 
@@ -118,6 +118,7 @@ export default async function OrderDetailPage({
                         orderId={order.id}
                         sousTotalCents={sousTotalCents}
                         livraisonCents={livraisonCents}
+                        shippingType={order.shippingType}
                         tvaCents={tvaCents}
                         totalCents={totalCents}
                     />

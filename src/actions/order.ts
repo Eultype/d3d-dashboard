@@ -14,6 +14,7 @@ const OrderSchema = z.object({
   info: z.object({
     prefix: z.string().min(1, "Le préfixe est requis"),
     delivery: z.string().min(1, "Le mode de livraison est requis"),
+    shippingCost: z.number().min(0, "Le coût de livraison est invalide"),
     manualNumber: z.number().optional().nullable(),
   }),
   clientId: z.string().nullable(),
@@ -146,6 +147,8 @@ export async function createOrder(data: OrderInputData) {
       data: {
         reference: reference,
         status: "A_VERIFIER",
+        shippingType: validData.info.delivery,
+        shippingCostCents: Math.round(validData.info.shippingCost * 100),
         customerId: finalCustomerId,
         items: { create: orderItems },
         ...(validData.internalNote && { notes: { create: { content: validData.internalNote, userId: user.id } } }),

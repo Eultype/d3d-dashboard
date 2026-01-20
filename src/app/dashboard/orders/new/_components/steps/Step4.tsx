@@ -53,8 +53,10 @@ export default function StepFour({
     return acc + (p.unitPrice + textOptionPrice) * p.quantity;
   }, 0);
 
-  // Calcul du total (Identique au sous-total pour l'instant, logique de remise à implémenter si besoin)
-  const total = subTotal;
+  const shippingCost = draft.info?.shippingCost || 0;
+
+  // Calcul du total
+  const total = subTotal + shippingCost;
 
   // Handlers pour mettre à jour le draft global directement
   const handleDiscountChange = (value: string) => {
@@ -296,9 +298,16 @@ export default function StepFour({
             {/* Calculs */}
             <div className="pt-2 space-y-3 border-t border-gray-100">
               <div className="flex justify-between text-sm">
-                <span className="">Sous-total</span>
+                <span className="">Sous-total produits</span>
                 <span className="font-medium ">
                   {subTotal.toFixed(2).replace(".", ",")} €
+                </span>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <span className="">Livraison ({draft.info?.delivery})</span>
+                <span className="font-medium ">
+                  {shippingCost.toFixed(2).replace(".", ",")} €
                 </span>
               </div>
 

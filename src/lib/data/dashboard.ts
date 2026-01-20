@@ -39,7 +39,7 @@ export async function getDashboardStats() {
   const countToProcess = countToVerify + countToShip + countToPickUp;
 
   const recent = lastOrders.map((o) => {
-    const totalCents = orderTotalCents(o.items);
+    const itemsTotalCents = orderTotalCents(o.items);
     const articlesCount = o.items.reduce((sum, it) => sum + it.quantity, 0);
     
     return {
@@ -51,7 +51,7 @@ export async function getDashboardStats() {
         ? { name: o.customer.name, email: o.customer.email }
         : null,
       articlesCount,
-      totalCents,
+      totalCents: itemsTotalCents + o.shippingCostCents,
     };
   });
 

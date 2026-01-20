@@ -36,13 +36,8 @@ export default async function ProductDetailPage({
     if (!product) return notFound();
 
     const lastItems = await getProductOrderItems(product.id);
-
     const lastCustomers = await getProductRecentCustomers(product.id);
-
     const { date: createdDate, time: createdTime } = formatDateTimeFR(new Date(product.createdAt));
-
-    const shortId = product.id.slice(0, 10);
-    const price = formatEUR(product.priceCents ?? 0);
 
     return (
         <div className="space-y-6">

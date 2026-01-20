@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { statusLabelFR } from "@/lib/orders";
 import { updateOrderStatus } from "@/actions/order";
 import { Loader2, Check } from "lucide-react";
-import { toast } from "sonner"; // Import toast
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,

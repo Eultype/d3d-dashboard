@@ -46,6 +46,7 @@ export type OrderDraft = {
   info: {
     prefix: string;
     delivery: string;
+    shippingCost: number;
     manualNumber?: number | null;
   };
   customerId: string | null;

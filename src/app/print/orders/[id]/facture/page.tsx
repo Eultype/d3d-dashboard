@@ -71,7 +71,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
 
                         <div className="text-right">
                             <p className="text-xs uppercase tracking-wide text-neutral-500">Facture</p>
-                            <h1 className="mt-1 text-2xl font-bold">FAC-{shortId.toUpperCase()}</h1>
+                            <h1 className="mt-1 text-2xl font-bold">FAC-{order.reference.slice(-4)}</h1>
 
                             <div className="mt-3 inline-grid gap-1 text-sm">
                                 <div className="flex justify-end gap-3">
@@ -80,7 +80,7 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                 </div>
                                 <div className="flex justify-end gap-3">
                                     <span className="text-neutral-500">Commande</span>
-                                    <span className="font-medium">#{shortId}</span>
+                                    <span className="font-medium">{order.reference}</span>
                                 </div>
                             </div>
                         </div>

@@ -12,9 +12,9 @@ import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 
 type OrderRow = {
     id: string;
-    reference?: string | null; // Ajout du champ optionnel
+    reference?: string | null;
     status: string;
-    createdAt: string; // ISO
+    createdAt: string;
     articlesCount: number;
     totalCents: number;
     customer: {

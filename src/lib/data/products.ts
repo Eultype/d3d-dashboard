@@ -12,6 +12,7 @@ export async function getProductDetails(id: string) {
             isActive: true,
             priceCents: true,
             createdAt: true,
+            updatedAt: true, // ADDED
         },
     });
 }
@@ -94,6 +95,7 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
                 isActive: true,
                 priceCents: true,
                 createdAt: true,
+                updatedAt: true, // ADDED
             },
         }),
         prisma.product.count({ where: whereClause }),
@@ -111,6 +113,7 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
         isActive: p.isActive,
         priceCents: p.priceCents,
         createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(), // ADDED
     }));
 
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);

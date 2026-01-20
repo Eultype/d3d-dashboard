@@ -26,6 +26,7 @@ export async function getCustomersAndStats(query?: string, page: number = 1) {
                 { name: { contains: query, mode: "insensitive" as const } },
                 { email: { contains: query, mode: "insensitive" as const } },
                 { companyName: { contains: query, mode: "insensitive" as const } },
+                { phone: { contains: query, mode : "insensitive" as const } },
             ],
         }
         : {};

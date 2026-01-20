@@ -55,6 +55,7 @@ export type OrderDraft = {
   newClientData?: NewClientData | null; // AJOUTÉ
   products: ProductItem[];
   discountType: string;
+  discountValue?: number;
   internalNote: string;
 };
 

@@ -12,6 +12,7 @@ type OrderSummaryCardProps = {
     tvaCents: number;
     taxRate?: number;
     totalCents: number;
+    discountAmountCents?: number;
 };
 
 export function OrderSummaryCard({
@@ -22,6 +23,7 @@ export function OrderSummaryCard({
     tvaCents,
     taxRate = 21,
     totalCents,
+    discountAmountCents = 0,
 }: OrderSummaryCardProps) {
     return (
         <Card>
@@ -42,6 +44,14 @@ export function OrderSummaryCard({
 
             <CardContent className="space-y-3">
                 <InfoRow label="Sous-total" value={<span className="tabular-nums">{formatEUR(sousTotalCents)}</span>} />
+                
+                {discountAmountCents > 0 && (
+                    <InfoRow 
+                        label={<span className="text-green-600">Remise</span>}
+                        value={<span className="tabular-nums text-green-600">-{formatEUR(discountAmountCents)}</span>} 
+                    />
+                )}
+
                 <InfoRow 
                     label={shippingType ? `Livraison (${shippingType})` : "Livraison"} 
                     value={<span className="tabular-nums">{formatEUR(livraisonCents)}</span>} 

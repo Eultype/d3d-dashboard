@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // Import useState and useEffect
+import { useState, useEffect } from "react";
 import { NotificationsBell } from "./NotificationsBell";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "@/components/auth/logout-button";

@@ -38,6 +38,7 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
             <div className="overflow-hidden rounded-lg border bg-background">
                 <Table>
                     <TableHeader>
+                        {/* Ligne d'en-tête du tableau des clients */}
                         <TableRow className="bg-muted/40">
                             <TableHead className="w-[320px] py-2">Nom</TableHead>
                             <TableHead>Email</TableHead>
@@ -49,7 +50,7 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                             <TableHead className="text-center w-[120px]">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-
+                    {/* Si aucun client */}
                     <TableBody>
                         {customers.length === 0 && (
                             <TableRow>
@@ -130,6 +131,7 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                                     {/* Actions */}
                                     <TableCell>
                                         <div className="flex items-center justify-center">
+                                            {/* Détails */}
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link
@@ -141,7 +143,7 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
                                                 </TooltipTrigger>
                                                 <TooltipContent>Détails</TooltipContent>
                                             </Tooltip>
-
+                                            {/* Modifier */}
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link

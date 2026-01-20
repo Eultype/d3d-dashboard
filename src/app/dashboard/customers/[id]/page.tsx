@@ -39,16 +39,17 @@ export default async function CustomerDetailPage({
     // Les commandes sont maintenant une propriété de l'objet customer
     const orders = customer.orders; 
 
-    const shortId = customer.id.slice(0, 10);
-    // ✅ Date + heure via 1 seule fonction (plus propre)
+    // Date + heure
     const { date: createdDate, time: createdTime } = formatDateTimeFR(
         new Date(customer.createdAt)
     );
 
     return (
         <div className="space-y-6">
+            {/* En-tête : fil d’Ariane, titre et badges client, actions */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2">
+                    {/* Fil d’Ariane */}
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
                             Dashboard
@@ -60,18 +61,22 @@ export default async function CustomerDetailPage({
                         / <span className="text-foreground">{customer.name ?? "Client sans nom"}</span>
                     </div>
 
+                    {/* Titre + badges type et statut */}
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-bold">{customer.name ?? "Client sans nom"}</h1>
                         <CustomerTypeBadge companyName={customer.companyName} />
                         <CustomerActiveBadge isActive={customer.isActive} />
                     </div>
 
+                    {/* Date de création du client */}
                     <p className="text-sm text-muted-foreground">
                         Créé le {createdDate} à {createdTime}
                     </p>
                 </div>
 
+                {/* Actions principales : retour / modification */}
                 <div className="flex items-center gap-2">
+                    {/* Bouton retour */}
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/customers">← Retour</Link>
                     </Button>
@@ -81,7 +86,8 @@ export default async function CustomerDetailPage({
                     </Button>
                 </div>
             </div>
-            {/* Informations du client */}
+
+            {/* Carte de contact du client */}
             <CustomerContactCard customer={customer} />
 
             {/* Commandes récentes - Derniers produits commandés */}

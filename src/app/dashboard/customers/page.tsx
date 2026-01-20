@@ -7,10 +7,10 @@ import type { Metadata } from "next";
 import { CustomersTable } from "./_components/CustomersTable";
 import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
-import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
-
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { SearchInput } from "@/components/ui/search-input";
+// Import de Lucide React
+import { Users, UserCheck, Building2, BadgeCheck, UserPlus,} from "lucide-react";
 
 // Metadata du dashboard
 export const metadata: Metadata = {

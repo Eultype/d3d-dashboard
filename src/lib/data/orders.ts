@@ -101,6 +101,7 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
                 shippingCostCents: true,
                 discountType: true,
                 discountValue: true,
+                taxRate: true,
                 items: {
                     select: { quantity: true, unitPriceCents: true }
                 }
@@ -147,15 +148,20 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
     const enProd = statsMap["PROD"] || 0;
     const terminees = statsMap["TERMINE"] || 0;
 
-    // CA Global
+    // CA Global (Calculé HT et Hors Livraison)
     const caTotalCents = allOrdersForCA.reduce((sum, order) => {
-        const { totalCents } = calculateOrderTotal(
+        const { subTotalCents, discountAmountCents } = calculateOrderTotal(
             order.items,
-            order.shippingCostCents,
+            0, // On force la livraison à 0 pour l'exclure du calcul
             order.discountType,
             order.discountValue
         );
-        return sum + totalCents;
+        
+        const netTTC = Math.max(0, subTotalCents - discountAmountCents);
+        const taxRate = order.taxRate || 21;
+        const netHT = netTTC / (1 + taxRate / 100);
+        
+        return sum + Math.round(netHT);
     }, 0);
 
     return {

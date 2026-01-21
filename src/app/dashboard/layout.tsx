@@ -17,6 +17,7 @@ import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 // import dynamic from "next/dynamic"; // Import dynamic
 import ClientSideHeaderElements from "./_components/ClientSideHeaderElements"; // New import
+import { MobileNav } from "./_components/MobileNav";
 
 // Dynamically import the client-side header elements component with SSR disabled
 // const ClientSideHeaderElements = dynamic(
@@ -83,6 +84,7 @@ export default async function DashboardLayout({
           <header className="h-16 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="h-full flex items-center justify-between px-4 lg:px-8">
               <div className="flex items-center gap-3">
+                <MobileNav />
                 <div className="font-medium">Dashboard</div>
                 <span className="text-xs text-muted-foreground hidden sm:inline">
                   Interne • v0.1

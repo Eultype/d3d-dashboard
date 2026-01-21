@@ -66,10 +66,10 @@ export default async function OrdersPage({
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <OrdersFilter />
-                    <SearchInput placeholder="Rechercher..." className="w-full sm:w-64" />
-                    <Button asChild className="w-full sm:w-auto">
+                    <SearchInput placeholder="Rechercher..." className="w-full sm:w-48 xl:w-64" />
+                    <Button asChild className="w-full sm:w-auto shrink-0">
                         <Link href="/dashboard/orders/new">Nouvelle commande</Link>
                     </Button>
                 </div>

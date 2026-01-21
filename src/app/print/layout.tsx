@@ -1,11 +1,13 @@
+import "@/app/globals.css";
+
 export default function PrintLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
-    </html>
+    <div className="light bg-white min-h-screen">
+      {children}
+    </div>
   );
 }

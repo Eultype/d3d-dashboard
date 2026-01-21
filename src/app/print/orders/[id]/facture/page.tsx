@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
+import Link from 'next/link';
 import Image from 'next/image';
 import { formatEUR } from "@/lib/money";
 import { calculateOrderTotal } from "@/lib/orders";
 import { formatDateFR } from "@/lib/dates";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
+import { PrintButton } from "@/app/print/_components/PrintButton";
 
 
 export default async function FacturePage({ params }: { params: Promise<{ id?: string }> }) {
@@ -42,27 +44,34 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
     const tvaCents = totalCents - (totalCents / (1 + taxRate / 100));
 
     return (
-        <main className="min-h-screen p-6 print:p-0">
+        <main className="min-h-screen p-0 sm:p-6 bg-neutral-50 print:bg-white print:p-0">
+            {/* Action Bar (Screen only) */}
+            <div className="max-w-[900px] mx-auto mb-4 p-4 flex justify-between items-center print:hidden bg-white sm:rounded-xl border shadow-sm mt-4">
+                <Link href={`/dashboard/orders/${order.id}`} className="text-sm font-medium text-blue-600 hover:underline">
+                    ← Retour à la commande
+                </Link>
+                <PrintButton />
+            </div>
+
             {/* Feuille A4 */}
             <section
                 className={[
-                    "mx-auto w-full bg-white text-black shadow-sm ring-1 ring-black/5",
+                    "mx-auto w-full bg-white text-black shadow-sm sm:ring-1 sm:ring-black/5",
                     "max-w-[900px]",
-                    "print:shadow-none print:ring-0",
-                    // “A4 feel” (suffisant pour Chrome print)
-                    "rounded-2xl print:rounded-none",
+                    "print:shadow-none print:ring-0 print:max-w-none",
+                    "sm:rounded-2xl print:rounded-none",
                 ].join(" ")}
             >
                 {/* Marges internes */}
-                <div className="p-8 print:p-8">
+                <div className="p-6 sm:p-12">
                     {/* Header */}
-                    <header className="flex items-start justify-between gap-6">
-                        <div className="space-y-2">
-                            <div className="inline-flex items-center gap-2">
-                                <div className="h-10 w-10 rounded-xl relative">
+                    <header className="flex flex-col sm:flex-row items-start justify-between gap-8">
+                        <div className="space-y-4 w-full sm:w-auto">
+                            <div className="flex items-center gap-3">
+                                <div className="h-12 w-12 rounded-xl relative shrink-0">
                                     <Image
                                         src="/logo_2d3d.png"
-                                        alt="Logo de votre entreprise"
+                                        alt="Logo D3D"
                                         fill={true}
                                         style={{ objectFit: 'cover' }}
                                         className="rounded-xl"
@@ -70,84 +79,87 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                 </div>
 
                                 <div>
-                                    <p className="text-sm font-semibold leading-none">D3D Crystal</p>
-                                    <p className="text-xs text-neutral-500">Gravure 2D – 3D cristal</p>
+                                    <p className="text-lg font-bold leading-none uppercase tracking-tight">D3D Crystal</p>
+                                    <p className="text-xs text-neutral-500 mt-1 font-medium">Gravure 2D – 3D cristal</p>
                                 </div>
                             </div>
 
-                            <div className="text-xs text-neutral-500 space-y-1">
+                            <div className="text-xs text-neutral-500 space-y-1.5 border-l-2 border-neutral-100 pl-4">
+                                <p className="font-medium text-neutral-800">D3D Crystal SPRL</p>
                                 <p>Chaussée de Louvain 730 • 1030 Schaerbeek • Belgique</p>
                                 <p>support@d3d.com • +32 4 00 00 00 00</p>
-                                <p>SIRET : 000 000 000 00000 • TVA : BE00 000000000</p>
+                                <p>TVA : BE00 0000 0000</p>
                             </div>
                         </div>
 
-                        <div className="text-right">
-                            <p className="text-xs uppercase tracking-wide text-neutral-500">Facture</p>
-                            <h1 className="mt-1 text-2xl font-bold">FAC-{order.reference ? order.reference.slice(-4) : "????"}</h1>
+                        <div className="text-left sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
+                            <p className="text-xs uppercase tracking-widest font-bold text-neutral-400">Facture</p>
+                            <h1 className="mt-1 text-3xl font-black text-slate-900">FAC-{order.reference ? order.reference.slice(-4) : "????"}</h1>
 
-                            <div className="mt-3 inline-grid gap-1 text-sm">
-                                <div className="flex justify-end gap-3">
-                                    <span className="text-neutral-500">Date</span>
-                                    <span className="font-medium">{date}</span>
+                            <div className="mt-4 grid gap-2 text-sm">
+                                <div className="flex justify-between sm:justify-end gap-6">
+                                    <span className="text-neutral-500">Date d'émission</span>
+                                    <span className="font-semibold text-slate-900">{date}</span>
                                 </div>
-                                <div className="flex justify-end gap-3">
-                                    <span className="text-neutral-500">Commande</span>
-                                    <span className="font-medium">{order.reference}</span>
+                                <div className="flex justify-between sm:justify-end gap-6">
+                                    <span className="text-neutral-500">Référence commande</span>
+                                    <span className="font-semibold text-slate-900">{order.reference}</span>
                                 </div>
                             </div>
                         </div>
                     </header>
 
                     {/* Separator */}
-                    <div className="my-8 h-px bg-neutral-200" />
+                    <div className="my-10 h-px bg-neutral-100" />
 
                     {/* Addresses */}
-                    <div className="grid gap-6 md:grid-cols-2">
-                        <div className="rounded-2xl border border-neutral-200 p-4">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Facturé à</p>
-                            <div className="mt-2 text-sm">
-                                <p className="font-semibold">{order.customer?.name ?? "—"}</p>
-                                <p className="text-neutral-600">{order.customer?.companyName ?? "Particulier"}</p>
-                                <p className="text-neutral-600 break-all">{order.customer?.email ?? "—"}</p>
-                                <p className="text-neutral-600">{order.customer?.phone ?? "—"}</p>
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                        <div className="rounded-2xl bg-neutral-50/50 border border-neutral-100 p-5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-4">Destinataire</p>
+                            <div className="text-sm space-y-1">
+                                <p className="font-bold text-base text-slate-900">{order.customer?.name ?? "—"}</p>
+                                <p className="text-slate-600 font-medium">{order.customer?.companyName ?? "Particulier"}</p>
+                                <p className="text-neutral-500 break-all">{order.customer?.email ?? "—"}</p>
                             </div>
 
-                            <div className="mt-3 text-sm text-neutral-600 space-y-1">
-                                <p>{order.customer?.addressLine1 ?? "—"}</p>
+                            <div className="mt-4 text-sm text-slate-600 space-y-1 pt-4 border-t border-neutral-200/50">
+                                <p className="font-medium text-slate-800">{order.customer?.addressLine1 ?? "—"}</p>
                                 {order.customer?.addressLine2?.trim() ? <p>{order.customer.addressLine2}</p> : null}
                                 <p>
                                     {(order.customer?.postalCode ?? "—") + " " + (order.customer?.city ?? "—")}
                                 </p>
-                                <p>{order.customer?.country ?? "—"}</p>
+                                <p className="font-medium">{order.customer?.country ?? "—"}</p>
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-neutral-200 p-4">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Livré à</p>
-                            <p className="mt-2 text-sm text-neutral-600">
-                                Identique à l’adresse de facturation
-                            </p>
+                        <div className="rounded-2xl border border-neutral-100 p-5 flex flex-col justify-between">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-4">Livraison</p>
+                                <p className="text-sm text-slate-500 italic">
+                                    Identique à l’adresse de facturation
+                                </p>
+                            </div>
 
-                            <div className="mt-6 rounded-xl bg-neutral-50 p-3 text-xs text-neutral-600">
-                                <p className="font-medium text-neutral-800">Informations</p>
-                                <p className="mt-1">
-                                    Merci pour votre commande. Cette facture est générée automatiquement.
+                            <div className="mt-6 rounded-xl bg-slate-900 p-4 text-xs text-slate-100">
+                                <p className="font-bold uppercase tracking-wider text-slate-400 mb-1">Note</p>
+                                <p className="leading-relaxed opacity-90">
+                                    Merci pour votre confiance. Pour toute question concernant cette facture, contactez notre support technique.
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Table */}
-                    <div className="mt-8 overflow-hidden rounded-2xl border border-neutral-200">
-                        <div className="grid grid-cols-12 bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
-                            <div className="col-span-6">Produit</div>
-                            <div className="col-span-2 text-right">Prix unitaire</div>
-                            <div className="col-span-2 text-right">Quantité</div>
-                            <div className="col-span-2 text-right">Total</div>
+                    <div className="mt-10 overflow-hidden rounded-2xl border border-neutral-200">
+                        {/* Table Header (Hidden on mobile) */}
+                        <div className="hidden sm:grid grid-cols-12 bg-neutral-50 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b">
+                            <div className="col-span-6">Désignation du produit</div>
+                            <div className="col-span-2 text-right">P.U. TTC</div>
+                            <div className="col-span-2 text-right">Qté</div>
+                            <div className="col-span-2 text-right">Total TTC</div>
                         </div>
 
-                        <div className="divide-y divide-neutral-200">
+                        <div className="divide-y divide-neutral-100">
                             {order.items.map((it) => {
                                 const name = it.product?.name ?? "Produit supprimé";
                                 const sku = it.product?.sku ?? null;
@@ -155,15 +167,26 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                 const line = formatEUR(it.unitPriceCents * it.quantity);
 
                                 return (
-                                    <div key={it.id} className="grid grid-cols-12 px-4 py-4 text-sm">
-                                        <div className="col-span-6 min-w-0">
-                                            <p className="font-semibold truncate">{name}</p>
-                                            {sku ? <p className="mt-0.5 text-xs text-neutral-500 font-mono">{sku}</p> : null}
+                                    <div key={it.id} className="flex flex-col sm:grid sm:grid-cols-12 px-6 py-5 text-sm hover:bg-neutral-50/50 transition-colors">
+                                        {/* Mobile view: Product name and total on same line */}
+                                        <div className="flex justify-between items-start sm:col-span-6 min-w-0 mb-2 sm:mb-0">
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-slate-900 truncate">{name}</p>
+                                                {sku ? <p className="mt-1 text-[10px] text-neutral-400 font-mono font-medium tracking-tighter uppercase">{sku}</p> : null}
+                                            </div>
+                                            <div className="sm:hidden font-bold text-slate-900 tabular-nums">{line}</div>
                                         </div>
 
-                                        <div className="col-span-2 text-right tabular-nums">{unit}</div>
-                                        <div className="col-span-2 text-right tabular-nums">{it.quantity}</div>
-                                        <div className="col-span-2 text-right font-semibold tabular-nums">{line}</div>
+                                        {/* Desktop and Mobile: Price and Quantity */}
+                                        <div className="flex sm:block justify-between items-center sm:col-span-2 text-neutral-500 sm:text-right tabular-nums text-xs sm:text-sm">
+                                            <span className="sm:hidden">Prix unitaire</span>
+                                            {unit}
+                                        </div>
+                                        <div className="flex sm:block justify-between items-center sm:col-span-2 text-neutral-500 sm:text-right tabular-nums text-xs sm:text-sm">
+                                            <span className="sm:hidden">Quantité</span>
+                                            x{it.quantity}
+                                        </div>
+                                        <div className="hidden sm:block sm:col-span-2 text-right font-bold text-slate-900 tabular-nums">{line}</div>
                                     </div>
                                 );
                             })}
@@ -172,60 +195,75 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
 
                     {/* Totals */}
                     <div className="mt-8 flex justify-end">
-                        <div className="w-full max-w-md rounded-2xl border border-neutral-200 p-4">
-                            <div className="space-y-2 text-sm">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-neutral-600">Sous-total produits</span>
-                                    <span className="tabular-nums">{formatEUR(sousTotalCents)}</span>
-                                </div>
-                                
-                                {discountAmountCents > 0 && (
-                                    <div className="flex items-center justify-between text-neutral-600">
-                                        <span>Remise</span>
-                                        <span className="tabular-nums">-{formatEUR(discountAmountCents)}</span>
-                                    </div>
-                                )}
+                        <div className="w-full sm:max-w-sm rounded-2xl bg-slate-50 border border-neutral-100 p-6">
+                            <div className="space-y-3 text-sm">
+                                {/* Calculs des bases HT pour la clarté */}
+                                {(() => {
+                                    const ratio = 1 + taxRate / 100;
+                                    const sousTotalHT = sousTotalCents / ratio;
+                                    const remiseHT = discountAmountCents / ratio;
+                                    const livraisonHT = livraisonCents / ratio;
+                                    const totalHT = totalCents / ratio;
 
-                                <div className="flex items-center justify-between">
-                                    <span className="text-neutral-600">
-                                        Livraison {order.shippingType ? `(${order.shippingType})` : ""}
-                                    </span>
-                                    <span className="tabular-nums">{formatEUR(livraisonCents)}</span>
-                                </div>
+                                    return (
+                                        <>
+                                            <div className="flex items-center justify-between text-neutral-500">
+                                                <span>Sous-total HT</span>
+                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(sousTotalHT))}</span>
+                                            </div>
+                                            
+                                            {discountAmountCents > 0 && (
+                                                <div className="flex items-center justify-between text-green-600 font-medium">
+                                                    <span>Remise HT</span>
+                                                    <span className="tabular-nums">-{formatEUR(Math.round(remiseHT))}</span>
+                                                </div>
+                                            )}
 
-                                <div className="my-3 h-px bg-neutral-100" />
+                                            <div className="flex items-center justify-between text-neutral-500">
+                                                <span>Livraison HT</span>
+                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(livraisonHT))}</span>
+                                            </div>
 
-                                <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold">Total TTC</span>
-                                    <span className="text-base font-bold tabular-nums">{formatEUR(totalCents)}</span>
-                                </div>
+                                            <div className="flex items-center justify-between text-neutral-500">
+                                                <span>TVA ({taxRate}%)</span>
+                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(tvaCents))}</span>
+                                            </div>
 
-                                <div className="flex justify-end">
-                                    <span className="text-[10px] text-neutral-500 italic">
-                                        Dont TVA ({taxRate}%) : {formatEUR(tvaCents)}
-                                    </span>
-                                </div>
+                                            <div className="my-4 h-px bg-neutral-200" />
+
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-lg font-bold text-slate-900">Total TTC</span>
+                                                <span className="text-2xl font-black text-slate-900 tabular-nums">{formatEUR(totalCents)}</span>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
 
                     {/* Footer / mentions */}
-                    <footer className="mt-10 space-y-2">
-                        <div className="h-px bg-neutral-200" />
-                        <div className="gap-6 text-xs text-neutral-500">
-                            <p className="text-right">
-                                Page 1/1
-                                <br />
-                                Généré le {formatDateFR(new Date())}
+                    <footer className="mt-16 space-y-6">
+                        <div className="h-px bg-neutral-100" />
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-neutral-400 font-medium uppercase tracking-widest">
+                            <p>D3D Crystal SPRL • BE0000.000.000</p>
+                            <p className="sm:text-right">
+                                Page 1 / 1 • Généré le {formatDateFR(new Date())}
                             </p>
                         </div>
                     </footer>
                 </div>
             </section>
 
-            {/* Petit hint écran (pas imprimé) */}
-            <div className="mx-auto mt-4 max-w-[900px] text-xs text-center text-neutral-500 print:hidden">
-                Astuce : dans la boîte d’impression, mets “Marges : Aucune” ou “Par défaut” et “Arrière-plans : Activés” pour un rendu encore plus propre.
+            {/* Print Tips (Screen only) */}
+            <div className="max-w-[900px] mx-auto mt-8 mb-12 px-6 py-4 bg-blue-50 border border-blue-100 rounded-xl text-[11px] text-blue-600 flex items-start gap-3 print:hidden">
+                <div className="mt-0.5 bg-blue-600 text-white rounded-full p-1 shrink-0">
+                    <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <p>
+                    <span className="font-bold uppercase mr-1">Astuce d'impression :</span>
+                    Pour un rendu professionnel, activez l'option <span className="font-bold italic">"Graphismes d'arrière-plan"</span> dans les paramètres de votre navigateur et réglez les marges sur <span className="font-bold italic">"Aucune"</span>.
+                </p>
             </div>
         </main>
     );

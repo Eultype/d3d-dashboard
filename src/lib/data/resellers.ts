@@ -53,11 +53,11 @@ export async function getResellersAndStats(query?: string, page: number = 1) {
         prisma.user.count({ where: { ...baseWhere, createdAt: { gte: d30 } } }),
     ]);
 
-    // Fetch matching customers to get companyName
+    // Fetch matching customers to get companyName and isActive
     const emails = resellers.map(r => r.email);
     const customers = await prisma.customer.findMany({
         where: { email: { in: emails } },
-        select: { email: true, companyName: true, name: true }
+        select: { id: true, email: true, companyName: true, name: true, isActive: true }
     });
 
     const customerMap = new Map(customers.map(c => [c.email, c]));
@@ -66,9 +66,11 @@ export async function getResellersAndStats(query?: string, page: number = 1) {
         const customer = customerMap.get(u.email);
         return {
             id: u.id,
+            customerId: customer?.id || null, // Add customerId
             email: u.email,
             name: customer?.name || null,
             companyName: customer?.companyName || null,
+            isActive: customer?.isActive ?? true,
             prefix: u.prefix,
             role: u.role,
             createdAt: u.createdAt.toISOString(),
@@ -90,5 +92,58 @@ export async function getResellersAndStats(query?: string, page: number = 1) {
             currentPage: page,
             totalCount,
         }
+    };
+}
+
+export async function getResellerFullDetails(userId: string) {
+    const user = await prisma.user.findUnique({
+        where: { id: userId, role: Role.REVENDEUR }
+    });
+
+    if (!user) return null;
+
+    // Fetch customer by email
+    const customer = await prisma.customer.findUnique({
+        where: { email: user.email },
+        include: {
+            orders: {
+                orderBy: { createdAt: "desc" },
+                take: 5,
+                include: {
+                    items: true,
+                },
+            },
+        },
+    });
+
+    let lastItems: any[] = [];
+    if (customer) {
+         lastItems = await prisma.orderItem.findMany({
+            where: {
+                order: { customerId: customer.id },
+            },
+            orderBy: {
+                createdAt: "desc"
+            },
+            take: 5,
+            include: {
+                product: true,
+                order: {
+                    select: {
+                        reference: true,
+                        createdAt: true
+                    }
+                },
+            },
+        });
+    }
+
+    return {
+        user,
+        customer,
+        lastItems: lastItems.map(item => ({
+            ...item,
+            createdAt: item.createdAt, 
+        }))
     };
 }

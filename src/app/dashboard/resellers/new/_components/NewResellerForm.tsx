@@ -20,6 +20,12 @@ export default function NewResellerForm() {
     email: "",
     companyName: "",
     prefix: "",
+    phone: "",
+    vatNumber: "",
+    addressLine1: "",
+    postalCode: "",
+    city: "",
+    country: "Belgique",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +41,7 @@ export default function NewResellerForm() {
     setLoading(true);
 
     try {
-      // @ts-ignore
+      // @ts-expect-error
       const result = await createReseller(formData);
       
       if (result.success) {
@@ -55,8 +61,9 @@ export default function NewResellerForm() {
       setLoading(false);
     }
   };
-
+  
   if (success) {
+    // ... same as before
     return (
       <Card className="max-w-lg mx-auto border-green-500 bg-green-50/50">
         <CardHeader>
@@ -83,8 +90,8 @@ export default function NewResellerForm() {
           </Alert>
 
           <div className="flex justify-center pt-4">
-            <Button onClick={() => router.push("/dashboard")}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Retour au Dashboard
+            <Button onClick={() => router.push("/dashboard/resellers")}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Retour à la liste
             </Button>
           </div>
         </CardContent>
@@ -114,29 +121,53 @@ export default function NewResellerForm() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="companyName">Nom de la société (Optionnel)</Label>
-            <Input
-              id="companyName"
-              name="companyName"
-              placeholder="Ex: Boutique XYZ"
-              value={formData.companyName}
-              onChange={handleChange}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="companyName">Nom de la société</Label>
+                <Input
+                id="companyName"
+                name="companyName"
+                placeholder="Ex: Boutique XYZ"
+                value={formData.companyName}
+                onChange={handleChange}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="vatNumber">Numéro de TVA</Label>
+                <Input
+                id="vatNumber"
+                name="vatNumber"
+                placeholder="Ex: BE0123456789"
+                value={formData.vatNumber}
+                onChange={handleChange}
+                />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="prefix">Préfixe de commande (Unique)</Label>
-            <Input
-              id="prefix"
-              name="prefix"
-              placeholder="Ex: XYZ"
-              maxLength={5}
-              value={formData.prefix}
-              onChange={handleChange}
-              required
-              className="uppercase font-mono"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="prefix">Préfixe (Unique)</Label>
+                <Input
+                id="prefix"
+                name="prefix"
+                placeholder="Ex: XYZ"
+                maxLength={5}
+                value={formData.prefix}
+                onChange={handleChange}
+                required
+                className="uppercase font-mono"
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input
+                id="phone"
+                name="phone"
+                placeholder="+32 4..."
+                value={formData.phone}
+                onChange={handleChange}
+                />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -150,9 +181,56 @@ export default function NewResellerForm() {
               onChange={handleChange}
               required
             />
-            <p className="text-xs text-muted-foreground">
-               Les identifiants seront envoyés à cette adresse. Vérifiez qu&apos;elle est correcte.
-            </p>
+          </div>
+
+          <div className="space-y-2 border-t pt-2">
+            <Label className="text-base font-semibold">Adresse</Label>
+            <div className="space-y-2">
+                <Label htmlFor="addressLine1" className="text-xs text-muted-foreground">Rue et numéro</Label>
+                <Input
+                    id="addressLine1"
+                    name="addressLine1"
+                    placeholder="Rue de la Gare 12"
+                    value={formData.addressLine1}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="postalCode" className="text-xs text-muted-foreground">Code postal</Label>
+                    <Input
+                        id="postalCode"
+                        name="postalCode"
+                        placeholder="1000"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="city" className="text-xs text-muted-foreground">Ville</Label>
+                    <Input
+                        id="city"
+                        name="city"
+                        placeholder="Bruxelles"
+                        value={formData.city}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="country" className="text-xs text-muted-foreground">Pays</Label>
+                <Input
+                    id="country"
+                    name="country"
+                    placeholder="Belgique"
+                    value={formData.country}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
           </div>
 
           <div className="pt-4 flex justify-end gap-2">

@@ -67,9 +67,6 @@ export function RecentOrdersCard({ orders }: RecentOrdersCardProps) {
                       <>
                         <span className="font-medium text-foreground/90">
                           {o.customer.name ?? "Client sans nom"}
-                        </span>{" "}
-                        <span className="text-muted-foreground">
-                          ({o.customer.email ?? "—"})
                         </span>
                         {" • "}
                       </>

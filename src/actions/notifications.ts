@@ -12,10 +12,21 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean, 
   }
 
   const userId = session.user.id;
+  const userRole = session.user.role;
 
   try {
+    let whereClause: any = {};
+    if (userRole === "REVENDEUR") {
+      whereClause = {
+        order: {
+          createdById: userId,
+        },
+      };
+    }
+
     // 1. Trouver toutes les notifications
     const allNotifications = await prisma.notification.findMany({
+      where: whereClause,
       select: { id: true }
     });
 

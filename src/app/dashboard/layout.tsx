@@ -24,10 +24,8 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  // Fetch initial notifications only for ADMIN
-  const initialNotifications = session.user.role === "ADMIN" 
-    ? await getNotificationsForUser() 
-    : [];
+  // Fetch initial notifications
+  const initialNotifications = await getNotificationsForUser();
 
   return (
     <div className="min-h-screen bg-background">

@@ -34,7 +34,7 @@ export default function ClientSideHeaderElements({
 
   return (
     <div className="flex items-center gap-3">
-      {isAdmin && <NotificationsBell initialNotifications={initialNotifications} />}
+      <NotificationsBell initialNotifications={initialNotifications} />
       <ThemeToggle />
       <span className="text-sm text-muted-foreground">
         {sessionUserEmail}

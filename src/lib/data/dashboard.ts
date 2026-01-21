@@ -35,6 +35,7 @@ export async function getDashboardStats(userContext?: { userId: string, role: st
     countToPickUp,
     countDone,
     lastOrders,
+    todoOrdersRaw,
   ] = await Promise.all([
     prisma.order.count({ where: { ...whereClause, status: STATUS.A_VERIFIER } }),
     prisma.order.count({ where: { ...whereClause, status: STATUS.PROD } }),
@@ -48,6 +49,17 @@ export async function getDashboardStats(userContext?: { userId: string, role: st
       include: {
         customer: true,
         items: { select: { quantity: true, unitPriceCents: true } },
+      },
+    }),
+    prisma.order.findMany({
+      where: {
+        ...whereClause,
+        status: { in: [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER] },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10, // On en prend un peu plus pour la liste à traiter
+      include: {
+        customer: true,
       },
     }),
   ]);
@@ -79,9 +91,14 @@ export async function getDashboardStats(userContext?: { userId: string, role: st
     };
   });
 
-  // À traiter = “ce qui nécessite une action maintenant”
-  const targetStatuses: string[] = [STATUS.A_VERIFIER, STATUS.A_EXPEDIER, STATUS.A_RECUPERER];
-  const todoOrders = recent.filter((o) => targetStatuses.includes(o.status));
+  // À traiter = ce qui a été récupéré spécifiquement
+  const todoOrders = todoOrdersRaw.map((o) => ({
+    id: o.id,
+    reference: o.reference,
+    status: o.status,
+    createdAt: o.createdAt,
+    customer: o.customer ? { name: o.customer.name } : null,
+  }));
 
   return {
     stats: {

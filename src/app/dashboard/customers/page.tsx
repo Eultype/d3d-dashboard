@@ -45,7 +45,7 @@ export default async function CustomersPage({
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
                             Dashboard
@@ -63,51 +63,61 @@ export default async function CustomersPage({
                 </div>
 
                 {/* Actions : Recherche + Nouveau */}
-                <div className="flex flex-col sm:flex-row gap-2">
-                    <SearchInput placeholder="Rechercher un client..." className="w-full sm:w-64" />
-                    <Button asChild>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <SearchInput placeholder="Rechercher..." className="w-full sm:w-64" />
+                    <Button asChild className="w-full sm:w-auto">
                         <Link href="/dashboard/customers/new">Nouveau client</Link>
                     </Button>
                 </div>
             </div>
 
-            {/* Stats (Total - Actifs - Entreprises - TVA - Nouveaux) */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {/* Stats (Scrollable on mobile/tablet, 5 on desktop) */}
+            <div className="flex overflow-x-auto pb-2 gap-3 xl:grid xl:grid-cols-5 xl:pb-0 scrollbar-hide">
                 {/* Total */}
-                <StatItem
-                    icon={<Users className="h-4 w-4" />}
-                    label="Clients"
-                    value={totalCustomers}
-                    hint="Total"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<Users className="h-4 w-4" />}
+                        label="Clients"
+                        value={totalCustomers}
+                        hint="Total"
+                    />
+                </div>
                 {/* Actifs */}
-                <StatItem
-                    icon={<UserCheck className="h-4 w-4" />}
-                    label="Actifs"
-                    value={actifs}
-                    hint="Statut actif"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<UserCheck className="h-4 w-4" />}
+                        label="Actifs"
+                        value={actifs}
+                        hint="Statut actif"
+                    />
+                </div>
                 {/* Entreprises */}
-                <StatItem
-                    icon={<Building2 className="h-4 w-4" />}
-                    label="Entreprises"
-                    value={entreprises}
-                    hint="Avec société"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<Building2 className="h-4 w-4" />}
+                        label="Entreprises"
+                        value={entreprises}
+                        hint="Avec société"
+                    />
+                </div>
                 {/* TVA */}
-                <StatItem
-                    icon={<BadgeCheck className="h-4 w-4" />}
-                    label="TVA"
-                    value={tvaRenseignee}
-                    hint="TVA renseignée"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<BadgeCheck className="h-4 w-4" />}
+                        label="TVA"
+                        value={tvaRenseignee}
+                        hint="TVA renseignée"
+                    />
+                </div>
                 {/* Nouveaux */}
-                <StatItem
-                    icon={<UserPlus className="h-4 w-4" />}
-                    label="Nouveaux"
-                    value={nouveaux30j}
-                    hint="Sur 30 jours"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<UserPlus className="h-4 w-4" />}
+                        label="Nouveaux"
+                        value={nouveaux30j}
+                        hint="Sur 30 jours"
+                    />
+                </div>
             </div>
 
             {/* Table */}

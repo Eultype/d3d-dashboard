@@ -7,7 +7,6 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/com
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "./NavLink";
-
 // Composant Navbar mobile
 export function MobileNav() {
   const [open, setOpen] = useState(false);

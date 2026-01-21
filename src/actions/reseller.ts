@@ -10,6 +10,7 @@ import { sendEmail } from "@/lib/mailer"; // ✅ Changement ici : Nodemailer
 const ResellerSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   email: z.string().email("Email invalide"),
+  companyName: z.string().optional(),
   prefix: z.string().min(2, "Le préfixe doit faire au moins 2 caractères").toUpperCase(),
 });
 
@@ -25,7 +26,7 @@ export async function createReseller(data: ResellerInput) {
     };
   }
 
-  const { name, email, prefix } = validation.data;
+  const { name, email, companyName, prefix } = validation.data;
 
   try {
     // 1. Vérifier existence
@@ -43,7 +44,16 @@ export async function createReseller(data: ResellerInput) {
     let customer = await prisma.customer.findUnique({ where: { email } });
     if (!customer) {
       customer = await prisma.customer.create({
-        data: { name, email, isActive: true, addressLine1: "", city: "", country: "Belgique", postalCode: "" }
+        data: { 
+          name, 
+          email, 
+          companyName, // ✅ Ajouté ici
+          isActive: true, 
+          addressLine1: "", 
+          city: "", 
+          country: "Belgique", 
+          postalCode: "" 
+        }
       });
     }
 

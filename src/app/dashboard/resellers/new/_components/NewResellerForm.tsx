@@ -18,6 +18,7 @@ export default function NewResellerForm() {
   const [formData, setFormData] = useState<ResellerInput>({
     name: "",
     email: "",
+    companyName: "",
     prefix: "",
   });
 
@@ -34,12 +35,12 @@ export default function NewResellerForm() {
     setLoading(true);
 
     try {
-      // @ts-ignore - On ignore l'erreur de type si le retour a changé
+      // @ts-ignore
       const result = await createReseller(formData);
       
       if (result.success) {
         if (result.emailError) {
-             toast.warning("Compte créé, mais échec de l'envoi du mail (Clé API manquante ?).");
+             toast.warning("Compte créé, mais échec de l'envoi du mail.");
         } else {
              toast.success("Revendeur créé et invitation envoyée !");
         }
@@ -69,7 +70,7 @@ export default function NewResellerForm() {
         </CardHeader>
         <CardContent className="space-y-6 text-center">
           <p className="text-gray-600">
-            Un email contenant les identifiants de connexion (mot de passe sécurisé) a été envoyé à :
+            Un email contenant les identifiants de connexion a été envoyé à :
           </p>
           <p className="font-bold text-lg">{formData.email}</p>
 
@@ -77,7 +78,7 @@ export default function NewResellerForm() {
             <AlertTitle>Sécurité Maximale</AlertTitle>
             <AlertDescription>
                Le mot de passe a été généré et envoyé directement au revendeur. 
-               Vous ne pouvez pas le voir, ce qui garantit la confidentialité totale du compte.
+               Vous ne pouvez pas le voir.
             </AlertDescription>
           </Alert>
 
@@ -102,14 +103,25 @@ export default function NewResellerForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nom du revendeur / Société</Label>
+            <Label htmlFor="name">Nom du contact</Label>
             <Input
               id="name"
               name="name"
-              placeholder="Ex: Boutique XYZ"
+              placeholder="Prénom Nom"
               value={formData.name}
               onChange={handleChange}
               required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="companyName">Nom de la société (Optionnel)</Label>
+            <Input
+              id="companyName"
+              name="companyName"
+              placeholder="Ex: Boutique XYZ"
+              value={formData.companyName}
+              onChange={handleChange}
             />
           </div>
 

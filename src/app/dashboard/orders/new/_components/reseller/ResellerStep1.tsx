@@ -206,9 +206,9 @@ export default function ResellerStep1({
                       <Input
                         id={`price-${item.uniqueId}`}
                         type="number"
-                        className="bg-gray-50 border-gray-200 h-11 font-medium"
+                        className="bg-gray-100 border-gray-200 h-11 font-medium cursor-not-allowed"
                         value={item.unitPrice}
-                        onChange={(e) => updateProduct(item.uniqueId, "unitPrice", parseFloat(e.target.value) || 0)}
+                        readOnly
                       />
                     </div>
                   </div>

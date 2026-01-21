@@ -22,12 +22,12 @@ const OrderSchema = z.object({
   clientDetails: z
     .object({
       name: z.string().min(1, "Le nom du client est requis"),
-      email: z.string().email("Email invalide"),
-      phone: z.string().min(1, "Le téléphone est requis"),
-      addressLine1: z.string().min(1, "L'adresse est requise"),
-      postalCode: z.string().min(1, "Le code postal est requis"),
-      city: z.string().min(1, "La ville est requise"),
-      country: z.string().min(1, "Le pays est requis"),
+      email: z.string().email("Email invalide").optional().or(z.literal('')),
+      phone: z.string().optional().or(z.literal('')),
+      addressLine1: z.string().optional().or(z.literal('')),
+      postalCode: z.string().optional().or(z.literal('')),
+      city: z.string().optional().or(z.literal('')),
+      country: z.string().optional().or(z.literal('')),
     })
     .nullable()
     .optional(),
@@ -51,10 +51,10 @@ export async function createOrder(data: OrderInputData) {
   const validatedFields = OrderSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    console.error("❌ [createOrder] Validation failed:", validatedFields.error);
+    console.error("❌ [createOrder] Validation failed:", JSON.stringify(validatedFields.error.format(), null, 2));
     return {
       success: false,
-      message: "Données invalides : " + validatedFields.error.issues.map((issue) => issue.message).join(", "),
+      message: "Données invalides : " + validatedFields.error.issues.map((issue) => `${issue.path.join('.')} : ${issue.message}`).join(", "),
     };
   }
 
@@ -158,6 +158,7 @@ export async function createOrder(data: OrderInputData) {
             ? validData.discountValue * 100 
             : validData.discountValue,
         customerId: finalCustomerId,
+        createdById: user.id,
         items: { create: orderItems },
         ...(validData.internalNote && { notes: { create: { content: validData.internalNote, userId: user.id } } }),
       },

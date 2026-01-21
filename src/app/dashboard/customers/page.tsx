@@ -19,12 +19,21 @@ export const metadata: Metadata = {
         "Gérez et suivez l’ensemble de vos clients : informations, statut, historique, entreprises, TVA et activités récentes.",
 };
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
 // Page de listing clients
 export default async function CustomersPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; page?: string }>;
 }) {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+        redirect("/dashboard");
+    }
+
     const { q, page } = await searchParams;
     const currentPage = Number(page) || 1;
 

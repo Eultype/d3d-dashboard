@@ -2,7 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  userRole?: string;
+}
+
+export function DashboardHeader({ userRole }: DashboardHeaderProps) {
+  const isAdmin = userRole === "ADMIN";
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="space-y-2">
@@ -29,19 +35,23 @@ export function DashboardHeader() {
           </Link>
         </Button>
 
-        <Button asChild variant="outline">
-          <Link href="/dashboard/customers/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau client
-          </Link>
-        </Button>
+        {isAdmin && (
+            <>
+                <Button asChild variant="outline">
+                <Link href="/dashboard/customers/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouveau client
+                </Link>
+                </Button>
 
-        <Button asChild variant="outline">
-          <Link href="/dashboard/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau produit
-          </Link>
-        </Button>
+                <Button asChild variant="outline">
+                <Link href="/dashboard/products/new">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nouveau produit
+                </Link>
+                </Button>
+            </>
+        )}
       </div>
     </div>
   );

@@ -1,36 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import StepOne from "./steps/Step1";
-import StepTwo from "./steps/Step2";
-import StepThree from "./steps/Step3";
-import StepFour from "./steps/Step4";
 import { createOrder } from "@/actions/order";
 import { OrderDraft, ProductFromDB } from "@/types/order";
+import ResellerStep1 from "./ResellerStep1";
+import ResellerStep2 from "./ResellerStep2";
 
-// --- Définition des types globaux ---
-
-type OrderFormProps = {
+type ResellerOrderFormProps = {
   productsCatalog: ProductFromDB[];
+  userPrefix: string;
+  prefilledCustomer: any;
 };
 
-export default function OrderForm({ productsCatalog }: OrderFormProps) {
+export default function ResellerOrderForm({ 
+  productsCatalog, 
+  userPrefix, 
+  prefilledCustomer 
+}: ResellerOrderFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Initialisation du draft spécifique Revendeur
   const [draft, setDraft] = useState<OrderDraft>({
     info: { 
-      prefix: "", 
-      delivery: "", 
-      shippingCost: 0, 
+      prefix: userPrefix, 
+      delivery: "Livraison Belgique", // Par défaut
+      shippingCost: 12, // Par défaut
       taxRate: 21,
       manualNumber: null 
     },
-    customerId: null,
-    clientDetails: null,
+    customerId: prefilledCustomer?.id || null,
+    clientDetails: prefilledCustomer ? {
+      name: prefilledCustomer.name || "",
+      email: prefilledCustomer.email || "",
+      phone: prefilledCustomer.phone || "",
+      addressLine1: prefilledCustomer.addressLine1 || "",
+      postalCode: prefilledCustomer.postalCode || "",
+      city: prefilledCustomer.city || "",
+      country: prefilledCustomer.country || "",
+      companyName: prefilledCustomer.companyName || "",
+      vatNumber: prefilledCustomer.vatNumber || "",
+    } : null,
     newClientData: null,
     products: [],
     discountType: "none",
@@ -46,7 +59,6 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
     setIsSubmitting(true);
 
     try {
-      // Préparation des données pour l'action serveur
       const payload = {
         info: draft.info,
         clientId: draft.customerId,
@@ -74,12 +86,12 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
         toast.success(`Commande ${result.reference} créée avec succès !`);
         router.push(`/dashboard/orders/${result.orderId}`);
       } else {
-        toast.error(result.message || "Une erreur est survenue lors de la création de la commande.");
+        toast.error(result.message || "Une erreur est survenue.");
         setIsSubmitting(false);
       }
     } catch (error) {
       console.error("Erreur technique:", error);
-      toast.error("Une erreur technique est survenue. Contactez le support.");
+      toast.error("Erreur technique.");
       setIsSubmitting(false);
     }
   };
@@ -87,37 +99,19 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
   return (
     <div className="space-y-6">
       {step === 1 && (
-        <StepOne
+        <ResellerStep1
           draft={draft}
           onChange={updateDraft}
           onNext={() => setStep(2)}
-        />
-      )}
-
-      {step === 2 && (
-        <StepTwo
-          draft={draft}
-          onChange={updateDraft}
-          onNext={() => setStep(3)}
-          onBack={() => setStep(1)}
-        />
-      )}
-
-      {step === 3 && (
-        <StepThree
-          draft={draft}
-          onChange={updateDraft}
-          onNext={() => setStep(4)}
-          onBack={() => setStep(2)}
           productsCatalog={productsCatalog}
         />
       )}
 
-      {step === 4 && (
-        <StepFour
+      {step === 2 && (
+        <ResellerStep2
           draft={draft}
           onChange={updateDraft}
-          onBack={() => setStep(3)}
+          onBack={() => setStep(1)}
           onSubmit={handleSubmit}
         />
       )}

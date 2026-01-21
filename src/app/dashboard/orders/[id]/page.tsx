@@ -1,9 +1,12 @@
 // Import des datas
 import { getOrderDetails } from "@/lib/data/orders";
 {/* Import Next */}
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import type {Metadata} from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+
 // Import des composants
 import { OrderProgressionCard } from "./_components/OrderProgressionCard";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
@@ -13,6 +16,7 @@ import { OrderFilesCard } from "./_components/OrderFilesCard";
 import { OrderSummaryCard } from "./_components/OrderSummaryCard";
 import { OrderCustomerCard } from "./_components/OrderCustomerCard";
 import { Button } from "@/components/ui/button";
+
 // Import des lib
 import { calculateOrderTotal } from "@/lib/orders";
 import { formatDateTimeFR } from "@/lib/dates";
@@ -30,6 +34,10 @@ export default async function OrderDetailPage({
                                               }: {
     params: Promise<{ id?: string }>;
 }) {
+    const session = await getServerSession(authOptions);
+    if (!session) redirect("/");
+    const userRole = session.user.role;
+
     const { id } = await params;
     if (!id) return notFound();
 
@@ -90,9 +98,11 @@ export default async function OrderDetailPage({
 
                 {/* Actions */}
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button asChild>
-                        <Link href={`/dashboard/orders/${order.id}/edit`}>Modifier la commande</Link>
-                    </Button>
+                    {userRole === "ADMIN" && (
+                        <Button asChild>
+                            <Link href={`/dashboard/orders/${order.id}/edit`}>Modifier la commande</Link>
+                        </Button>
+                    )}
 
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/orders">← Retour</Link>
@@ -105,7 +115,7 @@ export default async function OrderDetailPage({
                 {/* Colonne gauche : Progression - Produits - Notes + Fichiers */}
                 <div className="lg:col-span-8 space-y-4">
                     {/* Progression */}
-                    <OrderProgressionCard order={order} />
+                    <OrderProgressionCard order={order} userRole={userRole} />
                     {/* Produits */}
                     <OrderProductsCard items={order.items} orderStatus={order.status} />
 

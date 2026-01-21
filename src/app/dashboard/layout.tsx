@@ -35,8 +35,10 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  // Fetch initial notifications
-  const initialNotifications = await getNotificationsForUser(); // Move this inside the ClientSideHeaderElements component if needed client side only, or pass via props.
+  // Fetch initial notifications only for ADMIN
+  const initialNotifications = session.user.role === "ADMIN" 
+    ? await getNotificationsForUser() 
+    : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -65,16 +67,25 @@ export default async function DashboardLayout({
               icon={<ClipboardList className="h-4 w-4" />}
               label="Commandes"
             />
-            <NavLink
-              href="/dashboard/customers"
-              icon={<Users className="h-4 w-4" />}
-              label="Clients"
-            />
-            <NavLink
-              href="/dashboard/products"
-              icon={<ShoppingBag className="h-4 w-4" />}
-              label="Produits"
-            />
+            {session.user.role === "ADMIN" && (
+                <>
+                    <NavLink
+                    href="/dashboard/customers"
+                    icon={<Users className="h-4 w-4" />}
+                    label="Clients"
+                    />
+                    <NavLink
+                    href="/dashboard/products"
+                    icon={<ShoppingBag className="h-4 w-4" />}
+                    label="Produits"
+                    />
+                    <NavLink
+                      href="/dashboard/resellers/new"
+                      icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
+                      label="Nouveau Revendeur"
+                    />
+                </>
+            )}
           </nav>
         </aside>
 
@@ -94,6 +105,7 @@ export default async function DashboardLayout({
               <ClientSideHeaderElements
                 sessionUserEmail={session.user?.email ?? "Utilisateur"}
                 initialNotifications={initialNotifications}
+                userRole={session.user.role as string}
               />
             </div>
           </header>

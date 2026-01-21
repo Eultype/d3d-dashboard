@@ -118,7 +118,7 @@ export default function StepThree({
           type: res.type || file.type,
         };
         // Mise à jour : ajout au tableau existant
-        updateProduct(uniqueId, "files", (currentFiles: NonNullable<ProductItem["files"]>) => [
+        updateProduct(uniqueId, "files", (currentFiles) => [
           ...(currentFiles || []),
           newFile,
         ]);
@@ -135,7 +135,7 @@ export default function StepThree({
 
   // Fonction pour supprimer un fichier spécifique d'un produit
   const removeFile = (uniqueId: string, fileUrl: string) => {
-    updateProduct(uniqueId, "files", (currentFiles: NonNullable<ProductItem["files"]>) =>
+    updateProduct(uniqueId, "files", (currentFiles) =>
       (currentFiles || []).filter((f) => f.url !== fileUrl),
     );
   };
@@ -277,15 +277,9 @@ export default function StepThree({
                       <Input
                         id={`price-${item.uniqueId}`}
                         type="number"
-                        className="bg-gray-50 border-gray-200 h-11 font-medium"
+                        className="bg-gray-100 border-gray-200 h-11 font-medium cursor-not-allowed"
                         value={item.unitPrice}
-                        onChange={(e) =>
-                          updateProduct(
-                            item.uniqueId,
-                            "unitPrice",
-                            parseFloat(e.target.value) || 0,
-                          )
-                        }
+                        readOnly
                       />
                     </div>
                   </div>
@@ -297,7 +291,7 @@ export default function StepThree({
                         id={`custom-${item.uniqueId}`}
                         checked={item.hasCustomText}
                         onCheckedChange={(checked) =>
-                          updateProduct(item.uniqueId, "hasCustomText", checked)
+                          updateProduct(item.uniqueId, "hasCustomText", checked === true)
                         }
                       />
                       <label
@@ -312,7 +306,7 @@ export default function StepThree({
                         id={`3d-${item.uniqueId}`}
                         checked={item.needs3D}
                         onCheckedChange={(checked) =>
-                          updateProduct(item.uniqueId, "needs3D", checked)
+                          updateProduct(item.uniqueId, "needs3D", checked === true)
                         }
                       />
                       <label
@@ -434,7 +428,11 @@ export default function StepThree({
 
         {/* Navigation Buttons */}
         <div className="flex justify-between pt-6 border-t border-gray-100">
-          <Button variant="outline" onClick={onBack} className="w-32">
+          <Button 
+            variant="outline" 
+            onClick={onBack} 
+            className={`w-32 ${!onBack ? 'invisible' : ''}`} // Masquer si onBack absent
+          >
             ← Retour
           </Button>
           {/* IMPORTANT : Utiliser handleNext pour sauvegarder */}

@@ -28,13 +28,13 @@ export function OrderSummaryCard({
     return (
         <Card>
             <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="space-y-1 min-w-0">
                         <CardTitle className="text-base">Récapitulatif</CardTitle>
                         <p className="text-sm text-muted-foreground">Total de la commande</p>
                     </div>
 
-                    <Button asChild variant="outline">
+                    <Button asChild variant="outline" size="sm" className="shrink-0">
                         <Link href={`/print/orders/${orderId}/facture`} target="_blank" rel="noreferrer">
                             Facture
                         </Link>

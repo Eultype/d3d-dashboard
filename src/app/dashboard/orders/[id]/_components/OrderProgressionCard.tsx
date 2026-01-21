@@ -80,7 +80,7 @@ export function OrderProgressionCard({ order, userRole }: { order: { id: string;
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 md:grid-cols-4">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
             {steps.map((s, i) => {
               const isLastStep = i === steps.length - 1;
               const isDone = i < currentIdx || (isLastStep && currentIdx === i); // Si dernière étape et active -> considéré comme fini

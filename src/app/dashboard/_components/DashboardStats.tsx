@@ -15,7 +15,7 @@ type DashboardStatsProps = {
 
 export function DashboardStats({ stats }: DashboardStatsProps) {
   return (
-    <div className="flex overflow-x-auto pb-2 gap-3 lg:grid lg:grid-cols-5 lg:pb-0 scrollbar-hide">
+    <div className="flex overflow-x-auto pb-2 gap-3 md:grid md:grid-cols-3 xl:grid-cols-5 md:pb-0 scrollbar-hide">
         {/* Carte : Commandes en cours */}
         <div className="min-w-[140px] flex-1">
         <StatItem

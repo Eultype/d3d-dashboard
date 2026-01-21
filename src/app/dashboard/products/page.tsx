@@ -44,7 +44,7 @@ export default async function ProductsPage({
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
+                <div className="space-y-1">
                     {/* Fil d'Ariane */}
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
@@ -64,39 +64,45 @@ export default async function ProductsPage({
                 </div>
 
                 {/* Zone d’actions : champ de recherche et bouton “Nouveau produit” */}
-                <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {/* Champ de recherche */}
-                    <SearchInput placeholder="Rechercher un produit..." className="w-full sm:w-64" />
+                    <SearchInput placeholder="Rechercher..." className="w-full sm:w-64" />
                     {/* Bouton nouveau produit */}
-                    <Button asChild>
+                    <Button asChild className="w-full sm:w-auto">
                         <Link href="/dashboard/products/new">Nouveau produit</Link>
                     </Button>
                 </div>
             </div>
 
-            {/* Stats ( Total - Actifs - Inactifs */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Stats (Scrollable on mobile/tablet) */}
+            <div className="flex overflow-x-auto pb-2 gap-3 xl:grid xl:grid-cols-3 xl:pb-0 scrollbar-hide">
                 {/* Total */ }
-                <StatItem
-                    icon={<Package className="h-4 w-4" />}
-                    label="Produits"
-                    value={totalProducts}
-                    hint="Total"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<Package className="h-4 w-4" />}
+                        label="Produits"
+                        value={totalProducts}
+                        hint="Total"
+                    />
+                </div>
                 {/* Actifs */}
-                <StatItem
-                    icon={<CheckCircle2 className="h-4 w-4" />}
-                    label="Actifs"
-                    value={activeProducts}
-                    hint="Disponibles"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<CheckCircle2 className="h-4 w-4" />}
+                        label="Actifs"
+                        value={activeProducts}
+                        hint="Disponibles"
+                    />
+                </div>
                 {/* Inactifs */}
-                <StatItem
-                    icon={<XCircle className="h-4 w-4" />}
-                    label="Inactifs"
-                    value={inactiveProducts}
-                    hint="Non visibles"
-                />
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<XCircle className="h-4 w-4" />}
+                        label="Inactifs"
+                        value={inactiveProducts}
+                        hint="Non visibles"
+                    />
+                </div>
             </div>
 
             {/* Tableau produits */}

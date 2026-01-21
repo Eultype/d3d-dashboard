@@ -8,13 +8,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Badge } from "@/components/ui/badge";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 // Import de Lucide React
-import { Eye, Pencil } from "lucide-react";
+import { Eye } from "lucide-react";
 // Import des lib
 import { formatDateFR } from "@/lib/dates";
 
 export interface ResellerRow {
     id: string;
-    customerId: string | null;
     email: string;
     name: string | null;
     companyName: string | null;

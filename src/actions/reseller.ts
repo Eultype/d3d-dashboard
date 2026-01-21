@@ -46,27 +46,23 @@ export async function createReseller(data: ResellerInput) {
     const generatedPassword = randomBytes(8).toString('hex');
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
-    // 3. Création DB (Client + User + Sequence)
-    let customer = await prisma.customer.findUnique({ where: { email } });
-    if (!customer) {
-      customer = await prisma.customer.create({
-        data: { 
-          name, 
-          email, 
-          phone,
-          companyName,
-          vatNumber,
-          isActive: true, 
-          addressLine1, 
-          city, 
-          country, 
-          postalCode 
-        }
-      });
-    }
-
+    // 3. Création DB (User + Sequence)
     await prisma.user.create({
-      data: { email, password: hashedPassword, role: "REVENDEUR", prefix },
+      data: { 
+        email, 
+        password: hashedPassword, 
+        role: "REVENDEUR", 
+        prefix,
+        name,
+        companyName,
+        phone,
+        vatNumber,
+        addressLine1,
+        postalCode,
+        city,
+        country,
+        isActive: true
+      },
     });
 
     const existingSequence = await prisma.sequence.findUnique({ where: { id: prefix } });

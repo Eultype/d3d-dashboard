@@ -12,13 +12,23 @@ enum Role {
 }
 
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  password  String
-  role      Role        @default(REVENDEUR)
-  prefix    String?     // Nouveau champ pour les revendeurs
-  createdAt DateTime    @default(now())
-  notes     OrderNote[]
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  role         Role     @default(REVENDEUR)
+  prefix       String?  // Nouveau champ pour les revendeurs
+  name         String?
+  companyName  String?
+  vatNumber    String?
+  phone        String?
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  postalCode   String?
+  country      String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  notes        OrderNote[]
   readNotifications NotificationRead[]
   createdOrders Order[] @relation("OrderCreator")
 }

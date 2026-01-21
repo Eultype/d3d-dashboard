@@ -34,8 +34,10 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  // Fetch initial notifications
-  const initialNotifications = await getNotificationsForUser(); // Move this inside the ClientSideHeaderElements component if needed client side only, or pass via props.
+  // Fetch initial notifications only for ADMIN
+  const initialNotifications = session.user.role === "ADMIN" 
+    ? await getNotificationsForUser() 
+    : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,6 +103,7 @@ export default async function DashboardLayout({
               <ClientSideHeaderElements
                 sessionUserEmail={session.user?.email ?? "Utilisateur"}
                 initialNotifications={initialNotifications}
+                userRole={session.user.role as string}
               />
             </div>
           </header>

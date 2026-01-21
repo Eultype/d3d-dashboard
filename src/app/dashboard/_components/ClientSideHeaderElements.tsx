@@ -9,11 +9,13 @@ import { NotificationWithReadStatus } from "@/lib/data/notifications";
 type ClientSideHeaderElementsProps = {
   sessionUserEmail: string;
   initialNotifications: NotificationWithReadStatus[];
+  userRole?: string;
 };
 
 export default function ClientSideHeaderElements({
   sessionUserEmail,
   initialNotifications,
+  userRole,
 }: ClientSideHeaderElementsProps) {
   const [isClient, setIsClient] = useState(false);
 
@@ -25,9 +27,11 @@ export default function ClientSideHeaderElements({
     return null;
   }
 
+  const isAdmin = userRole === "ADMIN";
+
   return (
     <div className="flex items-center gap-3">
-      <NotificationsBell initialNotifications={initialNotifications} />
+      {isAdmin && <NotificationsBell initialNotifications={initialNotifications} />}
       <ThemeToggle />
       <span className="text-sm text-muted-foreground">
         {sessionUserEmail}

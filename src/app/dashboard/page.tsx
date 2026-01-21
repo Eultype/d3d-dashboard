@@ -26,15 +26,17 @@ export default async function DashboardPage() {
       redirect("/");
   }
 
+  const userRole = session.user.role as string;
+
   const { stats, recent, todoOrders } = await getDashboardStats({ 
       userId: session.user.id, 
-      role: session.user.role as string 
+      role: userRole
   });
 
   return (
     <div className="space-y-6">
       {/* Header & Actions */}
-      <DashboardHeader />
+      <DashboardHeader userRole={userRole} />
 
       {/* Stats Pipeline */}
       <DashboardStats stats={stats} />
@@ -50,12 +52,16 @@ export default async function DashboardPage() {
         <Button asChild variant="outline">
           <Link href="/dashboard/orders">Voir les commandes</Link>
         </Button>
-        <Button asChild variant="outline">
-          <Link href="/dashboard/customers">Voir les clients</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/dashboard/products">Voir les produits</Link>
-        </Button>
+        {userRole === "ADMIN" && (
+            <>
+                <Button asChild variant="outline">
+                <Link href="/dashboard/customers">Voir les clients</Link>
+                </Button>
+                <Button asChild variant="outline">
+                <Link href="/dashboard/products">Voir les produits</Link>
+                </Button>
+            </>
+        )}
       </div>
     </div>
   );

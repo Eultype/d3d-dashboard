@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CustomerContactCard } from "../../customers/[id]/_components/CustomerContactCard";
+import { ResellerContactCard } from "./_components/ResellerContactCard";
 import { CustomerRecentOrdersCard } from "../../customers/[id]/_components/CustomerRecentOrdersCard";
 import { CustomerLastProductsCard } from "../../customers/[id]/_components/CustomerLastProductsCard";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
@@ -27,8 +27,8 @@ export default async function ResellerDetailPage({ params }: { params: Promise<{
 
     if (!data || !data.user) return notFound();
 
-    const { user, customer, lastItems } = data;
-    const orders = customer?.orders || [];
+    const { user, lastItems } = data;
+    const orders = user.createdOrders;
 
     const { date: createdDate, time: createdTime } = formatDateTimeFR(user.createdAt);
 
@@ -44,17 +44,17 @@ export default async function ResellerDetailPage({ params }: { params: Promise<{
                         <Link href="/dashboard/resellers" className="hover:underline">
                             Revendeurs
                         </Link>{" "}
-                        / <span className="text-foreground">{customer?.name ?? user.email}</span>
+                        / <span className="text-foreground">{user.name ?? user.email}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-2xl font-bold">{customer?.name ?? "Revendeur sans nom"}</h1>
+                        <h1 className="text-2xl font-bold">{user.name ?? "Revendeur sans nom"}</h1>
                         {user.prefix && (
                             <Badge variant="outline" className="font-mono text-base">
                                 {user.prefix}
                             </Badge>
                         )}
-                        {customer && <CustomerActiveBadge isActive={customer.isActive} />}
+                        <CustomerActiveBadge isActive={user.isActive} />
                     </div>
 
                     <p className="text-sm text-muted-foreground">
@@ -66,29 +66,20 @@ export default async function ResellerDetailPage({ params }: { params: Promise<{
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/resellers">← Retour</Link>
                     </Button>
-                    {/* Placeholder for edit if we had a dedicated reseller edit page, or link to customer edit */}
-                    {customer && (
-                        <Button asChild variant="outline">
-                            <Link href={`/dashboard/customers/${customer.id}/edit`}>Modifier Infos</Link>
-                        </Button>
-                    )}
+                    {/* <Button asChild variant="outline">
+                        <Link href={`/dashboard/resellers/${user.id}/edit`}>Modifier Infos</Link>
+                    </Button> */}
                 </div>
             </div>
 
-            {customer ? (
-                <>
-                    <CustomerContactCard customer={customer} />
-                    
-                    <div className="grid items-stretch gap-4 xl:grid-cols-2">
-                        <CustomerRecentOrdersCard orders={orders} customerId={customer.id} />
-                        <CustomerLastProductsCard lastItems={lastItems} />
-                    </div>
-                </>
-            ) : (
-                <div className="rounded-lg border bg-card p-6 text-center text-muted-foreground">
-                    <p>Ce compte revendeur n&apos;est pas encore lié à une fiche client complète.</p>
-                </div>
-            )}
+            <ResellerContactCard user={user} />
+            
+            <div className="grid items-stretch gap-4 xl:grid-cols-2">
+                {/* I will need a ResellerRecentOrdersCard here */}
+                {/* For now, I can't reuse CustomerRecentOrdersCard because it uses customerId. */}
+                {/* I will use CustomerLastProductsCard because it should be compatible. */}
+                <CustomerLastProductsCard lastItems={lastItems} />
+            </div>
         </div>
     );
 }

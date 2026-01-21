@@ -1,8 +1,11 @@
 "use client";
 
+// Import Next
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+// Import React
 import { ReactNode } from "react";
+// Import clsx
 import clsx from "clsx";
 
 export function NavLink({

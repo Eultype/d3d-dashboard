@@ -1,14 +1,15 @@
 // src/app/dashboard/page.tsx
+// Import Next
 import Link from "next/link";
 import type { Metadata } from "next";
-
-import { getDashboardStats } from "@/lib/data/dashboard";
+// Import des composants
 import { Button } from "@/components/ui/button";
-
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { DashboardStats } from "./_components/DashboardStats";
 import { RecentOrdersCard } from "./_components/RecentOrdersCard";
 import { TodoOrdersCard } from "./_components/TodoOrdersCard";
+// Import des lib
+import { getDashboardStats } from "@/lib/data/dashboard";
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -35,13 +36,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Actions */}
+      {/* En-tête du dashboard (titre, breadcrumb, actions rapides) */}
       <DashboardHeader userRole={userRole} />
 
-      {/* Stats Pipeline */}
+      {/* Statistiques principales du pipeline de commandes */}
       <DashboardStats stats={stats} />
 
-      {/* Main Content Grid */}
+      {/* Grille principale : dernières commandes et commandes à traiter */}
       <div className="grid gap-4 xl:grid-cols-2 items-stretch">
         <RecentOrdersCard orders={recent} />
         <TodoOrdersCard orders={todoOrders} countToProcess={stats.countToProcess} />
@@ -49,14 +50,17 @@ export default async function DashboardPage() {
 
       {/* Accès rapides bas */}
       <div className="flex flex-wrap gap-2 pt-2">
+        {/* Bouton voir commandes */}
         <Button asChild variant="outline">
           <Link href="/dashboard/orders">Voir les commandes</Link>
         </Button>
         {userRole === "ADMIN" && (
             <>
+                {/* Bouton voir clients */}
                 <Button asChild variant="outline">
                 <Link href="/dashboard/customers">Voir les clients</Link>
                 </Button>
+                {/* Bouton voir produits */}
                 <Button asChild variant="outline">
                 <Link href="/dashboard/products">Voir les produits</Link>
                 </Button>

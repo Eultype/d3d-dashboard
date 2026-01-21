@@ -1,18 +1,14 @@
 "use client";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+// Import React
 import { Menu, LayoutDashboard, ClipboardList, Users, ShoppingBag } from "lucide-react";
-import { NavLink } from "./NavLink";
 import { useState } from "react";
+// Import des composants
+import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { NavLink } from "./NavLink";
 
+// Composant Navbar mobile
 export function MobileNav() {
   const [open, setOpen] = useState(false);
 

@@ -1,25 +1,28 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Bell, CheckCheck } from "lucide-react";
+// Import Next
 import Link from "next/link";
-import { NotificationWithReadStatus } from "@/lib/data/notifications";
+// Import React
+import { useState, useEffect, useTransition } from "react";
+import { Bell, CheckCheck } from "lucide-react";
+// Import des composants
+import {Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { pusherClient } from "@/lib/pusher-client";
-import { markAllNotificationsAsRead } from "@/actions/notifications";
 import { toast } from "sonner";
+// Import des lib
+import { NotificationWithReadStatus } from "@/lib/data/notifications";
+import { pusherClient } from "@/lib/pusher-client";
+// Import des actions
+import { markAllNotificationsAsRead } from "@/actions/notifications";
+
 
 type NotificationsBellProps = {
   initialNotifications: NotificationWithReadStatus[];
 };
 
+// Import du composant de notification
 export function NotificationsBell({ initialNotifications }: NotificationsBellProps) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [isPending, startTransition] = useTransition();

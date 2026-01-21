@@ -1,9 +1,12 @@
 "use client";
 
+// Import React
 import { useState, useEffect } from "react";
+// Import des composants
 import { NotificationsBell } from "./NotificationsBell";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoutButton } from "@/components/auth/logout-button";
+// Import des lib
 import { NotificationWithReadStatus } from "@/lib/data/notifications";
 
 type ClientSideHeaderElementsProps = {

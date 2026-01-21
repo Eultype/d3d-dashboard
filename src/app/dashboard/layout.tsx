@@ -1,30 +1,19 @@
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { NavLink } from "./_components/NavLink";
-import { ReactNode } from "react";
-import {
-  ShoppingBag,
-  ClipboardList,
-  Users,
-  LayoutDashboard,
-} from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { LogoutButton } from "@/components/auth/logout-button";
-// import { NotificationsBell } from "./_components/NotificationsBell"; // Import Bell
-import { getNotificationsForUser } from "@/lib/data/notifications"; // Import data function
-
+// Import Next
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
-// import dynamic from "next/dynamic"; // Import dynamic
-import ClientSideHeaderElements from "./_components/ClientSideHeaderElements"; // New import
+// Import React
+import { ReactNode } from "react";
+import { ShoppingBag, ClipboardList, Users, LayoutDashboard } from "lucide-react";
+// Import des composants
+import { Separator } from "@/components/ui/separator";
+import ClientSideHeaderElements from "./_components/ClientSideHeaderElements";
 import { MobileNav } from "./_components/MobileNav";
+import { NavLink } from "./_components/NavLink";
+// Import des lib
+import { getNotificationsForUser } from "@/lib/data/notifications";
+import { authOptions } from "@/lib/auth-options";
 
-// Dynamically import the client-side header elements component with SSR disabled
-// const ClientSideHeaderElements = dynamic(
-//   () => import("./_components/ClientSideHeaderElements"),
-//   { ssr: false, loading: () => <div className="flex items-center gap-3"><span className="text-sm text-muted-foreground">Chargement...</span></div> } // Add a loading fallback
-// );
-
+// Layout du dashboard
 export default async function DashboardLayout({
   children,
 }: {
@@ -43,7 +32,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-background">
       <div className="grid lg:grid-cols-[260px_1fr]">
-        {/* SIDEBAR */}
+        {/* Barre latérale (visible uniquement sur les écrans larges) */}
         <aside className="hidden lg:block border-r bg-background">
           <div className="h-16 flex items-center px-6">
             <div className="font-semibold tracking-tight">
@@ -54,8 +43,10 @@ export default async function DashboardLayout({
             </div>
           </div>
 
+          {/* Séparateur */}
           <Separator />
 
+          {/* Navigation dans la barre latérale */}
           <nav className="p-4 space-y-1">
             <NavLink
               href="/dashboard"
@@ -89,12 +80,13 @@ export default async function DashboardLayout({
           </nav>
         </aside>
 
-        {/* MAIN */}
+        {/* Contenu principal */}
         <div>
-          {/* TOPBAR */}
+          {/* Barre supérieure avec navigation et infos utilisateur */}
           <header className="h-16 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="h-full flex items-center justify-between px-4 lg:px-8">
               <div className="flex items-center gap-3">
+                {/* Navbar mobile */}
                 <MobileNav />
                 <div className="font-medium">Dashboard</div>
                 <span className="text-xs text-muted-foreground hidden sm:inline">
@@ -102,6 +94,7 @@ export default async function DashboardLayout({
                 </span>
               </div>
 
+              {/* Partie droite : éléments dynamiques côté client (email et notifications) */}
               <ClientSideHeaderElements
                 sessionUserEmail={session.user?.email ?? "Utilisateur"}
                 initialNotifications={initialNotifications}

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 // Import React
 import { ReactNode } from "react";
-import { ShoppingBag, ClipboardList, Users, LayoutDashboard } from "lucide-react";
+import { ShoppingBag, ClipboardList, Users, LayoutDashboard, Settings } from "lucide-react";
 // Import des composants
 import { Separator } from "@/components/ui/separator";
 import ClientSideHeaderElements from "./_components/ClientSideHeaderElements";
@@ -31,8 +31,8 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-background">
       <div className="grid lg:grid-cols-[260px_1fr]">
         {/* Barre latérale (visible uniquement sur les écrans larges) */}
-        <aside className="hidden lg:block border-r bg-background">
-          <div className="h-16 flex items-center px-6">
+        <aside className="hidden lg:flex flex-col border-r bg-background h-screen sticky top-0">
+          <div className="h-16 flex items-center px-6 shrink-0">
             <div className="font-semibold tracking-tight">
               D3D Dashboard
               <span className="block text-xs text-muted-foreground font-normal">
@@ -45,37 +45,50 @@ export default async function DashboardLayout({
           <Separator />
 
           {/* Navigation dans la barre latérale */}
-          <nav className="p-4 space-y-1">
-            <NavLink
-              href="/dashboard"
-              icon={<LayoutDashboard className="h-4 w-4" />}
-              label="Vue d’ensemble"
-            />
-            <NavLink
-              href="/dashboard/orders"
-              icon={<ClipboardList className="h-4 w-4" />}
-              label="Commandes"
-            />
+          <div className="flex-1 flex flex-col justify-between p-4 overflow-y-auto">
+            <nav className="space-y-1">
+              <NavLink
+                href="/dashboard"
+                icon={<LayoutDashboard className="h-4 w-4" />}
+                label="Vue d’ensemble"
+              />
+              <NavLink
+                href="/dashboard/orders"
+                icon={<ClipboardList className="h-4 w-4" />}
+                label="Commandes"
+              />
+              {session.user.role === "ADMIN" && (
+                  <>
+                      <NavLink
+                      href="/dashboard/customers"
+                      icon={<Users className="h-4 w-4" />}
+                      label="Clients"
+                      />
+                      <NavLink
+                      href="/dashboard/products"
+                      icon={<ShoppingBag className="h-4 w-4" />}
+                      label="Produits"
+                      />
+                      <NavLink
+                        href="/dashboard/resellers"
+                        icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
+                        label="Revendeurs"
+                      />
+                  </>
+              )}
+            </nav>
+
+            {/* Section bas (Paramètres) */}
             {session.user.role === "ADMIN" && (
-                <>
-                    <NavLink
-                    href="/dashboard/customers"
-                    icon={<Users className="h-4 w-4" />}
-                    label="Clients"
-                    />
-                    <NavLink
-                    href="/dashboard/products"
-                    icon={<ShoppingBag className="h-4 w-4" />}
-                    label="Produits"
-                    />
-                    <NavLink
-                      href="/dashboard/resellers"
-                      icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
-                      label="Revendeurs"
-                    />
-                </>
+              <nav className="pt-4 border-t">
+                <NavLink
+                  href="/dashboard/settings"
+                  icon={<Settings className="h-4 w-4" />}
+                  label="Paramètres"
+                />
+              </nav>
             )}
-          </nav>
+          </div>
         </aside>
 
         {/* Contenu principal */}

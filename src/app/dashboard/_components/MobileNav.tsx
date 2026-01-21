@@ -1,6 +1,6 @@
 "use client";
 // Import React
-import { Menu, LayoutDashboard, ClipboardList, Users, ShoppingBag } from "lucide-react";
+import { Menu, LayoutDashboard, ClipboardList, Users, ShoppingBag, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 // Import des composants
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -32,42 +32,55 @@ export function MobileNav() {
           <span className="sr-only">Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] p-0">
-        <SheetHeader className="p-6 text-left">
-          <SheetTitle className="font-bold">D3D Dashboard</SheetTitle>
-          <p className="text-xs text-muted-foreground">Gravure 2D - 3D cristal</p>
+      <SheetContent side="left" className="w-[280px] p-0 flex flex-col h-full">
+        <SheetHeader className="py-5 px-6 text-left shrink-0">
+          <SheetTitle className="font-bold text-lg">D3D Dashboard</SheetTitle>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Gravure 2D - 3D cristal</p>
         </SheetHeader>
         <Separator />
-        <nav className="flex flex-col gap-1 p-4">
-          <div onClick={() => setOpen(false)}>
-            <NavLink
-              href="/dashboard"
-              icon={<LayoutDashboard className="h-4 w-4" />}
-              label="Vue d’ensemble"
-            />
-          </div>
-          <div onClick={() => setOpen(false)}>
-            <NavLink
-              href="/dashboard/orders"
-              icon={<ClipboardList className="h-4 w-4" />}
-              label="Commandes"
-            />
-          </div>
-          <div onClick={() => setOpen(false)}>
-            <NavLink
-              href="/dashboard/customers"
-              icon={<Users className="h-4 w-4" />}
-              label="Clients"
-            />
-          </div>
-          <div onClick={() => setOpen(false)}>
-            <NavLink
-              href="/dashboard/products"
-              icon={<ShoppingBag className="h-4 w-4" />}
-              label="Produits"
-            />
-          </div>
-        </nav>
+        
+        <div className="flex-1 flex flex-col justify-between p-4 overflow-y-auto">
+          <nav className="flex flex-col gap-1">
+            <div onClick={() => setOpen(false)}>
+              <NavLink
+                href="/dashboard"
+                icon={<LayoutDashboard className="h-4 w-4" />}
+                label="Vue d’ensemble"
+              />
+            </div>
+            <div onClick={() => setOpen(false)}>
+              <NavLink
+                href="/dashboard/orders"
+                icon={<ClipboardList className="h-4 w-4" />}
+                label="Commandes"
+              />
+            </div>
+            <div onClick={() => setOpen(false)}>
+              <NavLink
+                href="/dashboard/customers"
+                icon={<Users className="h-4 w-4" />}
+                label="Clients"
+              />
+            </div>
+            <div onClick={() => setOpen(false)}>
+              <NavLink
+                href="/dashboard/products"
+                icon={<ShoppingBag className="h-4 w-4" />}
+                label="Produits"
+              />
+            </div>
+          </nav>
+
+          <nav className="pt-4 border-t">
+            <div onClick={() => setOpen(false)}>
+              <NavLink
+                href="/dashboard/settings"
+                icon={<Settings className="h-4 w-4" />}
+                label="Paramètres"
+              />
+            </div>
+          </nav>
+        </div>
       </SheetContent>
     </Sheet>
   );

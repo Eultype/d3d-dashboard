@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import OrderForm from "./_components/NewOrderForm";
+import ResellerOrderForm from "./_components/reseller/ResellerOrderForm"; // Import du nouveau formulaire
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -24,9 +25,8 @@ export default async function NewOrderPage() {
       select: { prefix: true, email: true }
     });
     
-    userPrefix = user?.prefix || "WEB"; // Fallback sur WEB si pas de préfixe (ne devrait pas arriver avec le nouveau flow)
+    userPrefix = user?.prefix || "WEB"; 
 
-    // On récupère le client associé pour pré-remplir les infos de facturation/contact
     if (user?.email) {
       prefilledCustomer = await prisma.customer.findUnique({
         where: { email: user.email },
@@ -34,7 +34,7 @@ export default async function NewOrderPage() {
     }
   }
 
-  // 1. Récupération des produits actifs depuis la base de données
+  // 1. Récupération des produits actifs
   const products = await prisma.product.findMany({
     where: { isActive: true },
     select: {
@@ -45,14 +45,12 @@ export default async function NewOrderPage() {
     orderBy: { name: "asc" },
   });
 
-  // 2. Transformation pour le composant client (si besoin, ici c'est déjà bon)
   const productsCatalog = products.map((p) => ({
     id: p.id,
     name: p.name,
     priceCents: p.priceCents,
   }));
 
-  // 3. Rendu du formulaire client avec les données injectées
   return (
     <div className="max-w-5xl mx-auto py-8">
       <div className="mb-8">
@@ -64,12 +62,18 @@ export default async function NewOrderPage() {
         </p>
       </div>
 
-      <OrderForm 
-        productsCatalog={productsCatalog} 
-        userRole={userRole}
-        userPrefix={userPrefix}
-        prefilledCustomer={prefilledCustomer}
-      />
+      {/* AIGUILLAGE INTELLIGENT */}
+      {userRole === "REVENDEUR" ? (
+        <ResellerOrderForm 
+          productsCatalog={productsCatalog} 
+          userPrefix={userPrefix}
+          prefilledCustomer={prefilledCustomer}
+        />
+      ) : (
+        <OrderForm 
+          productsCatalog={productsCatalog} 
+        />
+      )}
     </div>
   );
 }

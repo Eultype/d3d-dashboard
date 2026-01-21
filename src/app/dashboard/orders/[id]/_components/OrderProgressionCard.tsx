@@ -17,9 +17,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export function OrderProgressionCard({ order }: { order: { id: string; status: string } }) {
+export function OrderProgressionCard({ order, userRole }: { order: { id: string; status: string }, userRole?: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [targetStep, setTargetStep] = useState<{ key: string; label: string } | null>(null);
+
+  const isReadOnly = userRole === "REVENDEUR";
 
   // Définition des étapes logiques
   const steps = [
@@ -32,8 +34,8 @@ export function OrderProgressionCard({ order }: { order: { id: string; status: s
   const currentIdx = Math.max(0, steps.findIndex((s) => s.key === order.status));
 
   const handleStepClick = (stepKey: string, stepLabel: string) => {
-    // On ne fait rien si on clique sur l'étape actuelle ou si ça charge
-    if (stepKey === order.status || isLoading) return;
+    // Sécurité : On ne fait rien si ReadOnly ou si on clique sur l'étape actuelle
+    if (isReadOnly || stepKey === order.status || isLoading) return;
     setTargetStep({ key: stepKey, label: stepLabel });
   };
 

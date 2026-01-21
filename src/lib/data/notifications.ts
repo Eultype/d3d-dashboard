@@ -18,8 +18,20 @@ export async function getNotificationsForUser(): Promise<NotificationWithReadSta
   }
 
   const userId = session.user.id;
+  const userRole = session.user.role;
+
+  let whereClause: any = {};
+
+  if (userRole === "REVENDEUR") {
+    whereClause = {
+      order: {
+        createdById: userId,
+      },
+    };
+  }
 
   const notifications = await prisma.notification.findMany({
+    where: whereClause,
     orderBy: {
       createdAt: "desc",
     },

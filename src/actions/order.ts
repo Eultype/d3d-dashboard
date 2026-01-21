@@ -174,7 +174,8 @@ export async function createOrder(data: OrderInputData) {
     const newNotification = await prisma.notification.create({
         data: {
             message: `La commande ${newOrder.reference} a été créée par ${user.email}.`,
-            link: `/dashboard/orders/${newOrder.id}`
+            link: `/dashboard/orders/${newOrder.id}`,
+            orderId: newOrder.id
         }
     });
     
@@ -229,7 +230,8 @@ export async function updateOrderStatus(orderId: string, newStatus: string, trac
     const newNotification = await prisma.notification.create({
         data: {
             message: `Le statut de la commande ${orderToUpdate.reference} est passé de "${oldStatusLabel}" à "${newStatusLabel}" par ${user.email}.`,
-            link: `/dashboard/orders/${orderId}`
+            link: `/dashboard/orders/${orderId}`,
+            orderId: orderId
         }
     });
 

@@ -58,6 +58,7 @@ model Order {
   createdBy          User?       @relation("OrderCreator", fields: [createdById], references: [id])
   items              OrderItem[]
   notes              OrderNote[]
+  notifications      Notification[]
 }
 
 model OrderNote {
@@ -119,6 +120,8 @@ model Notification {
   link      String
   createdAt DateTime           @default(now())
   readBy    NotificationRead[]
+  orderId   String?
+  order     Order?             @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model NotificationRead {

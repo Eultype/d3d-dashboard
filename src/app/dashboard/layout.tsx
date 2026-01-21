@@ -69,9 +69,9 @@ export default async function DashboardLayout({
                     label="Produits"
                     />
                     <NavLink
-                      href="/dashboard/resellers/new"
+                      href="/dashboard/resellers"
                       icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
-                      label="Nouveau Revendeur"
+                      label="Revendeurs"
                     />
                 </>
             )}

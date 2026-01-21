@@ -12,6 +12,12 @@ const ResellerSchema = z.object({
   email: z.string().email("Email invalide"),
   companyName: z.string().optional(),
   prefix: z.string().min(2, "Le préfixe doit faire au moins 2 caractères").toUpperCase(),
+  phone: z.string().optional(),
+  vatNumber: z.string().optional(),
+  addressLine1: z.string().min(1, "L'adresse est requise"),
+  postalCode: z.string().min(1, "Le code postal est requis"),
+  city: z.string().min(1, "La ville est requise"),
+  country: z.string().min(1, "Le pays est requis"),
 });
 
 export type ResellerInput = z.infer<typeof ResellerSchema>;
@@ -26,7 +32,7 @@ export async function createReseller(data: ResellerInput) {
     };
   }
 
-  const { name, email, companyName, prefix } = validation.data;
+  const { name, email, companyName, prefix, phone, vatNumber, addressLine1, postalCode, city, country } = validation.data;
 
   try {
     // 1. Vérifier existence
@@ -47,12 +53,14 @@ export async function createReseller(data: ResellerInput) {
         data: { 
           name, 
           email, 
-          companyName, // ✅ Ajouté ici
+          phone,
+          companyName,
+          vatNumber,
           isActive: true, 
-          addressLine1: "", 
-          city: "", 
-          country: "Belgique", 
-          postalCode: "" 
+          addressLine1, 
+          city, 
+          country, 
+          postalCode 
         }
       });
     }

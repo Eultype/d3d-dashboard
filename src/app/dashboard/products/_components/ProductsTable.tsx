@@ -33,7 +33,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
         <TooltipProvider>
             <div className="space-y-4">
                 {/* VUE MOBILE : Liste de cartes (2 colonnes) */}
-                <div className="grid grid-cols-2 gap-2 md:hidden">
+                <div className="grid grid-cols-2 gap-2 xl:hidden">
                     {products.map((p) => {
                         const href = `/dashboard/products/${p.id}`;
 
@@ -84,7 +84,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                 </div>
 
                 {/* VUE DESKTOP : Tableau classique */}
-                <div className="hidden md:block overflow-hidden rounded-lg border bg-background">
+                <div className="hidden xl:block overflow-hidden rounded-lg border bg-background">
                     <Table>
                         <TableHeader>
                             {/* Ligne d'en-tête du tableau des produits */}

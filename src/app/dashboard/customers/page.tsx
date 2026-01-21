@@ -71,8 +71,8 @@ export default async function CustomersPage({
                 </div>
             </div>
 
-            {/* Stats (Scrollable on mobile/tablet, 5 on desktop) */}
-            <div className="flex overflow-x-auto pb-2 gap-3 xl:grid xl:grid-cols-5 xl:pb-0 scrollbar-hide">
+            {/* Stats (Scrollable on mobile, Grid on tablet/desktop) */}
+            <div className="flex overflow-x-auto pb-2 gap-3 md:grid md:grid-cols-3 xl:grid-cols-5 md:pb-0 scrollbar-hide">
                 {/* Total */}
                 <div className="min-w-[140px] flex-1">
                     <StatItem

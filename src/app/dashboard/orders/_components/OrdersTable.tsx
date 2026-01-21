@@ -37,7 +37,7 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
         <TooltipProvider>
             <div className="space-y-4">
                 {/* VUE MOBILE : Liste de cartes pour petits écrans */}
-                <div className="grid grid-cols-2 gap-2 md:hidden">
+                <div className="grid grid-cols-2 gap-2 xl:hidden">
                     {orders.map((o) => {
                         const href = `/dashboard/orders/${o.id}`;
                         const displayRef = o.reference || `#${o.id.slice(0, 10)}`;
@@ -83,7 +83,7 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                 </div>
 
                 {/* VUE DESKTOP : Tableau classique pour écrans larges */}
-                <div className="hidden md:block overflow-hidden rounded-lg border bg-background">
+                <div className="hidden xl:block w-full overflow-hidden rounded-lg border bg-background">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-muted/40">

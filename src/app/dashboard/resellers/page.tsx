@@ -34,7 +34,7 @@ export default async function ResellersPage({
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <div className="text-sm text-muted-foreground">
                         <Link href="/dashboard" className="hover:underline">
                             Dashboard
@@ -51,33 +51,40 @@ export default async function ResellersPage({
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2">
-                    <SearchInput placeholder="Rechercher un revendeur..." className="w-full sm:w-64" />
-                    <Button asChild>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <SearchInput placeholder="Rechercher..." className="w-full sm:w-64" />
+                    <Button asChild className="w-full sm:w-auto">
                         <Link href="/dashboard/resellers/new">Nouveau revendeur</Link>
                     </Button>
                 </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <StatItem
-                    icon={<Users className="h-4 w-4" />}
-                    label="Revendeurs"
-                    value={stats.totalResellers}
-                    hint="Total"
-                />
-                <StatItem
-                    icon={<Tag className="h-4 w-4" />}
-                    label="Avec préfixe"
-                    value={stats.withPrefix}
-                    hint="Préfixe défini"
-                />
-                <StatItem
-                    icon={<UserPlus className="h-4 w-4" />}
-                    label="Nouveaux"
-                    value={stats.new30j}
-                    hint="Sur 30 jours"
-                />
+            {/* Stats (Scrollable on mobile, Grid on tablet/desktop) */}
+            <div className="flex overflow-x-auto pb-2 gap-3 md:grid md:grid-cols-3 xl:grid-cols-4 md:pb-0 scrollbar-hide">
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<Users className="h-4 w-4" />}
+                        label="Revendeurs"
+                        value={stats.totalResellers}
+                        hint="Total"
+                    />
+                </div>
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<Tag className="h-4 w-4" />}
+                        label="Avec préfixe"
+                        value={stats.withPrefix}
+                        hint="Préfixe défini"
+                    />
+                </div>
+                <div className="min-w-[140px] flex-1">
+                    <StatItem
+                        icon={<UserPlus className="h-4 w-4" />}
+                        label="Nouveaux"
+                        value={stats.new30j}
+                        hint="Sur 30 jours"
+                    />
+                </div>
             </div>
 
             <ResellersTable resellers={resellers} />

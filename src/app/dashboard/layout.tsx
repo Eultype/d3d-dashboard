@@ -92,13 +92,13 @@ export default async function DashboardLayout({
         </aside>
 
         {/* Contenu principal */}
-        <div>
+        <div className="flex flex-col min-w-0 max-w-full overflow-x-hidden">
           {/* Barre supérieure avec navigation et infos utilisateur */}
           <header className="h-16 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="h-full flex items-center justify-between px-4 lg:px-8">
               <div className="flex items-center gap-3">
                 {/* Navbar mobile */}
-                <MobileNav />
+                <MobileNav userRole={session.user.role as string} />
                 <div className="font-medium">Dashboard</div>
                 <span className="text-xs text-muted-foreground hidden sm:inline">
                   Interne • v0.1

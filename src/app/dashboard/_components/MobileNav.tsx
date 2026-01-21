@@ -7,10 +7,13 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/com
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "./NavLink";
+
 // Composant Navbar mobile
-export function MobileNav() {
+export function MobileNav({ userRole }: { userRole?: string }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const isAdmin = userRole === "ADMIN";
 
   useEffect(() => {
     setMounted(true);
@@ -55,31 +58,45 @@ export function MobileNav() {
                 label="Commandes"
               />
             </div>
-            <div onClick={() => setOpen(false)}>
-              <NavLink
-                href="/dashboard/customers"
-                icon={<Users className="h-4 w-4" />}
-                label="Clients"
-              />
-            </div>
-            <div onClick={() => setOpen(false)}>
-              <NavLink
-                href="/dashboard/products"
-                icon={<ShoppingBag className="h-4 w-4" />}
-                label="Produits"
-              />
-            </div>
+
+            {isAdmin && (
+              <>
+                <div onClick={() => setOpen(false)}>
+                  <NavLink
+                    href="/dashboard/customers"
+                    icon={<Users className="h-4 w-4" />}
+                    label="Clients"
+                  />
+                </div>
+                <div onClick={() => setOpen(false)}>
+                  <NavLink
+                    href="/dashboard/products"
+                    icon={<ShoppingBag className="h-4 w-4" />}
+                    label="Produits"
+                  />
+                </div>
+                <div onClick={() => setOpen(false)}>
+                  <NavLink
+                    href="/dashboard/resellers"
+                    icon={<Users className="h-4 w-4" />}
+                    label="Revendeurs"
+                  />
+                </div>
+              </>
+            )}
           </nav>
 
-          <nav className="pt-4 border-t">
-            <div onClick={() => setOpen(false)}>
-              <NavLink
-                href="/dashboard/settings"
-                icon={<Settings className="h-4 w-4" />}
-                label="Paramètres"
-              />
-            </div>
-          </nav>
+          {isAdmin && (
+            <nav className="pt-4 border-t">
+              <div onClick={() => setOpen(false)}>
+                <NavLink
+                  href="/dashboard/settings"
+                  icon={<Settings className="h-4 w-4" />}
+                  label="Paramètres"
+                />
+              </div>
+            </nav>
+          )}
         </div>
       </SheetContent>
     </Sheet>

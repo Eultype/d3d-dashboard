@@ -33,10 +33,10 @@ export default function ClientSideHeaderElements({
   const isAdmin = userRole === "ADMIN";
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       <NotificationsBell initialNotifications={initialNotifications} />
       <ThemeToggle />
-      <span className="text-sm text-muted-foreground">
+      <span className="text-sm text-muted-foreground hidden sm:inline truncate max-w-[150px]">
         {sessionUserEmail}
       </span>
       <LogoutButton />

@@ -41,6 +41,7 @@ export default async function NewOrderPage() {
       id: true,
       name: true,
       priceCents: true,
+      category: true,
     },
     orderBy: { name: "asc" },
   });
@@ -49,6 +50,7 @@ export default async function NewOrderPage() {
     id: p.id,
     name: p.name,
     priceCents: p.priceCents,
+    category: p.category || undefined,
   }));
 
   return (

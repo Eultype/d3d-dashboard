@@ -37,6 +37,7 @@ const OrderSchema = z.object({
         typeId: z.string().min(1, "ID produit manquant"),
         quantity: z.number().min(1, "Quantité minimum 1"),
         unitPrice: z.number().min(0, "Prix invalide"),
+        customText: z.string().optional().nullable(),
         files: z.array(z.object({ url: z.string(), filename: z.string(), type: z.string() })).optional().default([]),
       })
     )
@@ -129,20 +130,11 @@ export async function createOrder(data: OrderInputData) {
       reference = await getNextOrderReference(validData.info.prefix);
     }
 
-    // 4. Préparation des lignes de commande
-    const aggregatedProducts = validData.products.reduce((acc, p) => {
-      const existing = acc.get(p.typeId);
-      if (existing) {
-        existing.quantity += p.quantity;
-      } else {
-        acc.set(p.typeId, { ...p });
-      }
-      return acc;
-    }, new Map<string, (typeof validData.products)[0]>());
-    const orderItems = Array.from(aggregatedProducts.values()).map((p) => ({
+    const orderItems = validData.products.map((p) => ({
       productId: p.typeId,
       quantity: p.quantity,
       unitPriceCents: Math.round(p.unitPrice * 100),
+      customText: p.customText,
     }));
 
     // 5. Création de la commande

@@ -111,6 +111,7 @@ model OrderItem {
   productId      String
   quantity       Int      @default(1)
   unitPriceCents Int      @default(0)
+  customText     String?  // Texte personnalisé à graver
   createdAt      DateTime @default(now())
   order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product        Product  @relation(fields: [productId], references: [id])

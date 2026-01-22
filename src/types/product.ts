@@ -5,7 +5,8 @@ export type ProductFormState = {
   errors?: {
     name?: string[];
     sku?: string[];
-    description?: string[];
+    dimensions?: string[];
+    category?: string[];
     imageFile?: string[];
     priceCents?: string[];
   };
@@ -19,7 +20,8 @@ export type ProductRow = {
     id: string;
     name: string;
     sku: string;
-    description: string | null;
+    dimensions: string | null;
+    category: string | null;
     imageUrl: string | null;
     isActive: boolean;
     priceCents: number;
@@ -31,7 +33,8 @@ export type ProductFormData = {
     id: string;
     name: string;
     sku: string;
-    description: string | null;
+    dimensions: string | null;
+    category: string | null;
     imageUrl: string | null;
     priceCents: number;
     isActive: boolean;

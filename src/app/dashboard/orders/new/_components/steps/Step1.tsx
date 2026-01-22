@@ -20,8 +20,9 @@ type Props = {
   draft: OrderDraft;
   onChange: (patch: Partial<OrderDraft>) => void;
   onNext: () => void;
-  onBack?: () => void; // Le bouton retour peut être optionnel au step 1
+  onBack?: () => void;
   currentStep?: number;
+  availablePrefixes: string[]; // Nouvelle prop
 };
 
 const steps = [
@@ -37,10 +38,15 @@ export default function StepOne({
   onNext,
   onBack,
   currentStep = 1,
+  availablePrefixes,
 }: Props) {
   const [nextSeq, setNextSeq] = useState<number | null>(null);
   const [isLoadingSeq, setIsLoadingSeq] = useState(false);
   
+  // Gestion du mode "Nouveau Préfixe"
+  const [isCreatingPrefix, setIsCreatingPrefix] = useState(false);
+  const [customPrefix, setCustomPrefix] = useState("");
+
   // Validation doublon
   const [isReferenceTaken, setIsReferenceTaken] = useState(false);
   const [isCheckingRef, setIsCheckingRef] = useState(false);
@@ -55,24 +61,61 @@ export default function StepOne({
     });
   };
 
+  // Gestion du changement de sélection
+  const handlePrefixChange = (val: string) => {
+    if (val === "CREATE_NEW") {
+      setIsCreatingPrefix(true);
+      // On ne change pas encore le préfixe dans le draft, on attend que l'utilisateur tape
+    } else {
+      setIsCreatingPrefix(false);
+      onChange({
+        info: {
+          ...draft.info,
+          prefix: val,
+          manualNumber: null,
+        },
+      });
+    }
+  };
+
+  // Gestion de la saisie manuelle du préfixe
+  const handleCustomPrefixInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5); // Max 5 chars, lettres seulement
+    setCustomPrefix(val);
+    updateInfo("prefix", val);
+  };
+
   // Charger la séquence quand le préfixe change
   useEffect(() => {
     async function loadSeq() {
-      if (!draft.info.prefix) return;
+      const prefix = draft.info.prefix;
+      if (!prefix || prefix.length < 2) {
+        setNextSeq(null);
+        return;
+      }
+      
       setIsLoadingSeq(true);
       try {
-        const val = await getNextSequenceValue(draft.info.prefix);
+        const val = await getNextSequenceValue(prefix);
         setNextSeq(val);
         // Si c'est WEB et qu'on n'a pas encore de valeur manuelle, on pré-remplit
-        if (draft.info.prefix === "WEB" && !draft.info.manualNumber) {
+        if (prefix === "WEB" && !draft.info.manualNumber) {
           updateInfo("manualNumber", val);
         }
       } finally {
         setIsLoadingSeq(false);
       }
     }
-    loadSeq();
-  }, [draft.info.prefix]); // Dépendance uniquement au préfixe
+
+    // Si on tape manuellement (mode création), on attend un peu
+    if (isCreatingPrefix) {
+      const t = setTimeout(loadSeq, 500);
+      return () => clearTimeout(t);
+    } else {
+      // Sinon (sélection dans la liste), on charge tout de suite
+      loadSeq();
+    }
+  }, [draft.info.prefix, isCreatingPrefix]);
 
   // Vérifier doublon quand le numéro manuel change
   useEffect(() => {
@@ -122,32 +165,50 @@ export default function StepOne({
             <FieldLabel htmlFor="select-prefix">
               Préfixe De Commande *
             </FieldLabel>
-            <Select
-              // 1. Liaison avec draft
-              value={draft.info.prefix}
-              // 2. Mise à jour via le helper
-              onValueChange={(val) => {
-                onChange({
-                  info: {
-                    ...draft.info,
-                    prefix: val,
-                    manualNumber: null, // Reset manual on change
-                  },
-                });
-              }}
-            >
-              <SelectTrigger className="w-full pl-4 pr-10 h-12">
-                <SelectValue
-                  id="select-prefix"
-                  placeholder="Sélectionner Un Préfixe"
+            
+            {/* Mode Sélection */}
+            {!isCreatingPrefix ? (
+              <Select
+                value={draft.info.prefix}
+                onValueChange={handlePrefixChange}
+              >
+                <SelectTrigger className="w-full pl-4 pr-10 h-12">
+                  <SelectValue
+                    id="select-prefix"
+                    placeholder="Sélectionner Un Préfixe"
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {availablePrefixes.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="CREATE_NEW" className="font-semibold text-blue-600">
+                    + Nouveau préfixe...
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              // Mode Création
+              <div className="flex gap-2">
+                <Input 
+                  value={customPrefix}
+                  onChange={handleCustomPrefixInput}
+                  placeholder="EX: TEST"
+                  className="h-12 uppercase font-mono"
+                  maxLength={5}
+                  autoFocus
                 />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="BOG">BOG - Atelier Bogny</SelectItem>
-                <SelectItem value="ERIC">ERIC - Eric</SelectItem>
-                <SelectItem value="WEB">WEB - Site Web</SelectItem>
-              </SelectContent>
-            </Select>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsCreatingPrefix(false)}
+                  className="h-12 px-4"
+                >
+                  Annuler
+                </Button>
+              </div>
+            )}
           </Field>
 
           {/* CHAMP DYNAMIQUE : NUMÉRO */}

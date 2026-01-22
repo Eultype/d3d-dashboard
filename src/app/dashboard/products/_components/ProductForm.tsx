@@ -15,7 +15,7 @@ import { ProductFormState, ProductFormProps } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -114,18 +114,40 @@ export function ProductForm({ product }: ProductFormProps) {
                         </Field>
                     </div>
 
-                    {/* Description */}
-                    <Field>
-                        <FieldLabel htmlFor="description">Description</FieldLabel>
-                        <Textarea
-                            id="description"
-                            name="description"
-                            defaultValue={product?.description ?? ""}
-                            rows={4}
-                            placeholder="Description détaillée du produit..."
-                        />
-                        <FieldError errors={formatErrors(state.errors?.description)} />
-                    </Field>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Dimensions */}
+                        <Field>
+                            <FieldLabel htmlFor="dimensions">Dimensions</FieldLabel>
+                            <Input
+                                id="dimensions"
+                                name="dimensions"
+                                defaultValue={product?.dimensions ?? ""}
+                                placeholder="Ex: 80x50x50 mm"
+                            />
+                            <FieldError errors={formatErrors(state.errors?.dimensions)} />
+                        </Field>
+
+                        {/* Catégorie */}
+                        <Field>
+                            <FieldLabel htmlFor="category">Catégorie</FieldLabel>
+                            <Select name="category" defaultValue={product?.category ?? ""}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Sélectionner une catégorie" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="BLOC">Bloc</SelectItem>
+                                    <SelectItem value="BLOC-CUBE">Bloc Cube</SelectItem>
+                                    <SelectItem value="CADRE">Cadre</SelectItem>
+                                    <SelectItem value="COEUR">Coeur</SelectItem>
+                                    <SelectItem value="PRISME">Prisme</SelectItem>
+                                    <SelectItem value="HORLOGE">Horloge</SelectItem>
+                                    <SelectItem value="PORTE-CLES">Porte-clés</SelectItem>
+                                    <SelectItem value="ACCESSOIRE">Accessoire</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FieldError errors={formatErrors(state.errors?.category)} />
+                        </Field>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Image */}

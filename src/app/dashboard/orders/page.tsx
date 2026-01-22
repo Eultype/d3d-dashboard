@@ -6,7 +6,6 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
-
 // Import des composants
 import { OrdersTable } from "./_components/OrdersTable";
 import { OrdersFilter } from "./_components/OrdersFilter";

@@ -57,9 +57,15 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                         <Link href={href} className="font-bold text-xs text-foreground hover:underline block truncate">
                                             {p.name}
                                         </Link>
-                                        <p className="text-[9px] text-muted-foreground font-mono truncate">
-                                            {p.sku}
-                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                            <p className="text-[9px] text-muted-foreground font-mono truncate">
+                                                {p.sku}
+                                            </p>
+                                            <span className="text-[9px] text-muted-foreground">•</span>
+                                            <p className="text-[9px] text-blue-600 font-medium truncate">
+                                                {p.category}
+                                            </p>
+                                        </div>
                                         <div className="font-bold text-sm tabular-nums pt-0.5">
                                             {formatPriceEUR(p.priceCents)}
                                         </div>
@@ -130,9 +136,9 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                                 <div className="min-w-0">
                                                     {/* Nom */}
                                                     <div className="font-medium truncate">{p.name}</div>
-                                                    {/* Description */}
+                                                    {/* Dimensions & Catégorie */}
                                                     <div className="text-xs text-muted-foreground truncate">
-                                                        {p.description ?? "Aucune description"}
+                                                        {p.dimensions ?? "—"} • {p.category ?? "—"}
                                                     </div>
                                                 </div>
                                             </div>

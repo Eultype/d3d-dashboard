@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import StepOne from "./steps/Step1";
@@ -8,6 +8,7 @@ import StepTwo from "./steps/Step2";
 import StepThree from "./steps/Step3";
 import StepFour from "./steps/Step4";
 import { createOrder } from "@/actions/order";
+import { getInternalPrefixes } from "@/actions/sequence";
 import { OrderDraft, ProductFromDB } from "@/types/order";
 
 // --- Définition des types globaux ---
@@ -20,6 +21,9 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Stockage des préfixes chargés depuis le serveur
+  const [prefixes, setPrefixes] = useState<string[]>([]);
 
   const [draft, setDraft] = useState<OrderDraft>({
     info: { 
@@ -36,6 +40,19 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
     discountType: "none",
     internalNote: "",
   });
+
+  // Charger les préfixes au montage
+  useEffect(() => {
+    async function loadPrefixes() {
+      try {
+        const list = await getInternalPrefixes();
+        setPrefixes(list);
+      } catch (err) {
+        console.error("Erreur chargement préfixes", err);
+      }
+    }
+    loadPrefixes();
+  }, []);
 
   const updateDraft = (patch: Partial<OrderDraft>) => {
     setDraft((prev) => ({ ...prev, ...patch }));
@@ -91,6 +108,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
           draft={draft}
           onChange={updateDraft}
           onNext={() => setStep(2)}
+          availablePrefixes={prefixes}
         />
       )}
 

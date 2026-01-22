@@ -77,15 +77,21 @@ export function ProductInfoCard({ product }: { product: Product }) {
                 </div>
               </div>
 
-              {/* Label Description */}
-              <span className="font-semibold text-right text-xs sm:text-base">Description</span>
-              {/* Affichage de la description ou message si absente */}
+              {/* Label Dimensions */}
+              <span className="font-semibold text-right text-xs sm:text-base">Dimensions</span>
+              {/* Affichage des dimensions */}
               <div className="text-xs sm:text-sm text-muted-foreground break-words min-w-0">
-                {product.description?.trim() ? (
-                    product.description
+                {product.dimensions?.trim() ? (
+                    product.dimensions
                 ) : (
-                    <span className="italic">Aucune description</span>
+                    <span className="italic">—</span>
                 )}
+              </div>
+
+              {/* Label Catégorie */}
+              <span className="font-semibold text-right text-xs sm:text-base">Catégorie</span>
+              <div className="text-xs sm:text-sm text-blue-600 font-medium">
+                {product.category ?? "—"}
               </div>
             </div>
           </div>

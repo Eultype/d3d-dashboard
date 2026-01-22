@@ -173,6 +173,12 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                             <div className="min-w-0">
                                                 <p className="font-bold text-slate-900 truncate">{name}</p>
                                                 {sku ? <p className="mt-1 text-[10px] text-neutral-400 font-mono font-medium tracking-tighter uppercase">{sku}</p> : null}
+                                                {/* Affichage du texte personnalisé */}
+                                                {it.customText ? (
+                                                    <p className="mt-1 text-[10px] text-blue-600 font-medium italic">
+                                                        Gravure : {it.customText}
+                                                    </p>
+                                                ) : null}
                                             </div>
                                             <div className="sm:hidden font-bold text-slate-900 tabular-nums">{line}</div>
                                         </div>

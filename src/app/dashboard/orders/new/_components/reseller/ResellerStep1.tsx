@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -129,6 +131,32 @@ export default function ResellerStep1({
     onNext();
   };
 
+  // Groupement des produits par catégorie
+  const categoriesMap = [
+    { label: "Coeur", dbValues: ["COEUR"] },
+    { label: "Porte-clé", dbValues: ["PORTE-CLES", "PORTE-CLE"] },
+    { label: "Gravure 2D", dbValues: ["CADRE", "PLAQUE"] },
+    { label: "Accessoire", dbValues: ["ACCESSOIRE", "HORLOGE", "SOCLE"] },
+    { label: "Gravure 3D", dbValues: ["BLOC", "BLOC-CUBE", "PRISME"] },
+  ];
+
+  const categorizedProducts = categoriesMap.map((cat) => ({
+    id: cat.label,
+    label: cat.label,
+    products: productsCatalog.filter((p) =>
+      p.category && cat.dbValues.includes(p.category.toUpperCase())
+    ),
+  }));
+
+  // On récupère tous les IDs de produits déjà classés pour trouver les "Autres"
+  const classifiedProductIds = new Set(
+    categorizedProducts.flatMap((c) => c.products.map((p) => p.id))
+  );
+
+  const otherProducts = productsCatalog.filter(
+    (p) => !classifiedProductIds.has(p.id)
+  );
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 pb-10">
       <div className="pb-2">
@@ -152,11 +180,28 @@ export default function ResellerStep1({
                   <SelectValue placeholder="Sélectionner un produit à ajouter" />
                 </SelectTrigger>
                 <SelectContent>
-                  {productsCatalog.map((prod) => (
-                    <SelectItem key={prod.id} value={prod.id}>
-                      {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
-                    </SelectItem>
+                  {categorizedProducts.map((cat) => (
+                    cat.products.length > 0 && (
+                      <SelectGroup key={cat.id}>
+                        <SelectLabel>{cat.label}</SelectLabel>
+                        {cat.products.map((prod) => (
+                          <SelectItem key={prod.id} value={prod.id}>
+                            {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )
                   ))}
+                  {otherProducts.length > 0 && (
+                    <SelectGroup>
+                      <SelectLabel>Autres</SelectLabel>
+                      {otherProducts.map((prod) => (
+                        <SelectItem key={prod.id} value={prod.id}>
+                          {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  )}
                 </SelectContent>
               </Select>
             </Field>
@@ -213,27 +258,48 @@ export default function ResellerStep1({
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 pt-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`custom-${item.uniqueId}`}
-                        checked={item.hasCustomText}
-                        onCheckedChange={(checked) => updateProduct(item.uniqueId, "hasCustomText", checked === true)}
-                      />
-                      <label htmlFor={`custom-${item.uniqueId}`} className="text-sm font-medium leading-none">
-                        Texte personnalisé (+10,00 €)
-                      </label>
+                  {/* Checkboxes */}
+                  <div className="space-y-4 pt-2">
+                    <div className="flex flex-wrap gap-4 sm:gap-6">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`custom-${item.uniqueId}`}
+                          checked={item.hasCustomText}
+                          onCheckedChange={(checked) =>
+                            updateProduct(item.uniqueId, "hasCustomText", checked === true)
+                          }
+                        />
+                        <label htmlFor={`custom-${item.uniqueId}`} className="text-sm font-medium leading-none">
+                          Texte personnalisé (+10,00 €)
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`3d-${item.uniqueId}`}
+                          checked={item.needs3D}
+                          onCheckedChange={(checked) =>
+                            updateProduct(item.uniqueId, "needs3D", checked === true)
+                          }
+                        />
+                        <label htmlFor={`3d-${item.uniqueId}`} className="text-sm font-medium leading-none">
+                          Nécessite sous-traitance 3D
+                        </label>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`3d-${item.uniqueId}`}
-                        checked={item.needs3D}
-                        onCheckedChange={(checked) => updateProduct(item.uniqueId, "needs3D", checked === true)}
-                      />
-                      <label htmlFor={`3d-${item.uniqueId}`} className="text-sm font-medium leading-none">
-                        Nécessite sous-traitance 3D
-                      </label>
-                    </div>
+
+                    {item.hasCustomText && (
+                      <div className="pl-6 w-full max-w-md">
+                        <Input
+                          placeholder="Texte à graver..."
+                          className="bg-white"
+                          value={item.customText || ""}
+                          onChange={(e) =>
+                            updateProduct(item.uniqueId, "customText", e.target.value)
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">

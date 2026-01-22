@@ -7,6 +7,7 @@ export type ProductItem = {
   unitPrice: number;
   quantity: number;
   hasCustomText: boolean;
+  customText?: string;
   needs3D: boolean;
   files?: {
     url: string;
@@ -63,4 +64,5 @@ export type ProductFromDB = {
   id: string;
   name: string;
   priceCents: number;
+  category?: string;
 };

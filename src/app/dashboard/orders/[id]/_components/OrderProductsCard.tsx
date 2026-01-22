@@ -8,6 +8,7 @@ type OrderProductsCardProps = {
         id: string;
         quantity: number;
         unitPriceCents: number;
+        customText?: string | null;
         product?: {
             name: string | null;
             sku: string | null;
@@ -78,6 +79,11 @@ export function OrderProductsCard({ items, orderStatus }: OrderProductsCardProps
                                                     <p className="text-xs text-muted-foreground truncate">
                                                         {sku} • {unit}
                                                     </p>
+                                                    {it.customText && (
+                                                        <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
+                                                            Gravure : {it.customText}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

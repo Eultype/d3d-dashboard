@@ -9,6 +9,7 @@ export type ProductFormState = {
     category?: string[];
     imageFile?: string[];
     priceCents?: string[];
+    status?: string[];
   };
   message?: string | null;
   success?: boolean;
@@ -23,7 +24,7 @@ export type ProductRow = {
     dimensions: string | null;
     category: string | null;
     imageUrl: string | null;
-    isActive: boolean;
+    status: string;
     priceCents: number;
     createdAt: string; // ISO
 };
@@ -37,7 +38,7 @@ export type ProductFormData = {
     category: string | null;
     imageUrl: string | null;
     priceCents: number;
-    isActive: boolean;
+    status: string;
 };
 
 // Structure pour les derniers items commandés (dans la page produit)

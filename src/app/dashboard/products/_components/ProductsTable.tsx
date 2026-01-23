@@ -152,11 +152,10 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                             {formatPriceEUR(p.priceCents)}
                                         </TableCell>
 
-                                        {/* Statut */}
-                                        <TableCell>
-                                            <ProductActiveBadge isActive={p.isActive} />
-                                        </TableCell>
-
+                                                                            {/* Statut */}
+                                                                            <TableCell>
+                                                                                <ProductActiveBadge status={p.status} />
+                                                                            </TableCell>
                                         {/* Date */}
                                         <TableCell className="text-sm text-muted-foreground">
                                             {formatDateFR(new Date(p.createdAt))}

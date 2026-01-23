@@ -65,4 +65,5 @@ export type ProductFromDB = {
   name: string;
   priceCents: number;
   category?: string;
+  status: string;
 };

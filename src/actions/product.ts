@@ -19,12 +19,29 @@ function parseProductFormData(formData: FormData) {
     dimensions: (formData.get("dimensions") as string) || null,
     category: (formData.get("category") as string) || null,
     priceCents: formData.get("priceCents"),
-    isActive: formData.get("isActive") === "true",
+    status: (formData.get("status") as string) || "AVAILABLE",
     imageFile: formData.get("imageFile") as File,
   };
 }
 
-// ... (helpers slugify et ImageSchema inchangés)
+// Crée un nom de fichier "slug" à partir d'un texte
+const slugify = (text: string) =>
+  text
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-");
+
+// Schéma pour le fichier image, avec validation de la taille et du type
+const ImageSchema = z
+  .instanceof(File)
+  .refine((file) => file.size === 0 || file.type.startsWith("image/"), { message: "Seuls les fichiers image sont acceptés." })
+  .refine((file) => file.size < 2 * 1024 * 1024, "L'image doit peser moins de 2MB.")
+  .optional();
 
 // Le schéma existant, mis à jour
 const ProductFormSchema = z.object({
@@ -34,7 +51,7 @@ const ProductFormSchema = z.object({
   category: z.string().optional().nullable(),
   imageFile: ImageSchema,
   priceCents: z.coerce.number().int().min(0, { message: "Le prix doit être un nombre positif." }),
-  isActive: z.boolean(),
+  status: z.enum(["AVAILABLE", "OUT_OF_STOCK", "HIDDEN"]),
 });
 
 // Fonction helper pour gérer l'upload

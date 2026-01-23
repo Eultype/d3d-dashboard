@@ -34,14 +34,17 @@ export default async function NewOrderPage() {
     }
   }
 
-  // 1. Récupération des produits actifs
+  // 1. Récupération des produits visibles (Disponible + Rupture)
   const products = await prisma.product.findMany({
-    where: { isActive: true },
+    where: { 
+      status: { in: ["AVAILABLE", "OUT_OF_STOCK"] } 
+    },
     select: {
       id: true,
       name: true,
       priceCents: true,
       category: true,
+      status: true,
     },
     orderBy: { name: "asc" },
   });
@@ -51,6 +54,7 @@ export default async function NewOrderPage() {
     name: p.name,
     priceCents: p.priceCents,
     category: p.category || undefined,
+    status: p.status,
   }));
 
   return (

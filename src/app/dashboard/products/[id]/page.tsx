@@ -58,7 +58,7 @@ export default async function ProductDetailPage({
                         {/* Titre du produit */}
                         <h1 className="text-2xl font-bold">{product.name}</h1>
                         {/* Statut (actif/inatif) */}
-                        <ProductActiveBadge isActive={product.isActive} />
+                        <ProductActiveBadge status={product.status} />
                         {product.sku ? (
                             <Badge variant="secondary" className="font-mono">
                                 {/* Badge SKU */}

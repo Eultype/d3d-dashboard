@@ -95,11 +95,11 @@ model Product {
   id          String      @id @default(cuid())
   name        String
   sku         String      @unique
-  dimensions  String?     // Nouveau : Dimensions du produit (ex: 80x50x50 mm)
+  dimensions  String?
   imageUrl    String?
   priceCents  Int         @default(0)
-  category    String?     // Nouveau : Catégorie (BLOC, COEUR, etc.)
-  isActive    Boolean     @default(true)
+  category    String?
+  status      String      @default("AVAILABLE") // AVAILABLE, OUT_OF_STOCK, HIDDEN
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   items       OrderItem[]

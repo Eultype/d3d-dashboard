@@ -40,7 +40,7 @@ export function ProductForm({ product }: ProductFormProps) {
     const initialState: ProductFormState = { errors: {}, message: null, success: false };
     const [state, dispatch] = useActionState(action, initialState);
 
-    const [isActive, setIsActive] = useState<boolean>(product?.isActive ?? true);
+    const [status, setStatus] = useState<string>(product?.status ?? "AVAILABLE");
 
     // Ajout pour la preview instantanée :
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -204,21 +204,25 @@ export function ProductForm({ product }: ProductFormProps) {
                                 <FieldError errors={formatErrors(state.errors?.priceCents)} />
                             </Field>
 
-                            {/* Switch statut */}
-                            <div className="rounded-xl border p-4 flex items-center justify-between bg-muted/10">
-                                <div>
-                                    <p className="text-sm font-medium">Statut du produit</p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                        {isActive ? "Le produit est visible dans le catalogue" : "Le produit est masqué"}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Switch id="isActive-switch" checked={isActive} onCheckedChange={setIsActive} />
-                                    <input type="hidden" name="isActive" value={String(isActive)} />
-                                    <label htmlFor="isActive-switch" className="text-xs font-medium cursor-pointer">
-                                        {isActive ? "Actif" : "Inactif"}
-                                    </label>
-                                </div>
+                            {/* Statut du produit */}
+                            <div className="space-y-2">
+                                <FieldLabel htmlFor="status">Statut et Disponibilité</FieldLabel>
+                                <Select name="status" value={status} onValueChange={setStatus}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Sélectionner un statut" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="AVAILABLE">✅ Disponible</SelectItem>
+                                        <SelectItem value="OUT_OF_STOCK">📦 Rupture de stock</SelectItem>
+                                        <SelectItem value="HIDDEN">🚫 Masqué du catalogue</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-[10px] text-muted-foreground">
+                                    {status === "AVAILABLE" && "Le produit peut être commandé normalement."}
+                                    {status === "OUT_OF_STOCK" && "Le produit est visible mais marqué en rupture."}
+                                    {status === "HIDDEN" && "Le produit n'apparaîtra plus dans les formulaires."}
+                                </p>
+                                <FieldError errors={formatErrors(state.errors?.status)} />
                             </div>
                         </div>
                     </div>

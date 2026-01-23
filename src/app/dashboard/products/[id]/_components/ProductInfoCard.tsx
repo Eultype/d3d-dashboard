@@ -43,7 +43,7 @@ export function ProductInfoCard({ product }: { product: Product }) {
               {/* Statut */}
               <span className="font-semibold text-right text-xs sm:text-base">Statut</span>
               <span>
-                <ProductActiveBadge isActive={product.isActive} />
+                <ProductActiveBadge status={product.status} />
               </span>
             </div>
 

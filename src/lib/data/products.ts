@@ -5,6 +5,18 @@ export async function getProductFullDetails(id: string) {
         // 1. Infos de base
         prisma.product.findUnique({
             where: { id },
+            select: {
+                id: true,
+                name: true,
+                sku: true,
+                dimensions: true,
+                category: true,
+                imageUrl: true,
+                priceCents: true,
+                status: true,
+                createdAt: true,
+                updatedAt: true,
+            }
         }),
         // 2. Dernières commandes (via OrderItem)
         prisma.orderItem.findMany({
@@ -71,7 +83,7 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
         }
         : {};
 
-    const [products, totalCount, countActive, countInactive] = await Promise.all([
+    const [products, totalCount, countActive, countOutOfStock] = await Promise.all([
         prisma.product.findMany({
             where: whereClause,
             take: PAGE_SIZE,
@@ -84,16 +96,16 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
                 dimensions: true,
                 category: true,
                 imageUrl: true,
-                isActive: true,
+                status: true,
                 priceCents: true,
                 createdAt: true,
-                updatedAt: true, // ADDED
+                updatedAt: true,
             },
         }),
         prisma.product.count({ where: whereClause }),
-        // Stats globales (indépendantes de la recherche, sauf Total)
-        prisma.product.count({ where: { isActive: true } }),
-        prisma.product.count({ where: { isActive: false } }),
+        // Stats globales : Disponibles vs Rupture (On ignore HIDDEN dans ces stats)
+        prisma.product.count({ where: { status: "AVAILABLE" } }),
+        prisma.product.count({ where: { status: "OUT_OF_STOCK" } }),
     ]);
 
     const rows = products.map((p) => ({
@@ -103,10 +115,10 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
         dimensions: p.dimensions,
         category: p.category,
         imageUrl: p.imageUrl,
-        isActive: p.isActive,
+        status: p.status,
         priceCents: p.priceCents,
         createdAt: p.createdAt.toISOString(),
-        updatedAt: p.updatedAt.toISOString(), // ADDED
+        updatedAt: p.updatedAt.toISOString(),
     }));
 
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -116,7 +128,7 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
         stats: {
             totalProducts: totalCount,
             activeProducts: countActive,
-            inactiveProducts: countInactive,
+            inactiveProducts: countOutOfStock,
         },
         pagination: {
             totalPages,
@@ -125,4 +137,3 @@ export async function getProductsAndStats(query?: string, page: number = 1) {
         }
     };
 }
-

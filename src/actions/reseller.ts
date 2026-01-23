@@ -5,7 +5,9 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
-import { sendEmail } from "@/lib/mailer"; // ✅ Changement ici : Nodemailer
+import { sendEmail } from "@/lib/mailer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 const ResellerSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
@@ -23,6 +25,12 @@ const ResellerSchema = z.object({
 export type ResellerInput = z.infer<typeof ResellerSchema>;
 
 export async function createReseller(data: ResellerInput) {
+  // BLINDAGE SÉCURITÉ
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return { success: false, message: "Non autorisé. Droits administrateur requis." };
+  }
+
   const validation = ResellerSchema.safeParse(data);
 
   if (!validation.success) {

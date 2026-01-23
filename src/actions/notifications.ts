@@ -14,6 +14,10 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean, 
   const userId = session.user.id;
   const userRole = session.user.role;
 
+  // SÉCURITÉ : VÉRIFIER QUE L'USER EXISTE BIEN
+  const userExists = await prisma.user.count({ where: { id: userId } });
+  if (userExists === 0) return { success: false, message: "Utilisateur invalide." };
+
   try {
     let whereClause: any = {};
     if (userRole === "REVENDEUR") {

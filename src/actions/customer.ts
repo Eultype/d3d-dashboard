@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { CustomerFormState } from "@/types/customer";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 // Schéma de base partagé pour les champs du formulaire
 const CustomerFormSchema = z.object({
@@ -52,6 +54,12 @@ export async function createCustomer(
   previousState: CustomerFormState | undefined,
   formData: FormData,
 ): Promise<CustomerFormState> {
+  // BLINDAGE SÉCURITÉ
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return { success: false, message: "Non autorisé. Droits administrateur requis." };
+  }
+
   const data = parseCustomerFormData(formData);
   const validatedFields = CustomerFormSchema.safeParse(data);
 
@@ -84,6 +92,12 @@ export async function updateCustomer(
   previousState: CustomerFormState | undefined,
   formData: FormData,
 ): Promise<CustomerFormState> {
+  // BLINDAGE SÉCURITÉ
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return { success: false, message: "Non autorisé. Droits administrateur requis." };
+  }
+
   const data = {
     ...parseCustomerFormData(formData),
     id: formData.get("id") as string,

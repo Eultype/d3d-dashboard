@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ProductFormState } from "@/types/product";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 // --- HELPERS ---
 
@@ -91,6 +93,12 @@ export async function createProduct(
   previousState: ProductFormState | undefined,
   formData: FormData,
 ): Promise<ProductFormState> {
+  // BLINDAGE SÉCURITÉ
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return { message: "Non autorisé. Droits administrateur requis." };
+  }
+
   const data = parseProductFormData(formData);
   const validatedFields = ProductFormSchema.safeParse(data);
 
@@ -129,6 +137,12 @@ export async function updateProduct(
   previousState: ProductFormState | undefined,
   formData: FormData,
 ): Promise<ProductFormState> {
+  // BLINDAGE SÉCURITÉ
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return { message: "Non autorisé. Droits administrateur requis." };
+  }
+
   const data = {
     ...parseProductFormData(formData),
     id: formData.get("id") as string,

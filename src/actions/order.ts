@@ -67,13 +67,23 @@ export async function createOrder(data: OrderInputData) {
     return { success: false, message: "Erreur d'autorisation : Vous devez être connecté." };
   }
 
+  // RÉCUPÉRATION DE L'UTILISATEUR AVEC SON RÔLE ET SON PRÉFIXE
   const user = await prisma.user.findUnique({
     where: { email: userEmail },
-    select: { id: true, email: true },
+    select: { id: true, email: true, role: true, prefix: true, name: true },
   });
+
   if (!user) {
     console.error("❌ [createOrder] Employé introuvable (Session) :", userEmail);
     return { success: false, message: "Erreur d'autorisation : Employé introuvable." };
+  }
+
+  const userName = user.name || user.email;
+
+  // SÉCURITÉ : UN REVENDEUR NE PEUT PAS UTILISER UN AUTRE PRÉFIXE
+  if (user.role === "REVENDEUR" && validData.info.prefix !== user.prefix) {
+    console.error("⚠️ [createOrder] Tentative d'usurpation de préfixe par :", userEmail);
+    return { success: false, message: "Action non autorisée : Préfixe invalide pour votre compte." };
   }
 
   try {
@@ -165,7 +175,7 @@ export async function createOrder(data: OrderInputData) {
     // 7. Création et envoi de la notification
     const newNotification = await prisma.notification.create({
         data: {
-            message: `La commande ${newOrder.reference} a été créée par ${user.email}.`,
+            message: `La commande ${newOrder.reference} a été créée par ${userName}.`,
             link: `/dashboard/orders/${newOrder.id}`,
             orderId: newOrder.id
         }
@@ -200,9 +210,20 @@ export async function updateOrderStatus(orderId: string, newStatus: string, trac
   if (!validation.success) {
     return { success: false, message: "Statut invalide" };
   }
-  const user = await prisma.user.findUnique({ where: { email: session.user.email }, select: { email: true } });
-   if (!user) {
+  const user = await prisma.user.findUnique({ 
+    where: { email: session.user.email }, 
+    select: { email: true, role: true, name: true } 
+  });
+
+  if (!user) {
     return { success: false, message: "Utilisateur non trouvé." };
+  }
+
+  const userName = user.name || user.email;
+
+  // SÉCURITÉ : SEULS LES ADMINS PEUVENT CHANGER LES STATUTS
+  if (user.role !== "ADMIN") {
+    return { success: false, message: "Non autorisé. Droits administrateur requis." };
   }
 
   try {
@@ -221,7 +242,7 @@ export async function updateOrderStatus(orderId: string, newStatus: string, trac
     // Création et envoi de la notification
     const newNotification = await prisma.notification.create({
         data: {
-            message: `Le statut de la commande ${orderToUpdate.reference} est passé de "${oldStatusLabel}" à "${newStatusLabel}" par ${user.email}.`,
+            message: `Le statut de la commande ${orderToUpdate.reference} est passé de "${oldStatusLabel}" à "${newStatusLabel}" par ${userName}.`,
             link: `/dashboard/orders/${orderId}`,
             orderId: orderId
         }

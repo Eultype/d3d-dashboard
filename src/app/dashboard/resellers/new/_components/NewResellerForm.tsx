@@ -41,7 +41,6 @@ export default function NewResellerForm() {
     setLoading(true);
 
     try {
-      // @ts-expect-error
       const result = await createReseller(formData);
       
       if (result.success) {

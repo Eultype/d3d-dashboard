@@ -49,7 +49,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                                             )}
                                         </div>
                                         <div className="shrink-0 scale-75 origin-top-right">
-                                            <ProductActiveBadge isActive={p.isActive} />
+                                            <ProductActiveBadge status={p.status} />
                                         </div>
                                     </div>
 

@@ -169,18 +169,18 @@ export default function StepThree({
   const categorizedProducts = categoriesMap.map((cat) => ({
     id: cat.label,
     label: cat.label,
-    products: productsCatalog.filter((p) =>
-      p.category && cat.dbValues.includes(p.category.toUpperCase())
+    products: productsCatalog.filter(
+      (p) => p.category && cat.dbValues.includes(p.category.toUpperCase()),
     ),
   }));
 
   // On récupère tous les IDs de produits déjà classés pour trouver les "Autres"
   const classifiedProductIds = new Set(
-    categorizedProducts.flatMap((c) => c.products.map((p) => p.id))
+    categorizedProducts.flatMap((c) => c.products.map((p) => p.id)),
   );
 
   const otherProducts = productsCatalog.filter(
-    (p) => !classifiedProductIds.has(p.id)
+    (p) => !classifiedProductIds.has(p.id),
   );
 
   return (
@@ -213,18 +213,20 @@ export default function StepThree({
                   <SelectValue placeholder="Sélectionner un produit à ajouter" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categorizedProducts.map((cat) => (
-                    cat.products.length > 0 && (
-                      <SelectGroup key={cat.id}>
-                        <SelectLabel>{cat.label}</SelectLabel>
-                        {cat.products.map((prod) => (
-                          <SelectItem key={prod.id} value={prod.id}>
-                            {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    )
-                  ))}
+                  {categorizedProducts.map(
+                    (cat) =>
+                      cat.products.length > 0 && (
+                        <SelectGroup key={cat.id}>
+                          <SelectLabel>{cat.label}</SelectLabel>
+                          {cat.products.map((prod) => (
+                            <SelectItem key={prod.id} value={prod.id}>
+                              {prod.name} - {(prod.priceCents / 100).toFixed(2)}{" "}
+                              €
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ),
+                  )}
                   {otherProducts.length > 0 && (
                     <SelectGroup>
                       <SelectLabel>Autres</SelectLabel>
@@ -337,7 +339,11 @@ export default function StepThree({
                           id={`custom-${item.uniqueId}`}
                           checked={item.hasCustomText}
                           onCheckedChange={(checked) =>
-                            updateProduct(item.uniqueId, "hasCustomText", checked === true)
+                            updateProduct(
+                              item.uniqueId,
+                              "hasCustomText",
+                              checked === true,
+                            )
                           }
                         />
                         <label
@@ -353,7 +359,11 @@ export default function StepThree({
                           id={`3d-${item.uniqueId}`}
                           checked={item.needs3D}
                           onCheckedChange={(checked) =>
-                            updateProduct(item.uniqueId, "needs3D", checked === true)
+                            updateProduct(
+                              item.uniqueId,
+                              "needs3D",
+                              checked === true,
+                            )
                           }
                         />
                         <label
@@ -368,11 +378,15 @@ export default function StepThree({
                     {item.hasCustomText && (
                       <div className="pl-6 w-full max-w-md">
                         <Input
-                          placeholder="Saisissez le texte à graver..."
+                          placeholder="Saisissez le texte personnalisé..."
                           className="bg-white"
                           value={item.customText || ""}
                           onChange={(e) =>
-                            updateProduct(item.uniqueId, "customText", e.target.value)
+                            updateProduct(
+                              item.uniqueId,
+                              "customText",
+                              e.target.value,
+                            )
                           }
                         />
                       </div>
@@ -489,10 +503,10 @@ export default function StepThree({
 
         {/* Navigation Buttons */}
         <div className="flex justify-between pt-6 border-t border-gray-100">
-          <Button 
-            variant="outline" 
-            onClick={onBack} 
-            className={`w-32 ${!onBack ? 'invisible' : ''}`} // Masquer si onBack absent
+          <Button
+            variant="outline"
+            onClick={onBack}
+            className={`w-32 ${!onBack ? "invisible" : ""}`} // Masquer si onBack absent
           >
             ← Retour
           </Button>

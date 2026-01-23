@@ -184,22 +184,48 @@ export default function ResellerStep1({
                     cat.products.length > 0 && (
                       <SelectGroup key={cat.id}>
                         <SelectLabel>{cat.label}</SelectLabel>
-                        {cat.products.map((prod) => (
-                          <SelectItem key={prod.id} value={prod.id}>
-                            {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
-                          </SelectItem>
-                        ))}
+                        {cat.products.map((prod) => {
+                          const isOutOfStock = prod.status === "OUT_OF_STOCK";
+                          return (
+                            <SelectItem 
+                              key={prod.id} 
+                              value={prod.id}
+                              disabled={isOutOfStock}
+                              className={isOutOfStock ? "opacity-50 grayscale cursor-not-allowed" : ""}
+                            >
+                              <div className="flex justify-between w-full gap-4">
+                                <span>{prod.name}</span>
+                                <span className="font-semibold">
+                                  {isOutOfStock ? "(RUPTURE)" : `${(prod.priceCents / 100).toFixed(2)} €`}
+                                </span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectGroup>
                     )
                   ))}
                   {otherProducts.length > 0 && (
                     <SelectGroup>
                       <SelectLabel>Autres</SelectLabel>
-                      {otherProducts.map((prod) => (
-                        <SelectItem key={prod.id} value={prod.id}>
-                          {prod.name} - {(prod.priceCents / 100).toFixed(2)} €
-                        </SelectItem>
-                      ))}
+                      {otherProducts.map((prod) => {
+                        const isOutOfStock = prod.status === "OUT_OF_STOCK";
+                        return (
+                          <SelectItem 
+                            key={prod.id} 
+                            value={prod.id}
+                            disabled={isOutOfStock}
+                            className={isOutOfStock ? "opacity-50 grayscale cursor-not-allowed" : ""}
+                          >
+                            <div className="flex justify-between w-full gap-4">
+                              <span>{prod.name}</span>
+                              <span className="font-semibold">
+                                {isOutOfStock ? "(RUPTURE)" : `${(prod.priceCents / 100).toFixed(2)} €`}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectGroup>
                   )}
                 </SelectContent>

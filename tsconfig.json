@@ -30,5 +30,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "migrate-to-cloudinary.ts",
+    "repair-cloudinary-urls.ts",
+    "sync-cloudinary.ts",
+    "debug-order-creation.ts",
+    "proxy.ts"
+  ]
 }

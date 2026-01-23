@@ -1,10 +1,9 @@
 "use server";
 
+import cloudinary from "@/lib/cloudinary";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { ProductFormState } from "@/types/product";
 
 // --- HELPERS ---
@@ -54,19 +53,36 @@ const ProductFormSchema = z.object({
   status: z.enum(["AVAILABLE", "OUT_OF_STOCK", "HIDDEN"]),
 });
 
-// Fonction helper pour gérer l'upload
+// Fonction helper pour gérer l'upload vers Cloudinary
 async function uploadImage(imageFile: File | undefined | null, productName: string): Promise<string | null> {
     if (!imageFile || imageFile.size === 0) {
         return null;
     }
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
-    const fileExtension = path.extname(imageFile.name);
-    const slug = slugify(productName);
-    const filename = `${slug}${fileExtension}`;
-    const uploadDir = path.join(process.cwd(), "public/uploads/products");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), buffer);
-    return `/uploads/products/${filename}`;
+    
+    try {
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const uploadResponse = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream(
+                {
+                    folder: "d3d/products",
+                    public_id: `${slugify(productName)}-${Date.now()}`,
+                    resource_type: "image",
+                    overwrite: true,
+                },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            ).end(buffer);
+        }) as any;
+
+        return uploadResponse.secure_url;
+    } catch (error) {
+        console.error("❌ [uploadImage] Cloudinary Error:", error);
+        return null;
+    }
 }
 
 
@@ -131,13 +147,7 @@ export async function updateProduct(
   const newImageUrl = await uploadImage(imageFile, updateData.name);
 
   try {
-    // 1. Récupérer l'ancienne image AVANT update
-    const currentProduct = await prisma.product.findUnique({
-      where: { id },
-      select: { imageUrl: true },
-    });
-
-    // 2. Mise à jour en base
+    // Mise à jour en base
     await prisma.product.update({
       where: { id },
       data: {
@@ -145,16 +155,6 @@ export async function updateProduct(
         ...(newImageUrl && { imageUrl: newImageUrl }),
       },
     });
-
-    // 3. Suppression de l'ancien fichier SEULEMENT si l'update a réussi
-    if (newImageUrl && currentProduct?.imageUrl) {
-      const oldImagePath = path.join(process.cwd(), "public", currentProduct.imageUrl);
-      try {
-        await fs.unlink(oldImagePath);
-      } catch (err) {
-        console.warn("⚠️ [Nettoyage] Impossible de supprimer l'ancienne image (peut-être déjà absente) :", oldImagePath);
-      }
-    }
 
     revalidatePath(`/dashboard/products/${id}`);
     revalidatePath("/dashboard/products");

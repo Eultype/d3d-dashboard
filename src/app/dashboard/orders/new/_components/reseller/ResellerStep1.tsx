@@ -196,7 +196,7 @@ export default function ResellerStep1({
                               <div className="flex justify-between w-full gap-4">
                                 <span>{prod.name}</span>
                                 <span className="font-semibold">
-                                  {isOutOfStock ? "(RUPTURE)" : `${(prod.priceCents / 100).toFixed(2)} €`}
+                                  {isOutOfStock ? "(Rupture de stock)" : `${(prod.priceCents / 100).toFixed(2)} €`}
                                 </span>
                               </div>
                             </SelectItem>

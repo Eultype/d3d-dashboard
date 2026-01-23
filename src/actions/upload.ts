@@ -1,8 +1,6 @@
 "use server";
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
+import cloudinary from "@/lib/cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 
@@ -18,40 +16,41 @@ export async function uploadOrderFile(formData: FormData) {
     return { success: false, message: "Aucun fichier fourni." };
   }
 
-  // Validation basique (Image uniquement pour l'instant)
   if (!file.type.startsWith("image/")) {
     return { success: false, message: "Seules les images sont acceptées." };
   }
 
-  // Limitation taille (ex: 10MB)
   if (file.size > 10 * 1024 * 1024) {
     return { success: false, message: "Fichier trop volumineux (max 10MB)." };
   }
 
   try {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    
-    // Génération d'un nom unique : uuid-nom_original
-    // On nettoie le nom original pour éviter les soucis de caractères spéciaux
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-    const fileName = `${randomUUID()}-${safeName}`;
-    
-    const uploadDir = path.join(process.cwd(), "public/uploads/orders");
-    const filePath = path.join(uploadDir, fileName);
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    await fs.writeFile(filePath, buffer);
-
-    const publicUrl = `/uploads/orders/${fileName}`;
+    // Upload vers Cloudinary via un Promise pour gérer le stream
+    const uploadResponse = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          folder: "d3d/orders",
+          resource_type: "image",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(buffer);
+    }) as any;
 
     return { 
       success: true, 
-      url: publicUrl, 
+      url: uploadResponse.secure_url, 
       filename: file.name,
       type: file.type 
     };
 
   } catch (error) {
-    console.error("Erreur upload:", error);
-    return { success: false, message: "Erreur lors de l'enregistrement du fichier." };
+    console.error("Erreur Cloudinary upload:", error);
+    return { success: false, message: "Erreur lors de l'enregistrement sur le Cloud." };
   }
 }

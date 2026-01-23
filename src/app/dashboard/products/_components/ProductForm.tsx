@@ -138,6 +138,7 @@ export function ProductForm({ product }: ProductFormProps) {
                                     <SelectItem value="BLOC">Bloc</SelectItem>
                                     <SelectItem value="BLOC-CUBE">Bloc Cube</SelectItem>
                                     <SelectItem value="CADRE">Cadre</SelectItem>
+                                    <SelectItem value="PLAQUE">Plaque</SelectItem>
                                     <SelectItem value="COEUR">Coeur</SelectItem>
                                     <SelectItem value="PRISME">Prisme</SelectItem>
                                     <SelectItem value="HORLOGE">Horloge</SelectItem>

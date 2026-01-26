@@ -118,6 +118,26 @@ export async function createReseller(data: ResellerInput) {
       return { success: true, emailError: true, message: "Compte créé mais échec de l'envoi du mail (Config Gmail ?)." };
     }
 
+    // Notification pour info@2d3d.be
+    await sendEmail({
+      to: "info@2d3d.be",
+      subject: `Nouveau revendeur inscrit : ${name}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+          <h2 style="color: #000;">Nouveau revendeur ajouté</h2>
+          <p>Un administrateur a ajouté un nouveau revendeur :</p>
+          <ul style="list-style: none; padding: 0;">
+            <li><strong>Nom :</strong> ${name}</li>
+            <li><strong>Email :</strong> ${email}</li>
+            <li><strong>Société :</strong> ${companyName || 'Non renseigné'}</li>
+            <li><strong>Préfixe :</strong> ${prefix}</li>
+            <li><strong>Ville :</strong> ${city}</li>
+            <li><strong>Pays :</strong> ${country}</li>
+          </ul>
+        </div>
+      `
+    });
+
     revalidatePath("/dashboard/resellers");
     return { success: true }; 
 

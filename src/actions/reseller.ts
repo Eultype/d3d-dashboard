@@ -50,15 +50,17 @@ export async function createReseller(data: ResellerInput) {
     const existingPrefixUser = await prisma.user.findFirst({ where: { prefix } });
     if (existingPrefixUser) return { success: false, message: `Préfixe ${prefix} déjà pris.` };
 
-    // 2. Génération mot de passe sécurisé
-    const generatedPassword = randomBytes(8).toString('hex');
-    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+    // 2. Génération token invitation
+    const invitationToken = randomBytes(32).toString('hex');
+    const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours
+    // Mot de passe bidon pour satisfaire la contrainte DB
+    const dummyPassword = await bcrypt.hash(randomBytes(20).toString('hex'), 10);
 
     // 3. Création DB (User + Sequence)
     await prisma.user.create({
       data: { 
         email, 
-        password: hashedPassword, 
+        password: dummyPassword, 
         role: "REVENDEUR", 
         prefix,
         name,
@@ -69,7 +71,9 @@ export async function createReseller(data: ResellerInput) {
         postalCode,
         city,
         country,
-        isActive: true
+        isActive: false,
+        invitationToken,
+        invitationExpires
       },
     });
 
@@ -78,25 +82,25 @@ export async function createReseller(data: ResellerInput) {
         await prisma.sequence.create({ data: { id: prefix, currentValue: 0 } });
     }
     
-    // 4. ENVOI DU MAIL (Via Nodemailer / Gmail)
+    // 4. ENVOI DU MAIL (Via Nodemailer / SMTP)
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const inviteUrl = `${baseUrl}/invite/${invitationToken}`;
 
     const htmlContent = `
       <div style="font-family: sans-serif; background-color: #ffffff; padding: 20px; color: #484848;">
         <div style="max-width: 560px; margin: 0 auto;">
           <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 20px;">Bienvenue, ${name}</h1>
           <p style="font-size: 16px; line-height: 26px; margin-bottom: 20px;">
-            Votre compte revendeur D3D a été créé avec succès. Voici vos identifiants pour accéder à votre espace de commande :
+            Votre compte revendeur D3D a été créé. Pour activer votre compte et définir votre mot de passe, veuillez cliquer sur le lien ci-dessous :
           </p>
-          <div style="padding: 24px; background-color: #f2f3f3; border-radius: 4px; margin: 24px 0; font-size: 16px;">
-            <p style="margin: 0 0 10px;"><strong>Email :</strong> ${email}</p>
-            <p style="margin: 0;"><strong>Mot de passe temporaire :</strong> ${generatedPassword}</p>
+          <div style="padding: 24px; background-color: #f2f3f3; border-radius: 4px; margin: 24px 0; font-size: 16px; text-align: center;">
+            <a href="${inviteUrl}" style="background-color: #000000; border-radius: 5px; color: #fff; font-size: 16px; font-weight: bold; text-decoration: none; display: inline-block; padding: 12px 24px;">
+              Activer mon compte
+            </a>
           </div>
-          <a href="${baseUrl}" style="background-color: #000000; border-radius: 5px; color: #fff; font-size: 16px; font-weight: bold; text-decoration: none; text-align: center; display: block; width: 100%; padding: 12px; margin-top: 20px; margin-bottom: 20px;">
-            Se connecter au Dashboard
-          </a>
-          <p style="font-size: 16px; line-height: 26px; margin-bottom: 20px;">
-            Pour des raisons de sécurité, nous vous conseillons de ne pas partager ces accès.
+          <p style="font-size: 14px; color: #666; margin-top: 20px;">
+            Ce lien est valable 7 jours. Si vous ne pouvez pas cliquer sur le bouton, copiez ce lien :<br>
+            <a href="${inviteUrl}" style="color: #000;">${inviteUrl}</a>
           </p>
           <p style="color: #8898aa; font-size: 12px; margin-top: 24px;">L'équipe D3D</p>
         </div>
@@ -105,7 +109,7 @@ export async function createReseller(data: ResellerInput) {
 
     const emailResult = await sendEmail({
       to: email,
-      subject: 'Bienvenue sur D3D - Vos accès',
+      subject: 'Invitation : Activez votre compte D3D',
       html: htmlContent,
     });
 

@@ -27,6 +27,8 @@ model User {
   postalCode   String?
   country      String?
   isActive     Boolean  @default(true)
+  invitationToken String? @unique
+  invitationExpires DateTime?
   createdAt    DateTime @default(now())
   notes        OrderNote[]
   readNotifications NotificationRead[]

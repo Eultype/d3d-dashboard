@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatEUR } from "@/lib/money";
+import { formatEUR } from "@/lib/utils/money";
 
 type OrderProductsCardProps = {
   items: {

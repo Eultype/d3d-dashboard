@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 // Import des lib
-import { formatDateFR } from "@/lib/dates";
-import { formatEUR } from "@/lib/money";
+import { formatDateFR } from "@/lib/utils/dates";
+import { formatEUR } from "@/lib/utils/money";
 import { CustomerLastOrderItem } from "@/types/customer";
 
 // Composant derniers produits achetés

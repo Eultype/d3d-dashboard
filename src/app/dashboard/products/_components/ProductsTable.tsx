@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 // Import Lucide React
 import { Eye, Pencil } from "lucide-react";
 // Import lib
-import { formatDateFR } from "@/lib/dates";
+import { formatDateFR } from "@/lib/utils/dates";
 // Import type
 import { ProductRow } from "@/types/product";
 

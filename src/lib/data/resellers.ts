@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { Role } from "@prisma/client";
 
 export async function getResellerFullDetails(userId: string) {

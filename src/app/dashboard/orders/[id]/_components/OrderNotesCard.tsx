@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDateFR } from "@/lib/dates";
+import { formatDateFR } from "@/lib/utils/dates";
 
 type OrderNotesCardProps = {
     notes: {

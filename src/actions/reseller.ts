@@ -1,11 +1,11 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
-import { sendEmail } from "@/lib/mailer";
+import { sendEmail } from "@/lib/services/mailer";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 

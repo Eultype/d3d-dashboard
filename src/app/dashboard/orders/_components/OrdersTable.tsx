@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { formatDateFR } from "@/lib/dates";
-import { formatEUR } from "@/lib/money";
+import { formatDateFR } from "@/lib/utils/dates";
+import { formatEUR } from "@/lib/utils/money";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";

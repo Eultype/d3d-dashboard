@@ -1,13 +1,13 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { getNextOrderReference } from "@/lib/sequences";
 import { z } from "zod";
-import { statusLabelFR } from "@/lib/orders";
-import { pusherServer } from "@/lib/pusher"; // Import Pusher server
+import { statusLabelFR } from "@/lib/utils/orders";
+import { pusherServer } from "@/lib/services/pusher"; // Import Pusher server
 
 // Schéma de validation (inchangé)
 const OrderSchema = z.object({

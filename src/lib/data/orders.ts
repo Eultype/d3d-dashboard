@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { Prisma } from "@prisma/client";
-import { calculateOrderTotal } from "@/lib/orders";
+import { calculateOrderTotal } from "@/lib/utils/orders";
 
 export async function getOrderDetails(id: string) {
     return prisma.order.findUnique({

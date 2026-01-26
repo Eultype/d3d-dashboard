@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 // Import des libz
-import { formatDateFR } from "@/lib/dates";
-import { formatEUR } from "@/lib/money";
+import { formatDateFR } from "@/lib/utils/dates";
+import { formatEUR } from "@/lib/utils/money";
 
 type ProductRecentOrdersCardProps = {
     lastItems: {

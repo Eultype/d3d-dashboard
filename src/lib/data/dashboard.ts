@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
-import { calculateOrderTotal } from "@/lib/orders";
+import { prisma } from "@/lib/services/prisma";
+import { calculateOrderTotal } from "@/lib/utils/orders";
 import { Prisma } from "@prisma/client";
 
 export async function getDashboardStats(userContext?: { userId: string, role: string }) {

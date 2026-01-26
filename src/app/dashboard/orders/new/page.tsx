@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import OrderForm from "./_components/NewOrderForm";
 import ResellerOrderForm from "./_components/reseller/ResellerOrderForm"; // Import du nouveau formulaire
 import type { Metadata } from "next";

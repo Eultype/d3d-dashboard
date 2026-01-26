@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 // Import des lib
-import { formatEUR } from "@/lib/money";
-import { formatDateFR } from "@/lib/dates";
+import { formatEUR } from "@/lib/utils/money";
+import { formatDateFR } from "@/lib/utils/dates";
 // Import Lucide-React
 import { ArrowRight, Eye } from "lucide-react";
 

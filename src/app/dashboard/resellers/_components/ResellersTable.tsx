@@ -10,7 +10,7 @@ import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 // Import de Lucide React
 import { Eye } from "lucide-react";
 // Import des lib
-import { formatDateFR } from "@/lib/dates";
+import { formatDateFR } from "@/lib/utils/dates";
 
 import { Button } from "@/components/ui/button";
 

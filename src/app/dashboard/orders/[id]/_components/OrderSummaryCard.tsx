@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/info-row";
-import { formatEUR } from "@/lib/money";
+import { formatEUR } from "@/lib/utils/money";
 
 type OrderSummaryCardProps = {
     orderId: string;

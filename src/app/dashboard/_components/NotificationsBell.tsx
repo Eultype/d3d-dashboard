@@ -13,7 +13,7 @@ import { fr } from 'date-fns/locale';
 import { toast } from "sonner";
 // Import des lib
 import { NotificationWithReadStatus } from "@/lib/data/notifications";
-import { pusherClient } from "@/lib/pusher-client";
+import { pusherClient } from "@/lib/services/pusher-client";
 // Import des actions
 import { markAllNotificationsAsRead } from "@/actions/notifications";
 

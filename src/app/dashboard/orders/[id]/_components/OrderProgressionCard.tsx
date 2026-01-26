@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { statusLabelFR } from "@/lib/orders";
+import { statusLabelFR } from "@/lib/utils/orders";
 import { updateOrderStatus } from "@/actions/order";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";

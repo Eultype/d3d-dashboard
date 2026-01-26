@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 // Import lib
-import { formatEUR } from "@/lib/money";
+import { formatEUR } from "@/lib/utils/money";
 // Import Prisma
 import { Product } from "@prisma/client";
 

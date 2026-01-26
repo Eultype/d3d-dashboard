@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/services/prisma";
 
 /**
  * Récupère la prochaine valeur pour un préfixe de séquence donné et construit la référence de commande complète.

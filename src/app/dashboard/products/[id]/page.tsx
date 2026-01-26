@@ -12,7 +12,7 @@ import { ProductActiveBadge } from "@/components/badges/product-active-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 // Import des lib
-import { formatDateTimeFR } from "@/lib/dates";
+import { formatDateTimeFR } from "@/lib/utils/dates";
 
 // Metadata du détails produit
 export const metadata: Metadata = {

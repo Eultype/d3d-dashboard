@@ -1,7 +1,7 @@
 "use server";
 
-import cloudinary from "@/lib/cloudinary";
-import { prisma } from "@/lib/prisma";
+import cloudinary from "@/lib/services/cloudinary";
+import { prisma } from "@/lib/services/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ProductFormState } from "@/types/product";

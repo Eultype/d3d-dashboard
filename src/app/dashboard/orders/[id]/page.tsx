@@ -18,8 +18,8 @@ import { OrderCustomerCard } from "./_components/OrderCustomerCard";
 import { Button } from "@/components/ui/button";
 
 // Import des lib
-import { calculateOrderTotal } from "@/lib/orders";
-import { formatDateTimeFR } from "@/lib/dates";
+import { calculateOrderTotal } from "@/lib/utils/orders";
+import { formatDateTimeFR } from "@/lib/utils/dates";
 
 // Metadata du dashboard
 export const metadata: Metadata = {
@@ -98,12 +98,6 @@ export default async function OrderDetailPage({
 
                 {/* Actions */}
                 <div className="flex flex-wrap items-center gap-2">
-                    {userRole === "ADMIN" && (
-                        <Button asChild>
-                            <Link href={`/dashboard/orders/${order.id}/edit`}>Modifier la commande</Link>
-                        </Button>
-                    )}
-
                     <Button asChild variant="ghost">
                         <Link href="/dashboard/orders">← Retour</Link>
                     </Button>

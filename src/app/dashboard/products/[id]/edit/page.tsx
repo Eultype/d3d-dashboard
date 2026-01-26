@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "../../_components/ProductForm";
 // Import lib
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 
 // Metadata de modification d'un produit
 export const metadata: Metadata = {

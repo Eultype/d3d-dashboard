@@ -7,7 +7,7 @@ import { ResellerContactCard } from "./_components/ResellerContactCard";
 import { CustomerRecentOrdersCard } from "../../customers/[id]/_components/CustomerRecentOrdersCard";
 import { CustomerLastProductsCard } from "../../customers/[id]/_components/CustomerLastProductsCard";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
-import { formatDateTimeFR } from "@/lib/dates";
+import { formatDateTimeFR } from "@/lib/utils/dates";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import type { Metadata } from "next";

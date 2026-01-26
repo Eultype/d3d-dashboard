@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { StatItem } from "@/components/dashboard/StatItem";
 import {ClipboardList, AlertCircle, Factory, CheckCircle2, Euro,} from "lucide-react";
 // Import des lib
-import { formatEUR } from "@/lib/money";
+import { formatEUR } from "@/lib/utils/money";
 import { SearchInput } from "@/components/ui/search-input";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 

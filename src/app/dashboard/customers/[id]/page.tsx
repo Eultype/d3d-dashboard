@@ -12,7 +12,7 @@ import { CustomerTypeBadge } from "@/components/badges/customer-type-badge";
 import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 import { Button } from "@/components/ui/button";
 // Import des lib
-import { formatDateTimeFR } from "@/lib/dates";
+import { formatDateTimeFR } from "@/lib/utils/dates";
 
 // Metadata de la page
 export const metadata: Metadata = {

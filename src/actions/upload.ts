@@ -1,6 +1,6 @@
 "use server";
 
-import cloudinary from "@/lib/cloudinary";
+import cloudinary from "@/lib/services/cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 

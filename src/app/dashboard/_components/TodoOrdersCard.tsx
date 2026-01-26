@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 // Import des lib
-import { formatDateFR } from "@/lib/dates";
+import { formatDateFR } from "@/lib/utils/dates";
 // Import Lucide-React
 import { CheckCircle2 } from "lucide-react";
 

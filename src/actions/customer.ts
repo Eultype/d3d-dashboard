@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { CustomerFormState } from "@/types/customer";

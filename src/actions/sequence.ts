@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 
 export async function getNextSequenceValue(prefix: string) {
   // On cherche la séquence

@@ -1,8 +1,7 @@
 "use server";
 
-import fs from "node:fs/promises";
-import path from "node:path";
-import { prisma } from "@/lib/prisma";
+import cloudinary from "@/lib/services/cloudinary";
+import { prisma } from "@/lib/services/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 
@@ -11,75 +10,71 @@ type CleanupResult = {
   message: string;
 };
 
+/**
+ * Nettoie les fichiers orphelins sur Cloudinary.
+ * Supprime les ressources du dossier 'd3d/orders' qui ne sont plus référencées en base de données.
+ */
 export async function cleanupOrphanedFiles(): Promise<CleanupResult> {
   const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { success: false, message: "Accès non autorisé." };
+  if (!session || session.user.role !== "ADMIN") {
+    return { success: false, message: "Accès non autorisé. Droits administrateur requis." };
   }
 
-  console.log("🧹 Démarrage du nettoyage des fichiers (2-sens)...");
-
-  const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/orders");
-  
-  try {
-    await fs.access(UPLOAD_DIR);
-  } catch {
-    console.log("⚠️ Dossier d'upload introuvable. Rien à nettoyer.");
-    return { success: true, message: "Dossier d'upload introuvable, rien à faire." };
-  }
+  console.log("🧹 Démarrage du nettoyage Cloudinary (dossier d3d/orders)...");
 
   try {
-    // --- Phase 1: Nettoyage du Disque (Fichiers sans référence DB) ---
-    const filesOnDisk = new Set(await fs.readdir(UPLOAD_DIR));
-    const dbFileRecords = await prisma.file.findMany({ select: { id: true, url: true } });
-    const validDbFilenames = new Set(dbFileRecords.map((f) => path.basename(f.url)));
+    // 1. Récupérer TOUTES les ressources du dossier orders sur Cloudinary
+    // Note: Cloudinary limite à 1000 ressources par requête.
+    const cloudinaryResources = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'd3d/orders/',
+      max_results: 500
+    });
 
-    let diskDeletedCount = 0;
+    if (!cloudinaryResources.resources || cloudinaryResources.resources.length === 0) {
+      return { success: true, message: "Aucun fichier trouvé dans le dossier d3d/orders sur Cloudinary." };
+    }
+
+    // 2. Récupérer toutes les URLs de fichiers en base de données
+    const dbFileRecords = await prisma.file.findMany({
+      select: { url: true }
+    });
+    const validUrls = new Set(dbFileRecords.map(f => f.url));
+
+    // 3. Identifier les fichiers à supprimer
+    // On ne supprime que les fichiers vieux de plus de 24h pour éviter de supprimer un upload en cours
     const NOW = Date.now();
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    for (const filename of filesOnDisk) {
-      if (validDbFilenames.has(filename)) {
-        continue;
-      }
+    const publicIdsToDelete = cloudinaryResources.resources
+      .filter((resource: any) => {
+        // Si l'URL n'est pas en base ET que le fichier a plus de 24h
+        const isOrphan = !validUrls.has(resource.secure_url);
+        const isOldEnough = (NOW - new Date(resource.created_at).getTime()) > ONE_DAY_MS;
+        return isOrphan && isOldEnough;
+      })
+      .map((resource: any) => resource.public_id);
 
-      const filePath = path.join(UPLOAD_DIR, filename);
-      const stats = await fs.stat(filePath);
-      const fileAge = NOW - stats.mtimeMs;
-
-      if (fileAge > ONE_DAY_MS) {
-        await fs.unlink(filePath);
-        console.log(`🗑️ Fichier disque supprimé : ${filename}`);
-        diskDeletedCount++;
-      }
+    if (publicIdsToDelete.length === 0) {
+      return { success: true, message: "Aucun fichier orphelin à supprimer sur Cloudinary." };
     }
 
-    // --- Phase 2: Nettoyage de la DB (Références sans fichier) ---
-    const dbEntriesToDelete: string[] = [];
-    for (const record of dbFileRecords) {
-        const filename = path.basename(record.url);
-        if (!filesOnDisk.has(filename)) {
-            dbEntriesToDelete.push(record.id);
-        }
-    }
+    // 4. Suppression effective sur Cloudinary
+    console.log(`🗑️ Suppression de ${publicIdsToDelete.length} fichiers sur Cloudinary...`);
+    
+    // Cloudinary permet la suppression groupée (max 100 par appel)
+    const deleteResult = await cloudinary.api.delete_resources(publicIdsToDelete);
 
-    let dbDeletedCount = 0;
-    if (dbEntriesToDelete.length > 0) {
-        const deleteResult = await prisma.file.deleteMany({
-            where: {
-                id: { in: dbEntriesToDelete }
-            }
-        });
-        dbDeletedCount = deleteResult.count;
-        console.log(`🗑️ ${dbDeletedCount} entrée(s) DB supprimée(s).`);
-    }
-
-    const message = `Nettoyage terminé. ${diskDeletedCount} fichier(s) disque et ${dbDeletedCount} entrée(s) base de données supprimé(s).`;
-    console.log(`✨ ${message}`);
+    const message = `Nettoyage terminé. ${publicIdsToDelete.length} fichier(s) supprimé(s) sur Cloudinary.`;
+    console.log(`✨ ${message}`, deleteResult);
+    
     return { success: true, message };
 
   } catch (error) {
-    console.error("❌ Erreur critique lors du nettoyage:", error);
+    console.error("❌ Erreur critique lors du nettoyage Cloudinary:", error);
+    if (error instanceof Error) {
+        return { success: false, message: `Erreur : ${error.message}` };
+    }
     return { success: false, message: "Une erreur serveur est survenue lors du nettoyage." };
   }
 }

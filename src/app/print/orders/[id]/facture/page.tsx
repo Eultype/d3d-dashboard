@@ -1,10 +1,10 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from 'next/link';
 import Image from 'next/image';
-import { formatEUR } from "@/lib/money";
-import { calculateOrderTotal } from "@/lib/orders";
-import { formatDateFR } from "@/lib/dates";
+import { formatEUR } from "@/lib/utils/money";
+import { calculateOrderTotal } from "@/lib/utils/orders";
+import { formatDateFR } from "@/lib/utils/dates";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { PrintButton } from "@/app/print/_components/PrintButton";

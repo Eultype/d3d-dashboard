@@ -1,5 +1,5 @@
 // Import des datas
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 // Import Next
 import { notFound } from "next/navigation";
 import Link from "next/link";

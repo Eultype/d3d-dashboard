@@ -11,7 +11,7 @@ import { CustomerActiveBadge } from "@/components/badges/customer-active-badge";
 // Import de Lucide React
 import { Eye, Pencil } from "lucide-react";
 // Import des lib
-import { formatDateFR } from "@/lib/dates";
+import { formatDateFR } from "@/lib/utils/dates";
 // Import des types
 import { CustomerRow } from "@/types/customer";
 

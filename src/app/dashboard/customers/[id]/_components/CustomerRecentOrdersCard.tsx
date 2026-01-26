@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // Import des lib
-import { formatDateFR } from "@/lib/dates";
-import { formatEUR } from "@/lib/money";
-import { calculateOrderTotal } from "@/lib/orders";
+import { formatDateFR } from "@/lib/utils/dates";
+import { formatEUR } from "@/lib/utils/money";
+import { calculateOrderTotal } from "@/lib/utils/orders";
 import { CustomerRecentOrder } from "@/types/customer";
 import { ArrowRight } from "lucide-react";
 

@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/services/prisma";
 
 export async function getProductFullDetails(id: string) {
     const [product, lastItems, lastCustomersRaw] = await Promise.all([

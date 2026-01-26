@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { isImageUrl } from "@/lib/strings";
+import { isImageUrl } from "@/lib/utils/strings";
 import Image from "next/image";
 import { Eye, Download, FileText } from "lucide-react";
 

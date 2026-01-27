@@ -39,8 +39,8 @@ export function ResellersTable({ resellers }: { resellers: ResellerRow[] }) {
     return (
         <TooltipProvider>
             <div className="space-y-4">
-                {/* VUE MOBILE : Liste de cartes (2 colonnes) */}
-                <div className="grid grid-cols-2 gap-2 xl:hidden">
+                {/* VUE MOBILE : Liste de cartes (1 col mobile, 2 cols tablette) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 xl:hidden">
                     {resellers.map((r) => {
                         const editHref = `/dashboard/resellers/${r.id}`;
 

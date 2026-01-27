@@ -37,8 +37,8 @@ export function CustomersTable({ customers }: { customers: CustomerRow[] }) {
     return (
         <TooltipProvider>
             <div className="space-y-4">
-                {/* VUE MOBILE : Liste de cartes (2 colonnes) */}
-                <div className="grid grid-cols-2 gap-2 xl:hidden">
+                {/* VUE MOBILE : Liste de cartes (1 col mobile, 2 cols tablette) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 xl:hidden">
                     {customers.map((c) => {
                         const isCompany = !!c.companyName?.trim();
                         const detailsHref = `/dashboard/customers/${c.id}`;

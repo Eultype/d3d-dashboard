@@ -37,7 +37,7 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
         <TooltipProvider>
             <div className="space-y-4">
                 {/* VUE MOBILE : Liste de cartes pour petits écrans */}
-                <div className="grid grid-cols-2 gap-2 xl:hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 xl:hidden">
                     {orders.map((o) => {
                         const href = `/dashboard/orders/${o.id}`;
                         const displayRef = o.reference || `#${o.id.slice(0, 10)}`;

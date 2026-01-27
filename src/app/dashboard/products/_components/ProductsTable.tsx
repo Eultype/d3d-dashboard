@@ -32,8 +32,8 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
     return (
         <TooltipProvider>
             <div className="space-y-4">
-                {/* VUE MOBILE : Liste de cartes (2 colonnes) */}
-                <div className="grid grid-cols-2 gap-2 xl:hidden">
+                {/* VUE MOBILE : Liste de cartes (1 col mobile, 2 cols tablette) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 xl:hidden">
                     {products.map((p) => {
                         const href = `/dashboard/products/${p.id}`;
 

@@ -32,8 +32,8 @@ export default async function TeamPage() {
       </div>
 
       <div className="space-y-4">
-        {/* VUE MOBILE : Liste de cartes (2 colonnes) */}
-        <div className="grid grid-cols-2 gap-2 xl:hidden">
+        {/* VUE MOBILE : Liste de cartes (1 col mobile, 2 cols tablette) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 xl:hidden">
           {members.map((m) => (
             <div key={m.id} className="rounded-lg border bg-card p-4 shadow-sm flex flex-col justify-between min-w-0">
               <div className="min-w-0">

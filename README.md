@@ -1,92 +1,141 @@
-# D3D Dashboard - Gestion de Commandes
+# 💎 D3D Dashboard
 
-Application de gestion interne pour l'atelier de gravure **D3D Crystal**.
-Permet de gérer les commandes, les clients, le catalogue produits et le suivi de production.
+Plateforme ERP (Enterprise Resource Planning) moderne pour la gestion de l'atelier de gravure **2D3D Crystal**.
+Développée avec les dernières technologies du web pour une performance, une sécurité et une évolutivité maximales.
 
-## 🚀 Fonctionnalités Clés
+![Status](https://img.shields.io/badge/Status-Production%20Ready-success)
+![Version](https://img.shields.io/badge/Version-1.0.0-blue)
 
-- **Gestion des Commandes :** Création multi-étapes, upload de fichiers clients, suivi de statut interactif.
-- **Facturation :** Génération de numéros de séquence (Auto/Manuel), impression PDF propre.
-- **Clients & Produits :** Gestion complète (CRUD), recherche instantanée, historique.
-- **Dashboard :** Vue d'ensemble avec statistiques en temps réel.
-- **Sécurité :** Authentification, Validation stricte (Zod), Uploads sécurisés.
+## 🚀 Fonctionnalités Principales
 
-## 🛠️ Stack Technique
+### 📦 Gestion des Commandes & Production
+*   **Création Intuitive (Wizard)** : Formulaire en 4 étapes (Infos, Client, Produits, Récap).
+*   **Pipeline Visuel** : Suivi des statuts (À vérifier 🔵, En production 🟠, Expédition 🟣, Livrée 🟢).
+*   **Gestion de Fichiers** : Upload sécurisé des photos clients sur le Cloud.
+*   **Séquençage** : Numérotation automatique par préfixe (BOG, WEB, ERIC) ou personnalisé.
 
-- **Framework :** [Next.js 16](https://nextjs.org/) (App Router, Server Actions)
-- **Langage :** TypeScript (Strict mode)
-- **Base de données :** PostgreSQL (via [Prisma ORM](https://www.prisma.io/))
-- **UI :** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
-- **Auth :** NextAuth.js v4
+### 👥 CRM & Partenaires (B2B/B2C)
+*   **Clients** : Base de données centralisée, recherche instantanée, historique complet.
+*   **Espace Revendeur** : Portail dédié aux partenaires B2B avec isolation des données (chaque revendeur ne voit que ses commandes).
+*   **Système d'Invitation** : Enrôlement sécurisé des nouveaux revendeurs et administrateurs par email.
 
-## 📦 Installation
+### 🛍️ Catalogue & Stock
+*   **Gestion Fine** : Prix en centimes (précision comptable), dimensions, catégories (Bloc, Cœur, Cadre...).
+*   **Stock** : Statuts avancés (Disponible, Rupture de stock, Masqué).
+*   **Synchronisation** : Images produits hébergées sur CDN haute performance.
 
-### Pré-requis
-- Node.js 18+
-- PostgreSQL (Local ou Docker)
+### 💳 Facturation & Admin
+*   **Factures PDF** : Génération automatique conforme (HT, TVA 21%, TTC, Mentions légales).
+*   **Dashboard** : Statistiques financières en temps réel (CA Net HT, volumes).
+*   **Équipe** : Gestion des accès administrateurs et maintenance système.
 
-### 1. Cloner et installer les dépendances
+---
+
+## 🛠️ Stack Technique (L'Architecture)
+
+Ce projet repose sur une **Clean Architecture** séparant strictement les responsabilités.
+
+### 🌐 Core & Frontend
+*   **Framework** : [Next.js 16](https://nextjs.org/) (App Router & Server Actions).
+*   **Langage** : TypeScript (Typage strict pour une robustesse maximale).
+*   **UI Kit** : [Shadcn UI](https://ui.shadcn.com/) + [Tailwind CSS](https://tailwindcss.com/) (Design System cohérent et responsive).
+*   **Icônes** : Lucide React.
+
+### 💾 Backend & Data
+*   **Base de Données** : PostgreSQL (Hébergé sur [Neon.tech](https://neon.tech/) - Serverless).
+*   **ORM** : [Prisma](https://www.prisma.io/) (Gestion des schémas et migrations).
+*   **Sécurité** : [NextAuth.js v4](https://next-auth.js.org/) (Sessions JWT, Hachage BCrypt).
+
+### ☁️ Infrastructure & Services
+*   **Stockage** : [Cloudinary](https://cloudinary.com/) (Hébergement et optimisation d'images).
+*   **Temps Réel** : [Pusher](https://pusher.com/) (WebSockets pour les notifications instantanées).
+*   **Emails** : [Nodemailer](https://nodemailer.com/) (SMTP Transactionnel) + Templates HTML.
+
+---
+
+## 🗂️ Structure du Code
+
+L'organisation des dossiers suit les meilleures pratiques Next.js 2025 :
+
+```bash
+src/
+├── actions/        # ⚡️ MUTATIONS (Server Actions)
+│   # Contient uniquement la logique d'écriture (Create/Update/Delete)
+│   # Sécurisé par RBAC (vérification des rôles au début de chaque fonction)
+│
+├── app/            # 🌐 ROUTAGE (Pages & Layouts)
+│   ├── (auth)/     # Page de connexion isolée
+│   ├── dashboard/  # Application métier protégée
+│   └── api/        # Webhooks et endpoints spécifiques
+│
+├── components/     # 🧩 UI (Interface Utilisateur)
+│   ├── ui/         # Composants atomiques (Boutons, Inputs...)
+│   └── ...         # Composants métier (Tableaux, Cartes...)
+│
+├── lib/            # 🧠 LOGIQUE & UTILITAIRES
+│   ├── data/       # Lectures seules (Requêtes Prisma optimisées)
+│   ├── services/   # Clients tiers (Pusher, Cloudinary, Mailer)
+│   └── utils/      # Fonctions pures (Formatage monétaire, dates...)
+│
+├── types/          # 🛡️ CONTRATS DE DONNÉES
+│   # Définitions TypeScript partagées entre Front et Back
+│
+└── emails/         # 📧 TEMPLATES
+    # Modèles d'emails transactionnels (Bienvenue, Notifs...)
+```
+
+---
+
+## 📦 Installation & Déploiement
+
+### 1. Installation Locale
 ```bash
 git clone <repo_url>
 cd d3d-dashboard
 npm install
 ```
 
-### 2. Configurer l'environnement
-Copiez le fichier d'exemple (créez-en un si absent) :
-```bash
-cp .env.example .env
-```
-Remplissez les variables :
+### 2. Configuration (`.env`)
+Créez un fichier `.env` à la racine avec les clés suivantes :
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/d3d_db"
-NEXTAUTH_SECRET="votre_cle_secrete_super_longue"
+# Base de données
+DATABASE_URL="postgresql://..."
+
+# Auth
+NEXTAUTH_SECRET="votre_cle_secrete"
 NEXTAUTH_URL="http://localhost:3000"
+
+# Services Tiers
+CLOUDINARY_CLOUD_NAME="..."
+CLOUDINARY_API_KEY="..."
+CLOUDINARY_API_SECRET="..."
+
+PUSHER_APP_ID="..."
+NEXT_PUBLIC_PUSHER_KEY="..."
+PUSHER_SECRET="..."
+
+GMAIL_USER="..."
+GMAIL_APP_PASSWORD="..."
 ```
 
-### 3. Initialiser la Base de Données
+### 3. Initialisation
 ```bash
-npx prisma migrate dev --name init
-npx prisma db seed # (Optionnel : si un seed.ts est configuré)
+npx prisma generate   # Génère le client DB
+npx prisma db seed    # Remplit la base avec les données de prod (Admins & Produits)
 ```
 
-### 4. Lancer le serveur de développement
+### 4. Lancement
 ```bash
 npm run dev
 ```
-L'application est accessible sur [http://localhost:3000](http://localhost:3000).
 
-## 🗂️ Structure du Projet
-
-```
-src/
-├── actions/        # Server Actions (Mutations : create, update, upload...)
-├── app/            # Pages & Routes (App Router)
-│   ├── api/        # Routes API (Search, Cron...)
-│   ├── dashboard/  # Espace protégé (Admin)
-│   └── (auth)/     # Login
-├── components/     # Composants UI (Shadcn + Métier)
-├── lib/            # Utilitaires & Data Access Layer
-│   ├── data/       # Fonctions de lecture DB (Getters)
-│   └── ...         # Helpers (Dates, Money, Prisma...)
-├── types/          # Définitions TypeScript partagées
-└── scripts/        # Scripts de maintenance (Cleanup...)
-```
-
-## 🛠️ Commandes Utiles
-
-| Commande | Description |
-| :--- | :--- |
-| `npm run dev` | Lance le serveur de développement |
-| `npm run build` | Compile l'application pour la production |
-| `npm run start` | Lance le serveur de production (après build) |
-| `npm run lint` | Vérifie la qualité du code (ESLint) |
-| `npm run cleanup` | Nettoie les fichiers uploadés orphelins (> 24h) |
+---
 
 ## 🔒 Sécurité & Maintenance
 
-- **Uploads :** Les fichiers clients sont stockés dans `public/uploads/orders`. Lancez régulièrement `npm run cleanup` pour supprimer les fichiers abandonnés.
-- **Rôles :** Actuellement, tout utilisateur connecté a les droits d'administration.
+*   **Rôles (RBAC)** : Le système distingue strictement `ADMIN` et `REVENDEUR`. Chaque Server Action vérifie l'identité et les droits avant d'exécuter une modification.
+*   **Nettoyage Automatique** : Un outil intégré dans "Paramètres" permet de scanner Cloudinary et de supprimer les fichiers orphelins.
+*   **Validation** : Toutes les entrées utilisateurs sont validées par **Zod** pour empêcher les injections et les données corrompues.
 
 ---
-Développé avec ❤️ par **Reda** ([@redasnkrs](https://github.com/redasnkrs)) et **Samuël** ([@Eultype](https://github.com/Eultype)) pour **D3D Crystal**.
+Développé avec passion par **Reda** et **Samuël** pour **D3D Crystal**. 💎

@@ -1,6 +1,6 @@
 "use client";
 // Import React
-import { Menu, LayoutDashboard, ClipboardList, Users, ShoppingBag, Settings } from "lucide-react";
+import { Menu, LayoutDashboard, ClipboardList, Users, ShoppingBag, Settings, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 // Import des composants
 import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -80,6 +80,13 @@ export function MobileNav({ userRole }: { userRole?: string }) {
                     href="/dashboard/resellers"
                     icon={<Users className="h-4 w-4" />}
                     label="Revendeurs"
+                  />
+                </div>
+                <div onClick={() => setOpen(false)}>
+                  <NavLink
+                    href="/dashboard/team"
+                    icon={<ShieldCheck className="h-4 w-4" />}
+                    label="Équipe"
                   />
                 </div>
               </>

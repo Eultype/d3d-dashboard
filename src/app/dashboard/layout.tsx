@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 // Import React
 import { ReactNode } from "react";
-import { ShoppingBag, ClipboardList, Users, LayoutDashboard, Settings } from "lucide-react";
+import { ShoppingBag, ClipboardList, Users, LayoutDashboard, Settings, ShieldCheck } from "lucide-react";
 // Import des composants
 import { Separator } from "@/components/ui/separator";
 import ClientSideHeaderElements from "./_components/ClientSideHeaderElements";
@@ -60,20 +60,26 @@ export default async function DashboardLayout({
               {session.user.role === "ADMIN" && (
                   <>
                       <NavLink
-                      href="/dashboard/customers"
-                      icon={<Users className="h-4 w-4" />}
-                      label="Clients"
+                          href="/dashboard/customers"
+                          icon={<Users className="h-4 w-4" />}
+                          label="Clients"
                       />
                       <NavLink
-                      href="/dashboard/products"
-                      icon={<ShoppingBag className="h-4 w-4" />}
-                      label="Produits"
+                        href="/dashboard/products"
+                        icon={<ShoppingBag className="h-4 w-4" />}
+                        label="Produits"
                       />
                       <NavLink
-                        href="/dashboard/resellers"
-                        icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
-                        label="Revendeurs"
+                          href="/dashboard/resellers"
+                          icon={<Users className="h-4 w-4" />} // Reuse Users icon or import another one like UserPlus
+                          label="Revendeurs"
                       />
+                      <NavLink
+                          href="/dashboard/team"
+                          icon={<ShieldCheck className="h-4 w-4" />}
+                          label="Équipe"
+                      />
+
                   </>
               )}
             </nav>

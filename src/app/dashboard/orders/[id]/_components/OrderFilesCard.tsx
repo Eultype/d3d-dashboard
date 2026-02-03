@@ -27,6 +27,16 @@ export function OrderFilesCard({ files }: OrderFilesCardProps) {
                         {files.map((file) => {
                             // On utilise le type MIME stocké en base (beaucoup plus fiable)
                             const isImg = file.type.startsWith("image/");
+                            
+                            // Fonction pour forcer le téléchargement via Cloudinary avec le bon nom
+                            const getDownloadUrl = (url: string, filename: string) => {
+                                if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+                                    // Nettoyage du nom de fichier pour l'URL
+                                    const cleanName = filename.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "_");
+                                    return url.replace("/upload/", `/upload/fl_attachment:${cleanName}/`);
+                                }
+                                return url;
+                            };
 
                             return (
                                 <div
@@ -70,8 +80,8 @@ export function OrderFilesCard({ files }: OrderFilesCardProps) {
                                         </a>
 
                                         <a
-                                            href={file.url}
-                                            download
+                                            href={getDownloadUrl(file.url, file.filename)}
+                                            download={file.filename}
                                             className="inline-flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted"
                                             title="Télécharger"
                                         >

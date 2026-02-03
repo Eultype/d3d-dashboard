@@ -23,6 +23,7 @@ type Props = {
   onBack?: () => void;
   currentStep?: number;
   availablePrefixes: string[]; // Nouvelle prop
+  onSequenceChange: (seq: number | null) => void;
 };
 
 const steps = [
@@ -39,6 +40,7 @@ export default function StepOne({
   onBack,
   currentStep = 1,
   availablePrefixes,
+  onSequenceChange,
 }: Props) {
   const [nextSeq, setNextSeq] = useState<number | null>(null);
   const [isLoadingSeq, setIsLoadingSeq] = useState(false);
@@ -91,6 +93,7 @@ export default function StepOne({
       const prefix = draft.info.prefix;
       if (!prefix || prefix.length < 2) {
         setNextSeq(null);
+        onSequenceChange(null);
         return;
       }
       
@@ -98,6 +101,7 @@ export default function StepOne({
       try {
         const val = await getNextSequenceValue(prefix);
         setNextSeq(val);
+        onSequenceChange(val); // Remonter l'info au parent
         // Si c'est WEB et qu'on n'a pas encore de valeur manuelle, on pré-remplit
         if (prefix === "WEB" && !draft.info.manualNumber) {
           updateInfo("manualNumber", val);

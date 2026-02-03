@@ -24,6 +24,8 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
   
   // Stockage des préfixes chargés depuis le serveur
   const [prefixes, setPrefixes] = useState<string[]>([]);
+  // Stockage de la séquence estimée (remontée depuis Step1)
+  const [estimatedSeq, setEstimatedSeq] = useState<number | null>(null);
 
   const [draft, setDraft] = useState<OrderDraft>({
     info: { 
@@ -40,6 +42,12 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
     discountType: "none",
     internalNote: "",
   });
+
+  // Calculer la référence à afficher
+  const currentNumber = draft.info.manualNumber ?? estimatedSeq;
+  const displayReference = draft.info.prefix && currentNumber 
+    ? `${draft.info.prefix}-${currentNumber}` 
+    : "";
 
   // Charger les préfixes au montage
   useEffect(() => {
@@ -104,12 +112,22 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
 
   return (
     <div className="space-y-6">
+      {/* En-tête Global avec le numéro de commande */}
+      <div className="flex flex-col gap-1">
+        {displayReference && (
+          <p className="text-lg font-medium text-muted-foreground">
+            Référence : <span className="text-primary">{displayReference}</span>
+          </p>
+        )}
+      </div>
+
       {step === 1 && (
         <StepOne
           draft={draft}
           onChange={updateDraft}
           onNext={() => setStep(2)}
           availablePrefixes={prefixes}
+          onSequenceChange={setEstimatedSeq}
         />
       )}
 

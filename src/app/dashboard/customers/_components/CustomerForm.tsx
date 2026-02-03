@@ -74,14 +74,14 @@ export function CustomerForm({ customer }: CustomerFormProps) {
 
                         {/* Email */}
                         <Field>
-                            <FieldLabel htmlFor="email">Email *</FieldLabel>
+                            <FieldLabel htmlFor="email">Email</FieldLabel>
                             <Input id="email" name="email" type="email" defaultValue={customer?.email ?? ""} placeholder="jean.dupont@exemple.com" />
                             <FieldError errors={formatErrors(state.errors?.email)} />
                         </Field>
 
                         {/* Téléphone */}
                         <Field>
-                            <FieldLabel htmlFor="phone">Téléphone *</FieldLabel>
+                            <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
                             <Input id="phone" name="phone" type="tel" defaultValue={customer?.phone ?? ""} placeholder="+32 4XX XX XX XX" />
                             <FieldError errors={formatErrors(state.errors?.phone)} />
                         </Field>

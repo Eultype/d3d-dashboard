@@ -10,8 +10,8 @@ import { authOptions } from "@/lib/auth-options";
 // Schéma de base partagé pour les champs du formulaire
 const CustomerFormSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
-  email: z.string().email({ message: "Veuillez entrer une adresse email valide." }),
-  phone: z.string().min(10, "Le téléphone est requis"),
+  email: z.string().email({ message: "Veuillez entrer une adresse email valide." }).nullable().optional().or(z.literal("")),
+  phone: z.string().nullable().optional(),
   companyName: z.string().nullable().optional(),
   vatNumber: z.string().nullable().optional(),
   isActive: z.boolean(),
@@ -36,8 +36,8 @@ function parseCustomerFormData(formData: FormData) {
 
   return {
     name: formData.get("name") as string,
-    email: formData.get("email") as string,
-    phone: formData.get("phone") as string,
+    email: getOptional("email"),
+    phone: getOptional("phone"),
     companyName: getOptional("companyName"),
     vatNumber: getOptional("vatNumber"),
     isActive: formData.get("isActive") === "true",

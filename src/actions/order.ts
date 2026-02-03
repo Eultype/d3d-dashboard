@@ -106,8 +106,8 @@ export async function createOrder(data: OrderInputData) {
         const newCustomer = await prisma.customer.create({
           data: {
             name: validData.clientDetails.name,
-            email: validData.clientDetails.email,
-            phone: validData.clientDetails.phone,
+            email: validData.clientDetails.email || undefined,
+            phone: validData.clientDetails.phone || undefined,
             addressLine1: validData.clientDetails.addressLine1,
             postalCode: validData.clientDetails.postalCode,
             city: validData.clientDetails.city,

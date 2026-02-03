@@ -218,7 +218,7 @@ export default function StepTwo({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   name="email"
@@ -229,7 +229,7 @@ export default function StepTwo({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Téléphone *</Label>
+                <Label>Téléphone</Label>
                 <Input
                   name="phone"
                   value={formData.phone}
@@ -314,8 +314,6 @@ export default function StepTwo({
               onClick={handleValidateNewClient}
               disabled={
                 !formData.name ||
-                !formData.email ||
-                !formData.phone ||
                 !formData.addressLine1 ||
                 !formData.postalCode ||
                 !formData.city ||

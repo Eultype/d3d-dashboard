@@ -87,6 +87,7 @@ export default function OrderForm({ productsCatalog }: OrderFormProps) {
           quantity: p.quantity,
           unitPrice: p.unitPrice,
           customText: p.customText,
+          needs3D: p.needs3D,
           files: p.files || [] 
         })),
         internalNote: draft.internalNote,

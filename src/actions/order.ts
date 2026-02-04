@@ -38,6 +38,7 @@ const OrderSchema = z.object({
         quantity: z.number().min(1, "Quantité minimum 1"),
         unitPrice: z.number().min(0, "Prix invalide"),
         customText: z.string().optional().nullable(),
+        needs3D: z.boolean().optional().default(false),
         files: z.array(z.object({ url: z.string(), filename: z.string(), type: z.string() })).optional().default([]),
       })
     )
@@ -145,6 +146,7 @@ export async function createOrder(data: OrderInputData) {
       quantity: p.quantity,
       unitPriceCents: Math.round(p.unitPrice * 100),
       customText: p.customText,
+      needs3D: p.needs3D,
     }));
 
     // 5. Création de la commande

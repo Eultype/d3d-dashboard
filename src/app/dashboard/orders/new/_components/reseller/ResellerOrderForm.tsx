@@ -74,6 +74,7 @@ export default function ResellerOrderForm({
           quantity: p.quantity,
           unitPrice: p.unitPrice,
           customText: p.customText,
+          needs3D: p.needs3D,
           files: p.files || [] 
         })),
         internalNote: draft.internalNote,

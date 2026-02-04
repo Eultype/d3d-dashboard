@@ -9,6 +9,7 @@ type OrderProductsCardProps = {
     quantity: number;
     unitPriceCents: number;
     customText?: string | null;
+    needs3D?: boolean | null;
     product?: {
       name: string | null;
       sku: string | null;
@@ -98,6 +99,11 @@ export function OrderProductsCard({
                           {it.customText && (
                             <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
                               Texte personnalisé : {it.customText}
+                            </p>
+                          )}
+                          {it.needs3D && (
+                            <p className="text-xs text-amber-600 font-medium truncate mt-0.5">
+                              • Nécessite sous-traitance 3D
                             </p>
                           )}
                         </div>

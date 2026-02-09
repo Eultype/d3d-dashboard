@@ -191,7 +191,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                                                 {/* Affichage du texte personnalisé et du détail prix */}
                                                 {hasCustomText ? (
                                                     <div className="mt-0.5">
-                                                        <p className="text-[10px] text-blue-600 font-medium italic">
+                                                        <p className="text-[14px] text-blue-600 font-medium italic">
                                                             Texte personnalisé : "{it.customText}" {isPriceIncreased ? "(+ 10,00 €)" : ""}
                                                         </p>
                                                     </div>

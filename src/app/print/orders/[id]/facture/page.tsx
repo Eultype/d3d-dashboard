@@ -29,7 +29,6 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
 
     if (!order) return notFound();
 
-    const shortId = order.id.slice(0, 10);
     const date = formatDateFR(new Date(order.createdAt));
 
     const { totalCents, discountAmountCents, subTotalCents: sousTotalCents } = calculateOrderTotal(
@@ -79,16 +78,16 @@ export default async function FacturePage({ params }: { params: Promise<{ id?: s
                                 </div>
 
                                 <div>
-                                    <p className="text-lg font-bold leading-none uppercase tracking-tight">D3D Crystal</p>
+                                    <p className="text-lg font-bold leading-none uppercase tracking-tight">2D3D</p>
                                     <p className="text-xs text-neutral-500 mt-1 font-medium">Gravure 2D – 3D cristal</p>
                                 </div>
                             </div>
 
                             <div className="text-xs text-neutral-500 space-y-1.5 border-l-2 border-neutral-100 pl-4">
-                                <p className="font-medium text-neutral-800">D3D Crystal SPRL</p>
-                                <p>Chaussée de Louvain 730 • 1030 Schaerbeek • Belgique</p>
-                                <p>support@d3d.com • +32 4 00 00 00 00</p>
-                                <p>TVA : BE00 0000 0000</p>
+                                <p className="font-medium text-neutral-800">IMMOGER S.A.</p>
+                                <p>Hoogstraat 189 • 1930 Zaventem</p>
+                                <p>info@2d3d.be • +32 491 52 46 85</p>
+                                <p>TVA : BE0442.502.023</p>
                             </div>
                         </div>
 

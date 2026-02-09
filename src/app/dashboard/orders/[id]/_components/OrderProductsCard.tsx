@@ -14,6 +14,7 @@ type OrderProductsCardProps = {
       name: string | null;
       sku: string | null;
       imageUrl: string | null;
+      priceCents: number;
     } | null;
   }[];
   orderStatus: string;
@@ -56,6 +57,12 @@ export function OrderProductsCard({
                 const unit = formatEUR(it.unitPriceCents);
                 const amount = formatEUR(it.unitPriceCents * it.quantity);
 
+                // Logic breakdown
+                const hasCustomText = !!it.customText;
+                const basePrice = it.product?.priceCents ?? 0;
+                const optionPrice = 1000; 
+                const isPriceIncreased = it.unitPriceCents > basePrice;
+
                 const lineStatus =
                   orderStatus === "TERMINE"
                     ? "Livré"
@@ -97,9 +104,11 @@ export function OrderProductsCard({
                             {sku} • {unit}
                           </p>
                           {it.customText && (
-                            <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
-                              Texte personnalisé : {it.customText}
-                            </p>
+                            <div className="mt-0.5">
+                                <p className="text-xs text-blue-600 font-medium truncate">
+                                    Texte personnalisé : {it.customText} {isPriceIncreased ? "(+ 10,00 €)" : ""}
+                                </p>
+                            </div>
                           )}
                           {it.needs3D && (
                             <p className="text-xs text-amber-600 font-medium truncate mt-0.5">

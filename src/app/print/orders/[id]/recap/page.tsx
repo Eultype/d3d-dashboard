@@ -79,13 +79,13 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                 ].join(" ")}
             >
                 {/* Marges internes */}
-                <div className="p-6 sm:p-12">
+                <div className="p-6 sm:p-8 print:p-8">
                     {/* Header */}
-                    <header className="flex flex-col sm:flex-row items-start justify-between gap-8">
+                    <header className="flex flex-col sm:flex-row items-start justify-between gap-6">
                         <div className="space-y-4 w-full sm:w-auto">
                            {/* Photo instead of Company Details */}
                            {photoUrl ? (
-                                <div className="relative w-64 h-64 rounded-xl overflow-hidden">
+                                <div className="relative w-48 h-40 rounded-xl overflow-hidden border border-neutral-100 bg-neutral-50">
                                     <Image
                                         src={photoUrl}
                                         alt="Photo de commande"
@@ -95,7 +95,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                                     />
                                 </div>
                            ) : (
-                               <div className="w-64 h-64 rounded-xl border border-neutral-100 bg-neutral-50 flex items-center justify-center text-neutral-400 text-sm italic">
+                               <div className="w-48 h-40 rounded-xl border border-neutral-100 bg-neutral-50 flex items-center justify-center text-neutral-400 text-sm italic">
                                    Aucune photo jointe
                                </div>
                            )}
@@ -119,19 +119,19 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                     </header>
 
                     {/* Separator */}
-                    <div className="my-10 h-px bg-neutral-100" />
+                    <div className="my-6 h-px bg-neutral-100" />
 
                     {/* Addresses */}
-                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-                        <div className="rounded-2xl bg-neutral-50/50 border border-neutral-100 p-5">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-4">Destinataire</p>
-                            <div className="text-sm space-y-1">
+                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+                        <div className="rounded-2xl bg-neutral-50/50 border border-neutral-100 p-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Destinataire</p>
+                            <div className="text-sm space-y-0.5">
                                 <p className="font-bold text-base text-slate-900">{order.customer?.name ?? "—"}</p>
                                 <p className="text-slate-600 font-medium">{order.customer?.companyName ?? "Particulier"}</p>
                                 <p className="text-neutral-500 break-all">{order.customer?.email ?? "—"}</p>
                             </div>
 
-                            <div className="mt-4 text-sm text-slate-600 space-y-1 pt-4 border-t border-neutral-200/50">
+                            <div className="mt-2 text-sm text-slate-600 space-y-0.5 pt-2 border-t border-neutral-200/50">
                                 <p className="font-medium text-slate-800">{order.customer?.addressLine1 ?? "—"}</p>
                                 {order.customer?.addressLine2?.trim() ? <p>{order.customer.addressLine2}</p> : null}
                                 <p>
@@ -141,9 +141,9 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-neutral-100 p-5 flex flex-col justify-between">
+                        <div className="rounded-2xl border border-neutral-100 p-4 flex flex-col justify-between">
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-4">Livraison</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-2">Livraison</p>
                                 <p className="text-base font-bold text-slate-900">
                                     {deliveryText}
                                 </p>
@@ -159,9 +159,9 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                     </div>
 
                     {/* Table */}
-                    <div className="mt-10 overflow-hidden rounded-2xl border border-neutral-200">
+                    <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200">
                         {/* Table Header (Hidden on mobile) */}
-                        <div className="hidden sm:grid grid-cols-12 bg-neutral-50 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b">
+                        <div className="hidden sm:grid grid-cols-12 bg-neutral-50 px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-neutral-500 border-b">
                             <div className="col-span-6">Désignation du produit</div>
                             <div className="col-span-2 text-right">P.U. TTC</div>
                             <div className="col-span-2 text-right">Qté</div>
@@ -174,19 +174,27 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                                 const sku = it.product?.sku ?? null;
                                 const unit = formatEUR(it.unitPriceCents);
                                 const line = formatEUR(it.unitPriceCents * it.quantity);
+                                
+                                // Calcul pour l'affichage détaillé
+                                const hasCustomText = !!it.customText;
+                                const basePrice = it.product?.priceCents ?? 0;
+                                const isPriceIncreased = it.unitPriceCents > basePrice;
 
                                 return (
-                                    <div key={it.id} className="flex flex-col sm:grid sm:grid-cols-12 px-6 py-5 text-sm hover:bg-neutral-50/50 transition-colors">
+                                    <div key={it.id} className="flex flex-col sm:grid sm:grid-cols-12 px-6 py-2 text-sm hover:bg-neutral-50/50 transition-colors">
                                         {/* Mobile view: Product name and total on same line */}
                                         <div className="flex justify-between items-start sm:col-span-6 min-w-0 mb-2 sm:mb-0">
                                             <div className="min-w-0">
                                                 <p className="font-bold text-slate-900 truncate">{name}</p>
-                                                {sku ? <p className="mt-1 text-[10px] text-neutral-400 font-mono font-medium tracking-tighter uppercase">{sku}</p> : null}
-                                                {/* Affichage du texte personnalisé */}
-                                                {it.customText ? (
-                                                    <p className="mt-1 text-[20px] text-blue-600 font-medium italic">
-                                                        Gravure : {it.customText}
-                                                    </p>
+                                                {sku ? <p className="mt-0.5 text-[10px] text-neutral-400 font-mono font-medium tracking-tighter uppercase">{sku}</p> : null}
+                                                
+                                                {/* Affichage du texte personnalisé et du détail prix */}
+                                                {hasCustomText ? (
+                                                    <div className="mt-0.5">
+                                                        <p className="text-[10px] text-blue-600 font-medium italic">
+                                                            Texte personnalisé : "{it.customText}" {isPriceIncreased ? "(+ 10,00 €)" : ""}
+                                                        </p>
+                                                    </div>
                                                 ) : null}
                                             </div>
                                             <div className="sm:hidden font-bold text-slate-900 tabular-nums">{line}</div>
@@ -209,9 +217,9 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                     </div>
 
                     {/* Totals */}
-                    <div className="mt-8 flex justify-end">
-                        <div className="w-full sm:max-w-sm rounded-2xl bg-slate-50 border border-neutral-100 p-6">
-                            <div className="space-y-3 text-sm">
+                    <div className="mt-6 flex justify-end">
+                        <div className="w-full sm:max-w-sm rounded-2xl bg-slate-50 border border-neutral-100 p-4">
+                            <div className="space-y-2 text-sm">
                                 {/* Calculs des bases HT pour la clarté */}
                                 {(() => {
                                     const ratio = 1 + taxRate / 100;
@@ -243,7 +251,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                                                 <span className="tabular-nums font-medium">{formatEUR(Math.round(tvaCents))}</span>
                                             </div>
 
-                                            <div className="my-4 h-px bg-neutral-200" />
+                                            <div className="my-3 h-px bg-neutral-200" />
 
                                             <div className="flex items-center justify-between">
                                                 <span className="text-lg font-bold text-slate-900">Total TTC</span>
@@ -257,7 +265,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                     </div>
 
                     {/* Footer / mentions */}
-                    <footer className="mt-16 space-y-6">
+                    <footer className="mt-8 space-y-4">
                         <div className="h-px bg-neutral-100" />
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-neutral-400 font-medium uppercase tracking-widest">
                             <p>D3D Crystal SPRL • BE0000.000.000</p>

@@ -34,11 +34,18 @@ export function OrderSummaryCard({
                         <p className="text-sm text-muted-foreground">Total de la commande</p>
                     </div>
 
-                    <Button asChild variant="outline" size="sm" className="shrink-0">
-                        <Link href={`/print/orders/${orderId}/facture`} target="_blank" rel="noreferrer">
-                            Facture
-                        </Link>
-                    </Button>
+                    <div className="flex gap-2 shrink-0">
+                        <Button asChild variant="outline" size="sm">
+                            <Link href={`/print/orders/${orderId}/recap`} target="_blank" rel="noreferrer">
+                                Récapitulatif
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href={`/print/orders/${orderId}/facture`} target="_blank" rel="noreferrer">
+                                Facture
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
             </CardHeader>
 

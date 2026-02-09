@@ -31,10 +31,10 @@ export function CustomerLastProductsCard({ lastItems }: { lastItems: CustomerLas
                     lastItems.map((item) => (
                         <div
                             key={item.id}
-                            className="group relative flex items-center justify-between gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+                            className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/50"
                         >
                             {/* Informations sur le produit et badge quantité */}
-                            <div className="min-w-0 space-y-1">
+                            <div className="min-w-0 space-y-1 w-full sm:w-auto">
                                 <div className="flex items-center gap-2">
                                     {/* Nom du produit */}
                                     <span className="truncate font-semibold">{item.product.name}</span>
@@ -63,8 +63,8 @@ export function CustomerLastProductsCard({ lastItems }: { lastItems: CustomerLas
                             </div>
 
                             {/* Total ligne + prix unitaire + bouton voir la commande */}
-                            <div className="flex items-center gap-4">
-                                <div className="text-right">
+                            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                                <div className="text-left sm:text-right">
                                     {/* Total */}
                                     <div className="font-bold text-primary">
                                         {formatEUR(item.unitPriceCents * item.quantity)}

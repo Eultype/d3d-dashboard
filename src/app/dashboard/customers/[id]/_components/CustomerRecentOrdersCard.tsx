@@ -43,10 +43,10 @@ export function CustomerRecentOrdersCard({ orders, customerId }: { orders: Custo
                         return (
                             <div
                                 key={order.id}
-                                className="group relative flex items-center justify-between gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/50"
+                                className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border p-4 transition-colors hover:bg-muted/50"
                             >
                                 {/* Informations principales de la commande */}
-                                <div className="min-w-0 space-y-1">
+                                <div className="min-w-0 space-y-1 w-full sm:w-auto">
                                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                                         {/* Réference */}
                                         <span className="font-mono text-sm font-bold text-blue-600">
@@ -66,8 +66,8 @@ export function CustomerRecentOrdersCard({ orders, customerId }: { orders: Custo
                                 </div>
 
                                 {/* Total de la commande & bouton d’accès au détail */}
-                                <div className="flex items-center gap-4">
-                                    <div className="text-right leading-tight">
+                                <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                                    <div className="text-left sm:text-right leading-tight">
                                         {/* Total */}
                                         <div className="whitespace-nowrap font-bold text-foreground">
                                             {total}

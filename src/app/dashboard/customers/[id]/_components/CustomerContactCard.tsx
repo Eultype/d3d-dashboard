@@ -26,7 +26,7 @@ export function CustomerContactCard({ customer }: { customer: Customer }) {
 
             {/* Email */}
             <span className="text-right font-semibold ">Email</span>
-            <span>{customer.email}</span>
+            <span className="break-all">{customer.email}</span>
 
             {/* Téléphone */}
             <span className="text-right font-semibold ">Téléphone</span>

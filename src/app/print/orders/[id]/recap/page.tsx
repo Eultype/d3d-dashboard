@@ -103,7 +103,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
 
                         <div className="text-left sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
                             <p className="text-xs uppercase tracking-widest font-bold text-neutral-400">Récapitulatif</p>
-                            <h1 className="mt-1 text-3xl font-black text-slate-900">RECAP-{order.reference ? order.reference.slice(-4) : "????"}</h1>
+                            <h1 className="mt-1 text-3xl font-black text-slate-900">{order.reference}</h1>
 
                             <div className="mt-4 grid gap-2 text-sm">
                                 <div className="flex justify-between sm:justify-end gap-6">

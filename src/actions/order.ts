@@ -260,3 +260,37 @@ export async function updateOrderStatus(orderId: string, newStatus: string, trac
     return { success: false, message: "Erreur lors de la mise à jour" };
   }
 }
+
+export async function updateOrderNote(noteId: string, content: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return { success: false, message: "Non autorisé" };
+  }
+  
+  // Validation simple
+  if (!content || content.trim() === "") {
+      return { success: false, message: "Le contenu ne peut pas être vide." };
+  }
+
+  try {
+    const note = await prisma.orderNote.findUnique({
+        where: { id: noteId },
+        include: { order: true }
+    });
+
+    if (!note) {
+        return { success: false, message: "Note introuvable." };
+    }
+
+    await prisma.orderNote.update({
+        where: { id: noteId },
+        data: { content },
+    });
+
+    revalidatePath(`/dashboard/orders/${note.orderId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur update note:", error);
+    return { success: false, message: "Erreur lors de la mise à jour de la note" };
+  }
+}

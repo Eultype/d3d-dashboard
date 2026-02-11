@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDateFR } from "@/lib/utils/dates";
+import { NoteItem } from "./NoteItem";
 
 type OrderNotesCardProps = {
     notes: {
@@ -25,12 +25,7 @@ export function OrderNotesCard({ notes }: OrderNotesCardProps) {
                 ) : (
                     <div className="space-y-4">
                         {notes.map((note) => (
-                            <div key={note.id} className="text-sm">
-                                <p>{note.content}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    Par {note.user.email} • {formatDateFR(new Date(note.createdAt))}
-                                </p>
-                            </div>
+                            <NoteItem key={note.id} note={note} />
                         ))}
                     </div>
                 )}

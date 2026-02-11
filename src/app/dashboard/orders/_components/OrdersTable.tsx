@@ -8,13 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
-import { Eye } from "lucide-react";
+import { Eye, Truck, Store } from "lucide-react";
 import { OrderStatusBadge } from "@/components/badges/order-status-badge";
 
 type OrderRow = {
     id: string;
     reference?: string | null;
     status: string;
+    shippingType?: string | null;
     createdAt: string;
     articlesCount: number;
     totalCents: number;
@@ -45,9 +46,16 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                             <div key={o.id} className="rounded-lg border bg-card p-4 shadow-sm flex flex-col justify-between">
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
-                                        <Link href={href} className="font-mono font-bold text-blue-600">
-                                            {displayRef}
-                                        </Link>
+                                        <div className="flex items-center gap-2">
+                                            <Link href={href} className="font-mono font-bold text-blue-600">
+                                                {displayRef}
+                                            </Link>
+                                            {o.shippingType === 'Retrait Atelier' ? (
+                                                <Store className="h-4 w-4 text-blue-600" aria-label="Retrait atelier" />
+                                            ) : (
+                                                <Truck className="h-4 w-4 text-orange-600" aria-label="Livraison" />
+                                            )}
+                                        </div>
                                         <OrderStatusBadge status={o.status} />
                                     </div>
 
@@ -106,14 +114,29 @@ export function OrdersTable({ orders }: { orders: OrderRow[] }) {
                                     <TableRow key={o.id} className="hover:bg-muted/30 transition-colors">
                                         {/* Commande + nb articles */}
                                         <TableCell className="align-top">
-                                            <Link href={href} className="block">
-                                                <div className="font-mono font-medium text-blue-600 hover:text-blue-800">
+                                            <div className="flex items-center gap-2">
+                                                <Link href={href} className="font-mono font-medium text-blue-600 hover:text-blue-800 block">
                                                     {displayRef}
-                                                </div>
-                                                <div className="mt-0.5 text-xs text-muted-foreground tabular-nums">
-                                                    {o.articlesCount} article{o.articlesCount > 1 ? "s" : ""}
-                                                </div>
-                                            </Link>
+                                                </Link>
+                                                {o.shippingType === 'Retrait Atelier' ? (
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <Store className="h-4 w-4 text-blue-600" />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>Retrait atelier</TooltipContent>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <Truck className="h-4 w-4 text-orange-600" />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>Livraison</TooltipContent>
+                                                    </Tooltip>
+                                                )}
+                                            </div>
+                                            <div className="mt-0.5 text-xs text-muted-foreground tabular-nums">
+                                                {o.articlesCount} article{o.articlesCount > 1 ? "s" : ""}
+                                            </div>
                                         </TableCell>
 
                                         {/* Client */}

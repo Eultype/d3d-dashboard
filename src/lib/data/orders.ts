@@ -125,6 +125,7 @@ export async function getOrdersAndStats(query?: string, page: number = 1, status
             id: o.id,
             reference: o.reference,
             status: o.status,
+            shippingType: o.shippingType,
             createdAt: o.createdAt.toISOString(),
             articlesCount,
             totalCents: totalCents,

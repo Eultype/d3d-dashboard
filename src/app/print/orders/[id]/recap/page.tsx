@@ -25,6 +25,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
             customer: true,
             items: { include: { product: true }, orderBy: { createdAt: "asc" } },
             files: true,
+            notes: { include: { user: true }, orderBy: { createdAt: 'desc' } },
         },
     });
 
@@ -216,50 +217,71 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                         </div>
                     </div>
 
-                    {/* Totals */}
-                    <div className="mt-6 flex justify-end">
-                        <div className="w-full sm:max-w-sm rounded-2xl bg-slate-50 border border-neutral-100 p-4">
-                            <div className="space-y-2 text-sm">
-                                {/* Calculs des bases HT pour la clarté */}
-                                {(() => {
-                                    const ratio = 1 + taxRate / 100;
-                                    const sousTotalHT = sousTotalCents / ratio;
-                                    const remiseHT = discountAmountCents / ratio;
-                                    const livraisonHT = livraisonCents / ratio;
-
-                                    return (
-                                        <>
-                                            <div className="flex items-center justify-between text-neutral-500">
-                                                <span>Sous-total HT</span>
-                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(sousTotalHT))}</span>
+                    {/* Notes & Totals */}
+                    <div className="mt-6 flex flex-col sm:flex-row gap-6 items-start">
+                        {/* Notes */}
+                        <div className="flex-1 w-full">
+                            <div className="rounded-2xl border border-neutral-100 p-4 bg-neutral-50/50 h-full">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">Notes</p>
+                                {order.notes.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {order.notes.map((note) => (
+                                            <div key={note.id} className="text-sm border-l-2 border-neutral-200 pl-3">
+                                                <p className="whitespace-pre-wrap text-slate-600 italic">{note.content}</p>
                                             </div>
-                                            
-                                            {discountAmountCents > 0 && (
-                                                <div className="flex items-center justify-between text-green-600 font-medium">
-                                                    <span>Remise HT</span>
-                                                    <span className="tabular-nums">-{formatEUR(Math.round(remiseHT))}</span>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-neutral-400 italic">Aucune note.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Totals */}
+                        <div className="w-full sm:max-w-sm shrink-0">
+                            <div className="rounded-2xl bg-slate-50 border border-neutral-100 p-4">
+                                <div className="space-y-2 text-sm">
+                                    {/* Calculs des bases HT pour la clarté */}
+                                    {(() => {
+                                        const ratio = 1 + taxRate / 100;
+                                        const sousTotalHT = sousTotalCents / ratio;
+                                        const remiseHT = discountAmountCents / ratio;
+                                        const livraisonHT = livraisonCents / ratio;
+
+                                        return (
+                                            <>
+                                                <div className="flex items-center justify-between text-neutral-500">
+                                                    <span>Sous-total HT</span>
+                                                    <span className="tabular-nums font-medium">{formatEUR(Math.round(sousTotalHT))}</span>
                                                 </div>
-                                            )}
+                                                
+                                                {discountAmountCents > 0 && (
+                                                    <div className="flex items-center justify-between text-green-600 font-medium">
+                                                        <span>Remise HT</span>
+                                                        <span className="tabular-nums">-{formatEUR(Math.round(remiseHT))}</span>
+                                                    </div>
+                                                )}
 
-                                            <div className="flex items-center justify-between text-neutral-500">
-                                                <span>Livraison HT</span>
-                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(livraisonHT))}</span>
-                                            </div>
+                                                <div className="flex items-center justify-between text-neutral-500">
+                                                    <span>Livraison HT</span>
+                                                    <span className="tabular-nums font-medium">{formatEUR(Math.round(livraisonHT))}</span>
+                                                </div>
 
-                                            <div className="flex items-center justify-between text-neutral-500">
-                                                <span>TVA ({taxRate}%)</span>
-                                                <span className="tabular-nums font-medium">{formatEUR(Math.round(tvaCents))}</span>
-                                            </div>
+                                                <div className="flex items-center justify-between text-neutral-500">
+                                                    <span>TVA ({taxRate}%)</span>
+                                                    <span className="tabular-nums font-medium">{formatEUR(Math.round(tvaCents))}</span>
+                                                </div>
 
-                                            <div className="my-3 h-px bg-neutral-200" />
+                                                <div className="my-3 h-px bg-neutral-200" />
 
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-lg font-bold text-slate-900">Total TTC</span>
-                                                <span className="text-2xl font-black text-slate-900 tabular-nums">{formatEUR(totalCents)}</span>
-                                            </div>
-                                        </>
-                                    );
-                                })()}
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-lg font-bold text-slate-900">Total TTC</span>
+                                                    <span className="text-2xl font-black text-slate-900 tabular-nums">{formatEUR(totalCents)}</span>
+                                                </div>
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </div>
                     </div>

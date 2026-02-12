@@ -290,7 +290,7 @@ export default async function RecapPage({ params }: { params: Promise<{ id?: str
                     <footer className="mt-8 space-y-4">
                         <div className="h-px bg-neutral-100" />
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-neutral-400 font-medium uppercase tracking-widest">
-                            <p>D3D Crystal SPRL • BE0000.000.000</p>
+                            <p>IMMOGER S.A. • BE0442.502.023</p>
                             <p className="sm:text-right">
                                 Page 1 / 1 • Généré le {formatDateFR(new Date())}
                             </p>
